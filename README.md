@@ -1,152 +1,285 @@
-# Tricia - Pilot App
+# Tricia Web - AI Assistant Interface
 
-<!--BEGIN_DESCRIPTION-->
-The Tricia Pilot App is a Next.js application that enables users to interact with Tricia, an AI-powered conversational assistant, through voice and chat. Users authenticate with a simple password, and the app automatically connects to a LiveKit WebRTC session for real-time audio/video communication with Tricia.
-<!--END_DESCRIPTION-->
+![Next.js](https://img.shields.io/badge/Next.js-14.0.4-black?logo=next.js)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.3.3-blue?logo=typescript)
+![LiveKit](https://img.shields.io/badge/LiveKit-2.5.1-FF5B00)
+![Vercel](https://img.shields.io/badge/Vercel-Deployed-black?logo=vercel)
 
-## Overview
+A modern web interface for interacting with Tricia, an AI-powered conversational assistant. Built on top of LiveKit's real-time communication infrastructure, this application provides seamless voice, video, and chat capabilities.
 
-This application transforms the LiveKit Agents Playground into a dedicated interface for Tricia, featuring:
-- **Simple Password Authentication**: Quick access with password protection
-- **Automatic Room Connection**: No manual URL/token entry required
-- **Seamless Integration**: Direct connection to Tricia backend API
-- **Real-time Communication**: Voice, video, and chat capabilities powered by LiveKit
+## 🏗️ Architecture Overview
 
-## Prerequisites
-
-1. **Tricia Backend API**: Access to the Tricia backend API
-2. **Node.js**: Version 18 or higher
-
-## Getting Started
-
-### 1. Install Dependencies
-
-```bash
-npm install
-```
-
-### 2. Environment Configuration
-
-Create a `.env.local` file by copying the example:
-
-```bash
-cp env.example .env.local
-```
-
-Then update the values in `.env.local` with your actual credentials:
-
-- **Supabase**: Update all Supabase-related URLs and keys
-- **Postgres**: Update database connection strings
-- **Tricia API**: Update the agent ID and bearer token if needed
-- **LiveKit**: Update if using development/fallback mode
-
-Note: The current implementation uses hardcoded values for the Tricia connection. To use environment variables instead, you would need to update the code in `src/hooks/useConnection.tsx` and `src/pages/api/tricia-proxy.ts`.
-
-### 3. Run the Development Server
-
-```bash
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) to see the app.
-
-## Usage
-
-1. **Access the App**: Navigate to the application URL
-2. **Enter Password**: Use the password "tricia" to authenticate
-3. **Connect**: Click the Connect button to start your session with Tricia
-4. **Interact**: Use voice, video, or chat to communicate with your AI assistant
-
-## Key Features
-
-### Authentication Flow
-- Simple password-based authentication
-- Password hint provided for ease of use
-- Secure connection to Tricia backend
-
-### Connection Management
-- Automatic API integration with Tricia backend
-- LiveKit WebRTC session management
-- Real-time audio/video streaming
-
-### User Interface
-- Clean, modern design with Tricia branding
-- Responsive layout for desktop and mobile
-- Intuitive controls for audio/video settings
-
-## API Integration
-
-The app connects to the Tricia API at `https://api.heytricia.ai/api/v1` with:
-- Endpoint: `/chats` (POST)
-- Authentication: Bearer token
-- Creates chat sessions and retrieves LiveKit connection details
-
-## Deployment
-
-### Vercel Deployment
-
-1. **Push to GitHub**: Ensure your code is in a GitHub repository
-2. **Import to Vercel**: Connect your GitHub repo to Vercel
-3. **Configure Environment**: Add any required environment variables
-4. **Deploy**: Vercel will automatically build and deploy your app
-
-### Production Considerations
-- Ensure HTTPS is enabled for secure WebRTC connections
-- Configure CORS if needed for API access
-- Monitor API availability and handle errors gracefully
-
-## Troubleshooting
-
-### Common Issues
-
-1. **API Connection Errors**:
-   - Check if the Tricia API is accessible
-   - Verify the API endpoint and authentication
-   - Check browser console for detailed error messages
-
-2. **WebRTC Issues**:
-   - Ensure microphone/camera permissions are granted
-   - Check firewall settings for WebRTC connections
-   - Try using a different browser if issues persist
-
-3. **Password Authentication**:
-   - Password is case-insensitive
-   - Default password is "tricia"
-
-## Development
+### Technology Stack
+- **Frontend Framework**: Next.js 14 with TypeScript
+- **Real-time Communication**: LiveKit WebRTC
+- **Styling**: Tailwind CSS with custom components
+- **State Management**: React Context API + Hooks
+- **Deployment**: Vercel
+- **API Integration**: Tricia Backend API
 
 ### Project Structure
-
 ```
 src/
-├── components/
-│   ├── PlaygroundConnect.tsx (authentication UI)
-│   ├── playground/
-│   │   ├── Playground.tsx
-│   │   └── PlaygroundHeader.tsx (Tricia branding)
-│   └── chat/
-├── hooks/
-│   ├── useConnection.tsx (Tricia API integration)
-│   └── useConfig.tsx
-├── pages/
-│   ├── index.tsx
-│   └── api/
-│       └── tricia-proxy.ts (CORS proxy for API)
-└── styles/
+├── components/          # React components
+│   ├── playground/      # Main app interface components
+│   ├── chat/           # Chat functionality
+│   ├── config/         # Configuration UI components
+│   └── toast/          # Notification system
+├── hooks/              # Custom React hooks
+│   ├── useConnection   # WebRTC connection management
+│   └── useConfig       # App configuration
+├── pages/              # Next.js pages
+│   ├── api/           # API routes (including CORS proxy)
+│   └── index.tsx      # Main application page
+├── styles/            # Global styles
+└── lib/              # Utility functions
 ```
+
+## 🚀 Getting Started for Developers
+
+### Prerequisites
+- Node.js 18+ and npm
+- Access to Vercel team (for deployment)
+- Access to Tricia backend API credentials
+
+### Local Development Setup
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/Tricia-Inc/Web.git
+   cd Web
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Get environment variables from Vercel**
+   
+   Since you're part of the Vercel team, pull the environment variables:
+   ```bash
+   vercel env pull .env.local
+   ```
+   
+   This will download all production environment variables to your local `.env.local` file.
+
+4. **Verify your `.env.local`**
+   
+   Ensure these critical variables are present:
+   ```env
+   # Tricia API (Required)
+   NEXT_PUBLIC_TRICIA_BASE_URL=https://api.heytricia.ai/api/v1
+   NEXT_PUBLIC_TRICIA_AGENT_ID=<agent-id>
+   NEXT_PUBLIC_TRICIA_USER_ID=<user-id>
+   TRICIA_API_BEARER_TOKEN=<bearer-token>
+   
+   # Optional: LiveKit fallback
+   LIVEKIT_API_KEY=<if-using-env-mode>
+   LIVEKIT_API_SECRET=<if-using-env-mode>
+   NEXT_PUBLIC_LIVEKIT_URL=<if-using-env-mode>
+   ```
+
+5. **Run the development server**
+   ```bash
+   npm run dev
+   ```
+   
+   Open [http://localhost:8005](http://localhost:8005) (note: custom port 8005)
+
+## 🔑 Key Features & Implementation Details
+
+### Authentication Flow
+- **Password-based**: Simple password authentication (default: "tricia")
+- **Implementation**: `src/components/PlaygroundConnect.tsx`
+- **No database required**: Authentication is handled client-side for simplicity
+
+### Connection Management
+- **Automatic connection**: Connects to Tricia backend upon authentication
+- **WebRTC session**: Managed via LiveKit SDK
+- **Implementation**: `src/hooks/useConnection.tsx`
+- **Connection modes**:
+  - `tricia`: Production mode - connects to Tricia API
+  - `env`: Development mode - uses LiveKit credentials from env
+  - `manual`: Debug mode - manual URL/token entry
+
+### API Integration
+- **Tricia Backend**: `POST /chats` endpoint creates WebRTC sessions
+- **CORS Proxy**: `/api/tricia-proxy` handles browser CORS restrictions
+- **Response format**:
+  ```json
+  {
+    "participant_token": "jwt-token",
+    "server_url": "wss://livekit-server.com"
+  }
+  ```
+
+### Real-time Features
+- **Voice communication**: Full-duplex audio with echo cancellation
+- **Video streaming**: Agent video display with configurable quality
+- **Chat interface**: Real-time transcription display
+- **RPC capabilities**: Remote procedure calls to agent
+
+### UI/UX Customization
+- **Theme colors**: 8 pre-defined color schemes
+- **Responsive design**: Desktop and mobile optimized
+- **Settings panel**: Runtime configuration options
+- **Audio visualization**: Real-time audio level indicators
+
+## 🛠️ Development Workflow
 
 ### Making Changes
 
-1. **Branding**: Update logos and colors in `PlaygroundHeader.tsx`
-2. **Authentication**: Modify password logic in `PlaygroundConnect.tsx`
-3. **API Integration**: Update connection logic in `useConnection.tsx`
+1. **UI Components**
+   - Modify components in `src/components/`
+   - Use Tailwind CSS for styling
+   - Follow existing component patterns
 
-## Support
+2. **Branding**
+   - Logo: Update in `src/components/playground/PlaygroundHeader.tsx`
+   - Colors: Modify theme options in `src/pages/index.tsx`
+   - Title/Meta: Update in `src/hooks/useConfig.tsx`
 
-For questions or issues:
-- Tricia Backend API: Contact your API administrator
-- LiveKit Documentation: [https://docs.livekit.io](https://docs.livekit.io)
+3. **API Integration**
+   - Connection logic: `src/hooks/useConnection.tsx`
+   - Proxy endpoints: `src/pages/api/tricia-proxy.ts`
+   - Add new API calls as needed
+
+4. **Testing Locally**
+   ```bash
+   # Run with hot reload
+   npm run dev
+   
+   # Test production build
+   npm run build
+   npm start
+   
+   # Lint code
+   npm run lint
+   ```
+
+## 📦 Deployment
+
+### Automatic Deployment (Recommended)
+Every push to `main` branch automatically deploys to Vercel.
+
+### Manual Deployment
+```bash
+# Deploy to production
+vercel --prod
+
+# Deploy preview
+vercel
+```
+
+### Environment Variable Management
+
+**Update environment variables:**
+```bash
+# Pull latest from Vercel
+vercel env pull .env.local
+
+# Push local changes to Vercel
+./push-env-to-vercel.sh
+
+# Or use Vercel dashboard
+# Project Settings → Environment Variables
+```
+
+**Required environment variables:**
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `NEXT_PUBLIC_TRICIA_BASE_URL` | Tricia API base URL | ✅ |
+| `NEXT_PUBLIC_TRICIA_AGENT_ID` | Agent identifier | ✅ |
+| `NEXT_PUBLIC_TRICIA_USER_ID` | User identifier | ✅ |
+| `TRICIA_API_BEARER_TOKEN` | API authentication token | ✅ |
+| `NEXT_PUBLIC_SUPABASE_*` | Supabase config (if using) | ❌ |
+| `LIVEKIT_*` | LiveKit config (dev mode) | ❌ |
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+1. **"NotAllowedError: A user gesture is required"**
+   - Browser security requires user interaction for media access
+   - Solution: Click "Enable audio playback" button when prompted
+
+2. **CORS errors with API**
+   - Use the proxy endpoint: `/api/tricia-proxy`
+   - Ensure `TRICIA_API_BEARER_TOKEN` is set
+
+3. **WebRTC connection failures**
+   - Check browser console for detailed errors
+   - Verify firewall allows WebRTC traffic
+   - Test with different browser/network
+
+4. **Build failures on Vercel**
+   - Check all `NEXT_PUBLIC_*` variables are set
+   - Review build logs in Vercel dashboard
+
+### Debug Mode
+Add `#debug=1` to URL for additional logging and manual connection options.
+
+## 🔧 Advanced Configuration
+
+### Custom Deployment
+To deploy to your own infrastructure:
+
+1. Build the application:
+   ```bash
+   npm run build
+   ```
+
+2. The build output is in `.next/` directory
+
+3. Deploy using Node.js:
+   ```bash
+   npm start
+   ```
+
+4. Or use Docker:
+   ```dockerfile
+   FROM node:18-alpine
+   WORKDIR /app
+   COPY package*.json ./
+   RUN npm ci --only=production
+   COPY .next ./.next
+   COPY public ./public
+   EXPOSE 3000
+   CMD ["npm", "start"]
+   ```
+
+### Performance Optimization
+- **Dynamic imports**: Heavy components are lazy-loaded
+- **Image optimization**: Next.js Image component used
+- **API caching**: Consider implementing SWR for API calls
+- **WebRTC optimization**: Adaptive bitrate enabled by default
+
+## 📚 Additional Resources
+
+- **LiveKit Documentation**: [https://docs.livekit.io](https://docs.livekit.io)
+- **Next.js Documentation**: [https://nextjs.org/docs](https://nextjs.org/docs)
+- **Tailwind CSS**: [https://tailwindcss.com/docs](https://tailwindcss.com/docs)
+
+## 🤝 Contributing
+
+1. Create a feature branch from `main`
+2. Make your changes
+3. Test thoroughly (including mobile)
+4. Create a pull request
+5. Ensure CI checks pass
+6. Request review from team
+
+### Code Style
+- TypeScript strict mode enabled
+- ESLint configuration included
+- Prettier for formatting
+- Follow existing patterns
+
+## 📄 License
+
+Proprietary - Tricia Inc. All rights reserved.
 
 ---
 
-Built with ❤️ using Next.js and LiveKit
+Built with ❤️ by the Tricia team using Next.js, LiveKit, and modern web technologies.

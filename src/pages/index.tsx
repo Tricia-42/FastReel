@@ -88,11 +88,11 @@ export function HomeInner() {
         <meta name="apple-mobile-web-app-status-bar-style" content="black" />
         <meta
           property="og:title"
-          content="Tricia - AI Assistant"
+          content="Tricia - Memory Guide"
         />
         <meta
           property="og:description"
-          content="Your AI-powered conversational assistant"
+          content="Capture your stories with guided conversations"
         />
         <meta
           property="og:image"
@@ -100,7 +100,7 @@ export function HomeInner() {
         />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/favicon.png" />
       </Head>
       <main className="relative flex flex-col justify-center px-4 items-center h-full w-full bg-black repeating-square-background">
         <AnimatePresence>

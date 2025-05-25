@@ -1,7 +1,7 @@
 {
   "name": "tricia-pilot-app",
   "version": "0.1.0",
-  "description": "Tricia AI Assistant - Pilot Application",
+  "description": "Tricia - Guided memory capture through conversation",
   "private": true,
   "scripts": {
     "dev": "next dev -p 8005",

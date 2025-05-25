@@ -40,8 +40,8 @@ export const PlaygroundConnect = ({
       <div className="flex flex-col items-center gap-8 p-8 w-full max-w-md">
         <div className="flex flex-col items-center gap-3">
           {/* Title */}
-          <h1 className="text-3xl font-semibold text-white">Talk to Tricia</h1>
-          <p className="text-gray-400 text-center">Your AI-powered conversational assistant</p>
+          <h1 className="text-3xl font-semibold text-white">Ready to meet Tricia?</h1>
+          <p className="text-gray-400 text-center">Start your guided memory journey</p>
         </div>
 
         {/* Form */}

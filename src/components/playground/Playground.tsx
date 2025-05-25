@@ -30,6 +30,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import tailwindTheme from "../../lib/tailwindTheme.preval";
 import { EditableNameValueRow } from "@/components/config/NameValueRow";
+import { JournalDisplay } from "@/components/playground/JournalDisplay";
 
 export interface PlaygroundMeta {
   name: string;
@@ -275,7 +276,14 @@ export default function Playground({
             />
           </div>
           <div className="flex flex-col gap-2 mt-4">
-            <div className="text-xs text-gray-500 mt-2">RPC Method</div>
+            <div className="text-xs text-gray-500 mt-2">Journal Tools (RPC Methods)</div>
+            <div className="flex flex-col gap-1 mb-2 text-xs text-gray-400">
+              <div>• add_memory - Capture memory fragments</div>
+              <div>• update_journal - Generate journal entry</div>
+              <div>• save_journal - Save the journal</div>
+              <div>• switch_agent - Change personality style</div>
+            </div>
+            <div className="text-xs text-gray-500 mt-2">Custom RPC Method</div>
             <input
               type="text"
               value={rpcMethod}
@@ -459,6 +467,18 @@ export default function Playground({
   }
 
   mobileTabs.push({
+    title: "Journal",
+    content: (
+      <PlaygroundTile
+        className="w-full h-full grow"
+        childrenClassName="h-full"
+      >
+        <JournalDisplay agentVideoTrack={agentVideoTrack} />
+      </PlaygroundTile>
+    ),
+  });
+
+  mobileTabs.push({
     title: "Settings",
     content: (
       <PlaygroundTile
@@ -531,6 +551,15 @@ export default function Playground({
             {chatTileContent}
           </PlaygroundTile>
         )}
+        
+        {/* Journal tile for desktop */}
+        <PlaygroundTile
+          title="Journal"
+          className="h-full grow basis-1/4 hidden lg:flex"
+        >
+          <JournalDisplay agentVideoTrack={agentVideoTrack} />
+        </PlaygroundTile>
+        
         <PlaygroundTile
           padding={false}
           backgroundColor="gray-950"

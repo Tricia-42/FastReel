@@ -40,8 +40,8 @@ export type UserSettings = {
 
 // Fallback if NEXT_PUBLIC_APP_CONFIG is not set
 const defaultConfig: AppConfig = {
-  title: "Tricia - Pilot App",
-  description: "Your AI-powered conversational assistant",
+  title: "Tricia - Memory Guide",
+  description: "Capture your stories with guided conversations",
   video_fit: "cover",
   settings: {
     editable: false, // Disable manual settings for production

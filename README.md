@@ -1,11 +1,11 @@
-# Tricia Web - AI Assistant Interface
+# Tricia Web - Memory Guide Interface
 
 ![Next.js](https://img.shields.io/badge/Next.js-14.0.4-black?logo=next.js)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.3.3-blue?logo=typescript)
 ![LiveKit](https://img.shields.io/badge/LiveKit-2.5.1-FF5B00)
 ![Vercel](https://img.shields.io/badge/Vercel-Deployed-black?logo=vercel)
 
-A modern web interface for interacting with Tricia, an AI-powered conversational assistant. Built on top of LiveKit's real-time communication infrastructure, this application provides seamless voice, video, and chat capabilities.
+A modern web interface for Tricia, your personal memory guide. Built on LiveKit's real-time communication infrastructure, this application provides seamless voice, video, and chat capabilities for capturing and preserving your stories through guided conversations.
 
 ## 🏗️ Architecture Overview
 

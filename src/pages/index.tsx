@@ -61,7 +61,7 @@ export function HomeInner() {
   const [isDisconnecting, setIsDisconnecting] = useState(false);
 
   const handleConnect = useCallback(
-    async (newMode: ConnectionMode) => {
+    async (mode: ConnectionMode) => {
       // If already connected, disconnect first
       if (shouldConnect && !isDisconnecting) {
         setIsDisconnecting(true);
@@ -70,7 +70,7 @@ export function HomeInner() {
         await new Promise(resolve => setTimeout(resolve, 500));
         setIsDisconnecting(false);
       }
-      await connect(newMode);
+      connect(mode);
     },
     [connect, disconnect, shouldConnect, isDisconnecting]
   );

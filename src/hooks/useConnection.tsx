@@ -192,10 +192,6 @@ export const ConnectionProvider = ({
             throw new Error('Invalid response from Tricia API - missing LiveKit credentials');
           }
           
-          // Add a small delay to ensure agent dispatch has time to process
-          // This helps with reconnection scenarios where the agent might not dispatch properly
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          
         } catch (error) {
           console.error('Tricia connection error:', error);
           

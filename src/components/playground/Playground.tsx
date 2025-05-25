@@ -30,7 +30,6 @@ import { QRCodeSVG } from "qrcode.react";
 import { ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import tailwindTheme from "../../lib/tailwindTheme.preval";
 import { EditableNameValueRow } from "@/components/config/NameValueRow";
-import { JournalDisplay } from "@/components/playground/JournalDisplay";
 
 export interface PlaygroundMeta {
   name: string;
@@ -41,6 +40,15 @@ export interface PlaygroundProps {
   logo?: ReactNode;
   themeColors: string[];
   onConnect: (connect: boolean) => void;
+}
+
+// Journal content interface
+interface JournalContent {
+  title?: string;
+  text?: string;
+  images?: string[];
+  video?: string;
+  createdAt?: string;
 }
 
 const headerHeight = 56;
@@ -63,6 +71,9 @@ export default function Playground({
 
   const [rpcMethod, setRpcMethod] = useState("");
   const [rpcPayload, setRpcPayload] = useState("");
+  
+  // State for journal content
+  const [journalContent, setJournalContent] = useState<JournalContent | null>(null);
 
   useEffect(() => {
     if (roomState === ConnectionState.Connected) {
@@ -121,14 +132,15 @@ export default function Playground({
 
     const disconnectedContent = (
       <div className="flex items-center justify-center text-gray-700 text-center w-full h-full">
-        No video track. Connect to get started.
+        Connect to start your memory journey
       </div>
     );
 
     const loadingContent = (
       <div className="flex flex-col items-center justify-center gap-2 text-gray-700 text-center h-full w-full">
         <LoadingSVG />
-        Waiting for video track
+        <div className="text-sm">Waiting for journal generation</div>
+        <div className="text-xs mt-2">Ask Tricia to capture your memories</div>
       </div>
     );
 
@@ -139,9 +151,53 @@ export default function Playground({
       />
     );
 
+    const journalDisplayContent = (
+      <div className="flex flex-col h-full w-full overflow-y-auto p-6 text-white">
+        {journalContent?.title && (
+          <h2 className="text-2xl font-bold mb-4">{journalContent.title}</h2>
+        )}
+        
+        {journalContent?.text && (
+          <div className="prose prose-invert max-w-none mb-4">
+            <p className="whitespace-pre-wrap">{journalContent.text}</p>
+          </div>
+        )}
+        
+        {journalContent?.images && journalContent.images.length > 0 && (
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            {journalContent.images.map((imageUrl, index) => (
+              <img
+                key={index}
+                src={imageUrl}
+                alt={`Journal image ${index + 1}`}
+                className="w-full h-auto rounded-lg"
+              />
+            ))}
+          </div>
+        )}
+        
+        {journalContent?.video && (
+          <video
+            src={journalContent.video}
+            controls
+            className="w-full max-w-2xl mx-auto rounded-lg"
+          />
+        )}
+        
+        {journalContent?.createdAt && (
+          <p className="text-sm text-gray-400 mt-4">
+            Created: {new Date(journalContent.createdAt).toLocaleString()}
+          </p>
+        )}
+      </div>
+    );
+
     let content = null;
     if (roomState === ConnectionState.Disconnected) {
       content = disconnectedContent;
+    } else if (journalContent) {
+      // Show journal content if available
+      content = journalDisplayContent;
     } else if (agentVideoTrack) {
       content = videoContent;
     } else {
@@ -153,7 +209,7 @@ export default function Playground({
         {content}
       </div>
     );
-  }, [agentVideoTrack, config, roomState]);
+  }, [agentVideoTrack, config, roomState, journalContent]);
 
   useEffect(() => {
     document.body.style.setProperty(
@@ -232,6 +288,18 @@ export default function Playground({
         payload: rpcPayload,
       });
       console.log('RPC response:', response);
+      
+      // Handle journal responses
+      if (rpcMethod === 'update_journal' || rpcMethod === 'save_journal') {
+        try {
+          const data = typeof response === 'string' ? JSON.parse(response) : response;
+          if (data.journal || data.content) {
+            setJournalContent(data.journal || data.content);
+          }
+        } catch (e) {
+          console.error('Failed to parse journal response:', e);
+        }
+      }
     } catch (e) {
       console.error('RPC call failed:', e);
     }
@@ -312,6 +380,15 @@ export default function Playground({
             >
               Perform RPC Call
             </button>
+            
+            {journalContent && (
+              <button
+                onClick={() => setJournalContent(null)}
+                className={`mt-2 px-2 py-1 rounded-sm text-xs bg-gray-600 hover:bg-gray-700 text-white`}
+              >
+                Clear Journal Display
+              </button>
+            )}
           </div>
         </ConfigurationPanelItem>
         <ConfigurationPanelItem title="Status">
@@ -428,12 +505,13 @@ export default function Playground({
     rpcMethod,
     rpcPayload,
     handleRpcCall,
+    journalContent,
   ]);
 
   let mobileTabs: PlaygroundTab[] = [];
   if (config.settings.outputs.video) {
     mobileTabs.push({
-      title: "Video",
+      title: "Journal",
       content: (
         <PlaygroundTile
           className="w-full h-full grow"
@@ -465,18 +543,6 @@ export default function Playground({
       content: chatTileContent,
     });
   }
-
-  mobileTabs.push({
-    title: "Journal",
-    content: (
-      <PlaygroundTile
-        className="w-full h-full grow"
-        childrenClassName="h-full"
-      >
-        <JournalDisplay agentVideoTrack={agentVideoTrack} />
-      </PlaygroundTile>
-    ),
-  });
 
   mobileTabs.push({
     title: "Settings",
@@ -525,7 +591,7 @@ export default function Playground({
         >
           {config.settings.outputs.video && (
             <PlaygroundTile
-              title="Video"
+              title="Journal"
               className="w-full h-full grow"
               childrenClassName="justify-center"
             >
@@ -551,14 +617,6 @@ export default function Playground({
             {chatTileContent}
           </PlaygroundTile>
         )}
-        
-        {/* Journal tile for desktop */}
-        <PlaygroundTile
-          title="Journal"
-          className="h-full grow basis-1/4 hidden lg:flex"
-        >
-          <JournalDisplay agentVideoTrack={agentVideoTrack} />
-        </PlaygroundTile>
         
         <PlaygroundTile
           padding={false}

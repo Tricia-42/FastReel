@@ -175,6 +175,14 @@ export const ConnectionProvider = ({
               if (tokenParts.length === 3) {
                 const payload = JSON.parse(atob(tokenParts[1]));
                 console.log('JWT room config:', payload.roomConfig);
+                console.log('JWT issuer (API Key):', payload.iss);
+                console.log('JWT video grant:', payload.video);
+                
+                // Extract LiveKit server from URL
+                const serverMatch = url.match(/wss:\/\/([^\/]+)/);
+                if (serverMatch) {
+                  console.log('LiveKit Server:', serverMatch[1]);
+                }
               }
             } catch (e) {
               console.log('Could not decode JWT for debugging');

@@ -2,18 +2,19 @@ import {
   LiveKitRoom,
   RoomAudioRenderer,
   StartAudio,
+  useConnectionState,
 } from "@livekit/components-react";
+import { ConnectionState } from "livekit-client";
 import { AnimatePresence, motion } from "framer-motion";
 import { Inter } from "next/font/google";
 import Head from "next/head";
 import { useCallback, useState } from "react";
 
-import { PlaygroundConnect } from "@/components/PlaygroundConnect";
 import Playground from "@/components/playground/Playground";
-import { PlaygroundToast, ToastType } from "@/components/toast/PlaygroundToast";
+import { PlaygroundToast } from "@/components/toast/PlaygroundToast";
 import { ConfigProvider, useConfig } from "@/hooks/useConfig";
 import { ConnectionMode, ConnectionProvider, useConnection } from "@/hooks/useConnection";
-import { useMemo } from "react";
+import { PlaygroundConnect } from "@/components/PlaygroundConnect";
 import { ToastProvider, useToast } from "@/components/toast/ToasterProvider";
 
 const themeColors = [
@@ -29,6 +30,18 @@ const themeColors = [
 
 const inter = Inter({ subsets: ["latin"] });
 
+// Component to conditionally render audio based on connection state
+function ConditionalAudio() {
+  const connectionState = useConnectionState();
+  
+  return (
+    <>
+      {connectionState === ConnectionState.Connected && <RoomAudioRenderer />}
+      <StartAudio label="Click to enable audio playback" />
+    </>
+  );
+}
+
 export default function Home() {
   return (
     <ToastProvider>
@@ -42,28 +55,25 @@ export default function Home() {
 }
 
 export function HomeInner() {
-  const { shouldConnect, wsUrl, token, mode, connect, disconnect } =
-    useConnection();
-  
-  const {config} = useConfig();
+  const { shouldConnect, wsUrl, token, mode, connect, disconnect } = useConnection();
+  const { config } = useConfig();
   const { toastMessage, setToastMessage } = useToast();
 
   const handleConnect = useCallback(
-    async (c: boolean, mode: ConnectionMode) => {
-      c ? connect(mode) : disconnect();
+    async (newMode: ConnectionMode) => {
+      await connect(newMode);
     },
-    [connect, disconnect]
+    [connect]
   );
 
-  const showPG = useMemo(() => {
-    if (process.env.NEXT_PUBLIC_LIVEKIT_URL) {
-      return true;
-    }
-    if(wsUrl) {
-      return true;
-    }
-    return false;
-  }, [wsUrl])
+  const handleDisconnect = useCallback(
+    (shouldStayConnected: boolean) => {
+      if (!shouldStayConnected) {
+        disconnect();
+      }
+    },
+    [disconnect]
+  );
 
   return (
     <>
@@ -77,8 +87,16 @@ export function HomeInner() {
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black" />
         <meta
+          property="og:title"
+          content="Tricia - AI Assistant"
+        />
+        <meta
+          property="og:description"
+          content="Your AI-powered conversational assistant"
+        />
+        <meta
           property="og:image"
-          content="https://livekit.io/images/og/agents-playground.png"
+          content="https://heytricia.ai/og-image.png"
         />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
@@ -97,7 +115,13 @@ export function HomeInner() {
             </motion.div>
           )}
         </AnimatePresence>
-        {showPG ? (
+        
+        {!shouldConnect ? (
+          <PlaygroundConnect
+            accentColor={config.settings.theme_color}
+            onConnectClicked={handleConnect}
+          />
+        ) : (
           <LiveKitRoom
             className="flex flex-col h-full w-full"
             serverUrl={wsUrl}
@@ -110,21 +134,10 @@ export function HomeInner() {
           >
             <Playground
               themeColors={themeColors}
-              onConnect={(c) => {
-                const m = process.env.NEXT_PUBLIC_LIVEKIT_URL ? "env" : mode;
-                handleConnect(c, m);
-              }}
+              onConnect={handleDisconnect}
             />
-            <RoomAudioRenderer />
-            <StartAudio label="Click to enable audio playback" />
+            <ConditionalAudio />
           </LiveKitRoom>
-        ) : (
-          <PlaygroundConnect
-            accentColor={themeColors[0]}
-            onConnectClicked={(mode) => {
-              handleConnect(true, mode);
-            }}
-          />
         )}
       </main>
     </>

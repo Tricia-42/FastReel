@@ -25,6 +25,7 @@ export const PlaygroundHeader = ({
   connectionState,
 }: PlaygroundHeader) => {
   const { config } = useConfig();
+  
   return (
     <div
       className={`flex gap-4 pt-4 text-${accentColor}-500 justify-between items-center shrink-0`}
@@ -34,7 +35,9 @@ export const PlaygroundHeader = ({
     >
       <div className="flex items-center gap-3 basis-2/3">
         <div className="flex lg:basis-1/2">
-          <a href="https://livekit.io">{logo ?? <LKLogo />}</a>
+          <a href="https://heytricia.ai" target="_blank" rel="noopener noreferrer">
+            {logo ?? <TriciaLogo />}
+          </a>
         </div>
         <div className="lg:basis-1/2 lg:text-center text-xs lg:text-base lg:font-semibold text-white">
           {title}
@@ -72,6 +75,27 @@ export const PlaygroundHeader = ({
     </div>
   );
 };
+
+const TriciaLogo = () => (
+  <div className="flex items-center gap-2">
+    <svg
+      width="32"
+      height="32"
+      viewBox="0 0 32 32"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <circle cx="16" cy="16" r="15" fill="currentColor" opacity="0.1" />
+      <circle cx="16" cy="16" r="12" fill="currentColor" opacity="0.2" />
+      <path
+        d="M16 8C16 8 12 10 12 16C12 22 16 24 16 24C16 24 20 22 20 16C20 10 16 8 16 8Z"
+        fill="currentColor"
+      />
+      <circle cx="16" cy="16" r="3" fill="white" />
+    </svg>
+    <span className="text-white font-semibold text-lg">Tricia</span>
+  </div>
+);
 
 const LKLogo = () => (
   <svg

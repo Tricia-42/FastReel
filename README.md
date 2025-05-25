@@ -1,83 +1,152 @@
-<!--BEGIN_BANNER_IMAGE-->
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="/.github/banner_dark.png">
-  <source media="(prefers-color-scheme: light)" srcset="/.github/banner_light.png">
-  <img style="width:100%;" alt="The LiveKit icon, the name of the repository and some sample code in the background." src="https://raw.githubusercontent.com/livekit/agent-playground/main/.github/banner_light.png">
-</picture>
-
-<!--END_BANNER_IMAGE-->
-
-# LiveKit Agents Playground
+# Tricia - Pilot App
 
 <!--BEGIN_DESCRIPTION-->
-The Agents Playground is designed for quickly prototyping with server side agents built with [LiveKit Agents Framework](https://github.com/livekit/agents). Easily tap into LiveKit WebRTC sessions and process or generate audio, video, and data streams.
-  The playground includes components to fully interact with any LiveKit agent, through video, audio and chat.
+The Tricia Pilot App is a Next.js application that enables users to interact with Tricia, an AI-powered conversational assistant, through voice and chat. Users authenticate with a simple password, and the app automatically connects to a LiveKit WebRTC session for real-time audio/video communication with Tricia.
 <!--END_DESCRIPTION-->
 
-## Docs and references
+## Overview
 
-Docs for how to get started with LiveKit agents at [https://docs.livekit.io/agents](https://docs.livekit.io/agents)
+This application transforms the LiveKit Agents Playground into a dedicated interface for Tricia, featuring:
+- **Simple Password Authentication**: Quick access with password protection
+- **Automatic Room Connection**: No manual URL/token entry required
+- **Seamless Integration**: Direct connection to Tricia backend API
+- **Real-time Communication**: Voice, video, and chat capabilities powered by LiveKit
 
-The repo containing the (server side) agent implementations (including example agents): [https://github.com/livekit/agents](https://github.com/livekit/agents)
+## Prerequisites
 
-## Try out a live version
+1. **Tricia Backend API**: Access to the Tricia backend API
+2. **Node.js**: Version 18 or higher
 
-You can try out a demo of the playground with [KITT](https://kitt.livekit.io) or the [hosted playground](https://agents-playground.livekit.io) for your own agents.
+## Getting Started
 
-## Setting up the playground locally
-
-1. Install dependencies
-
-```bash
-  npm install
-```
-
-2. Copy and rename the `.env.example` file to `.env.local` and fill in the necessary environment variables.
-
-```
-LIVEKIT_API_KEY=<your API KEY>
-LIVEKIT_API_SECRET=<Your API Secret>
-NEXT_PUBLIC_LIVEKIT_URL=wss://<Your Cloud URL>
-```
-
-3. Run the development server:
+### 1. Install Dependencies
 
 ```bash
-  npm run dev
+npm install
 ```
 
-4. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-5. If you haven't done so yet, start your agent (with the same project variables as in step 2.)
-6. Connect to a room and see your agent connecting to the playground
+### 2. Environment Configuration
 
-## Features
+Create a `.env.local` file by copying the example:
 
-- Render video, audio and chat from your agent
-- Send video, audio, or text to your agent
-- Configurable settings panel to work with your agent
+```bash
+cp env.example .env.local
+```
 
-## Notes
+Then update the values in `.env.local` with your actual credentials:
 
-- This playground is currently work in progress. There are known layout/responsive bugs and some features are under tested.
-- The playground was tested against the kitt example in `https://github.com/livekit/agents`.
-- Feel free to ask questions, request features in our [community slack](https://livekit.io/join-slack).
+- **Supabase**: Update all Supabase-related URLs and keys
+- **Postgres**: Update database connection strings
+- **Tricia API**: Update the agent ID and bearer token if needed
+- **LiveKit**: Update if using development/fallback mode
 
-## Known issues
+Note: The current implementation uses hardcoded values for the Tricia connection. To use environment variables instead, you would need to update the code in `src/hooks/useConnection.tsx` and `src/pages/api/tricia-proxy.ts`.
 
-- Layout can break on smaller screens.
-- Mobile device sizes not supported currently
+### 3. Run the Development Server
 
-<!--BEGIN_REPO_NAV-->
-<br/><table>
-<thead><tr><th colspan="2">LiveKit Ecosystem</th></tr></thead>
-<tbody>
-<tr><td>LiveKit SDKs</td><td><a href="https://github.com/livekit/client-sdk-js">Browser</a> · <a href="https://github.com/livekit/client-sdk-swift">iOS/macOS/visionOS</a> · <a href="https://github.com/livekit/client-sdk-android">Android</a> · <a href="https://github.com/livekit/client-sdk-flutter">Flutter</a> · <a href="https://github.com/livekit/client-sdk-react-native">React Native</a> · <a href="https://github.com/livekit/rust-sdks">Rust</a> · <a href="https://github.com/livekit/node-sdks">Node.js</a> · <a href="https://github.com/livekit/python-sdks">Python</a> · <a href="https://github.com/livekit/client-sdk-unity">Unity</a> · <a href="https://github.com/livekit/client-sdk-unity-web">Unity (WebGL)</a></td></tr><tr></tr>
-<tr><td>Server APIs</td><td><a href="https://github.com/livekit/node-sdks">Node.js</a> · <a href="https://github.com/livekit/server-sdk-go">Golang</a> · <a href="https://github.com/livekit/server-sdk-ruby">Ruby</a> · <a href="https://github.com/livekit/server-sdk-kotlin">Java/Kotlin</a> · <a href="https://github.com/livekit/python-sdks">Python</a> · <a href="https://github.com/livekit/rust-sdks">Rust</a> · <a href="https://github.com/agence104/livekit-server-sdk-php">PHP (community)</a> · <a href="https://github.com/pabloFuente/livekit-server-sdk-dotnet">.NET (community)</a></td></tr><tr></tr>
-<tr><td>UI Components</td><td><a href="https://github.com/livekit/components-js">React</a> · <a href="https://github.com/livekit/components-android">Android Compose</a> · <a href="https://github.com/livekit/components-swift">SwiftUI</a></td></tr><tr></tr>
-<tr><td>Agents Frameworks</td><td><a href="https://github.com/livekit/agents">Python</a> · <a href="https://github.com/livekit/agents-js">Node.js</a> · <b>Playground</b></td></tr><tr></tr>
-<tr><td>Services</td><td><a href="https://github.com/livekit/livekit">LiveKit server</a> · <a href="https://github.com/livekit/egress">Egress</a> · <a href="https://github.com/livekit/ingress">Ingress</a> · <a href="https://github.com/livekit/sip">SIP</a></td></tr><tr></tr>
-<tr><td>Resources</td><td><a href="https://docs.livekit.io">Docs</a> · <a href="https://github.com/livekit-examples">Example apps</a> · <a href="https://livekit.io/cloud">Cloud</a> · <a href="https://docs.livekit.io/home/self-hosting/deployment">Self-hosting</a> · <a href="https://github.com/livekit/livekit-cli">CLI</a></td></tr>
-</tbody>
-</table>
-<!--END_REPO_NAV-->
+```bash
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) to see the app.
+
+## Usage
+
+1. **Access the App**: Navigate to the application URL
+2. **Enter Password**: Use the password "tricia" to authenticate
+3. **Connect**: Click the Connect button to start your session with Tricia
+4. **Interact**: Use voice, video, or chat to communicate with your AI assistant
+
+## Key Features
+
+### Authentication Flow
+- Simple password-based authentication
+- Password hint provided for ease of use
+- Secure connection to Tricia backend
+
+### Connection Management
+- Automatic API integration with Tricia backend
+- LiveKit WebRTC session management
+- Real-time audio/video streaming
+
+### User Interface
+- Clean, modern design with Tricia branding
+- Responsive layout for desktop and mobile
+- Intuitive controls for audio/video settings
+
+## API Integration
+
+The app connects to the Tricia API at `https://api.heytricia.ai/api/v1` with:
+- Endpoint: `/chats` (POST)
+- Authentication: Bearer token
+- Creates chat sessions and retrieves LiveKit connection details
+
+## Deployment
+
+### Vercel Deployment
+
+1. **Push to GitHub**: Ensure your code is in a GitHub repository
+2. **Import to Vercel**: Connect your GitHub repo to Vercel
+3. **Configure Environment**: Add any required environment variables
+4. **Deploy**: Vercel will automatically build and deploy your app
+
+### Production Considerations
+- Ensure HTTPS is enabled for secure WebRTC connections
+- Configure CORS if needed for API access
+- Monitor API availability and handle errors gracefully
+
+## Troubleshooting
+
+### Common Issues
+
+1. **API Connection Errors**:
+   - Check if the Tricia API is accessible
+   - Verify the API endpoint and authentication
+   - Check browser console for detailed error messages
+
+2. **WebRTC Issues**:
+   - Ensure microphone/camera permissions are granted
+   - Check firewall settings for WebRTC connections
+   - Try using a different browser if issues persist
+
+3. **Password Authentication**:
+   - Password is case-insensitive
+   - Default password is "tricia"
+
+## Development
+
+### Project Structure
+
+```
+src/
+├── components/
+│   ├── PlaygroundConnect.tsx (authentication UI)
+│   ├── playground/
+│   │   ├── Playground.tsx
+│   │   └── PlaygroundHeader.tsx (Tricia branding)
+│   └── chat/
+├── hooks/
+│   ├── useConnection.tsx (Tricia API integration)
+│   └── useConfig.tsx
+├── pages/
+│   ├── index.tsx
+│   └── api/
+│       └── tricia-proxy.ts (CORS proxy for API)
+└── styles/
+```
+
+### Making Changes
+
+1. **Branding**: Update logos and colors in `PlaygroundHeader.tsx`
+2. **Authentication**: Modify password logic in `PlaygroundConnect.tsx`
+3. **API Integration**: Update connection logic in `useConnection.tsx`
+
+## Support
+
+For questions or issues:
+- Tricia Backend API: Contact your API administrator
+- LiveKit Documentation: [https://docs.livekit.io](https://docs.livekit.io)
+
+---
+
+Built with ❤️ using Next.js and LiveKit

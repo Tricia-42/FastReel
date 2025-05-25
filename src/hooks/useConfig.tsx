@@ -1,7 +1,6 @@
 "use client";
 
 import { getCookie, setCookie } from "cookies-next";
-import jsYaml from "js-yaml";
 import { useRouter } from "next/navigation";
 import React, {
   createContext,
@@ -41,16 +40,16 @@ export type UserSettings = {
 
 // Fallback if NEXT_PUBLIC_APP_CONFIG is not set
 const defaultConfig: AppConfig = {
-  title: "LiveKit Agents Playground",
-  description: "A virtual workbench for testing multimodal AI agents.",
+  title: "Tricia - Pilot App",
+  description: "Your AI-powered conversational assistant",
   video_fit: "cover",
   settings: {
-    editable: true,
+    editable: false, // Disable manual settings for production
     theme_color: "cyan",
     chat: true,
     inputs: {
       camera: true,
-      screen: true,
+      screen: false, // Disable screen sharing for Tricia
       mic: true,
     },
     outputs: {
@@ -66,25 +65,9 @@ const defaultConfig: AppConfig = {
 };
 
 const useAppConfig = (): AppConfig => {
-  return useMemo(() => {
-    if (process.env.NEXT_PUBLIC_APP_CONFIG) {
-      try {
-        const parsedConfig = jsYaml.load(
-          process.env.NEXT_PUBLIC_APP_CONFIG
-        ) as AppConfig;
-        if (parsedConfig.settings === undefined) {
-          parsedConfig.settings = defaultConfig.settings;
-        }
-        if (parsedConfig.settings.editable === undefined) {
-          parsedConfig.settings.editable = true;
-        }
-        return parsedConfig;
-      } catch (e) {
-        console.error("Error parsing app config:", e);
-      }
-    }
-    return defaultConfig;
-  }, []);
+  // Since we're not using NEXT_PUBLIC_APP_CONFIG anymore,
+  // just return the default config directly
+  return useMemo(() => defaultConfig, []);
 };
 
 type ConfigData = {

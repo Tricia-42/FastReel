@@ -1,128 +1,95 @@
 import { useConfig } from "@/hooks/useConfig";
-import { CLOUD_ENABLED, CloudConnect } from "../cloud/CloudConnect";
 import { Button } from "./button/Button";
 import { useState } from "react";
 import { ConnectionMode } from "@/hooks/useConnection";
+import { LoadingSVG } from "./button/LoadingSVG";
 
 type PlaygroundConnectProps = {
   accentColor: string;
   onConnectClicked: (mode: ConnectionMode) => void;
 };
 
-const ConnectTab = ({ active, onClick, children }: any) => {
-  let className = "px-2 py-1 text-sm";
-
-  if (active) {
-    className += " border-b border-cyan-500 text-cyan-500";
-  } else {
-    className += " text-gray-500 border-b border-transparent";
-  }
-
-  return (
-    <button className={className} onClick={onClick}>
-      {children}
-    </button>
-  );
-};
-
-const TokenConnect = ({
-  accentColor,
-  onConnectClicked,
-}: PlaygroundConnectProps) => {
-  const { setUserSettings, config } = useConfig();
-  const [url, setUrl] = useState(config.settings.ws_url);
-  const [token, setToken] = useState(config.settings.token);
-
-  return (
-    <div className="flex left-0 top-0 w-full h-full bg-black/80 items-center justify-center text-center">
-      <div className="flex flex-col gap-4 p-8 bg-gray-950 w-full text-white border-t border-gray-900">
-        <div className="flex flex-col gap-2">
-          <input
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            className="text-white text-sm bg-transparent border border-gray-800 rounded-sm px-3 py-2"
-            placeholder="wss://url"
-          ></input>
-          <textarea
-            value={token}
-            onChange={(e) => setToken(e.target.value)}
-            className="text-white text-sm bg-transparent border border-gray-800 rounded-sm px-3 py-2"
-            placeholder="room token..."
-          ></textarea>
-        </div>
-        <Button
-          accentColor={accentColor}
-          className="w-full"
-          onClick={() => {
-            const newSettings = { ...config.settings };
-            newSettings.ws_url = url;
-            newSettings.token = token;
-            setUserSettings(newSettings);
-            onConnectClicked("manual");
-          }}
-        >
-          Connect
-        </Button>
-        <a
-          href="https://kitt.livekit.io/"
-          className={`text-xs text-${accentColor}-500 hover:underline`}
-        >
-          Don’t have a URL or token? Try out our KITT example to see agents in
-          action!
-        </a>
-      </div>
-    </div>
-  );
-};
-
 export const PlaygroundConnect = ({
   accentColor,
   onConnectClicked,
 }: PlaygroundConnectProps) => {
-  const [showCloud, setShowCloud] = useState(true);
-  const copy = CLOUD_ENABLED
-    ? "Connect to playground with LiveKit Cloud or manually with a URL and token"
-    : "Connect to playground with a URL and token";
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [isConnecting, setIsConnecting] = useState(false);
+
+  const handleConnect = async () => {
+    if (password.toLowerCase() !== "tricia") {
+      setError("Invalid access code");
+      return;
+    }
+    
+    setError("");
+    setIsConnecting(true);
+    
+    try {
+      // Password is correct, initiate Tricia connection
+      onConnectClicked("tricia");
+    } catch (err) {
+      setError("Failed to connect. Please try again.");
+      setIsConnecting(false);
+    }
+  };
+
   return (
-    <div className="flex left-0 top-0 w-full h-full bg-black/80 items-center justify-center text-center gap-2">
-      <div className="min-h-[540px]">
-        <div className="flex flex-col bg-gray-950 w-full max-w-[480px] rounded-lg text-white border border-gray-900">
-          <div className="flex flex-col gap-2">
-            <div className="px-10 space-y-2 py-6">
-              <h1 className="text-2xl">Connect to playground</h1>
-              <p className="text-sm text-gray-500">{copy}</p>
-            </div>
-            {CLOUD_ENABLED && (
-              <div className="flex justify-center pt-2 gap-4 border-b border-t border-gray-900">
-                <ConnectTab
-                  active={showCloud}
-                  onClick={() => {
-                    setShowCloud(true);
-                  }}
-                >
-                  LiveKit Cloud
-                </ConnectTab>
-                <ConnectTab
-                  active={!showCloud}
-                  onClick={() => {
-                    setShowCloud(false);
-                  }}
-                >
-                  Manual
-                </ConnectTab>
-              </div>
+    <div className="flex left-0 top-0 w-full h-full bg-black items-center justify-center">
+      <div className="flex flex-col items-center gap-8 p-8 w-full max-w-md">
+        <div className="flex flex-col items-center gap-3">
+          {/* Title */}
+          <h1 className="text-3xl font-semibold text-white">Talk to Tricia</h1>
+          <p className="text-gray-400 text-center">Your AI-powered conversational assistant</p>
+        </div>
+
+        {/* Form */}
+        <div className="flex flex-col gap-4 w-full">
+          <div className="relative">
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                setError("");
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !isConnecting) {
+                  handleConnect();
+                }
+              }}
+              className={`w-full text-white text-sm bg-gray-900/50 border ${
+                error ? 'border-red-500' : 'border-gray-800'
+              } rounded-lg px-4 py-3 placeholder-gray-500 focus:outline-none focus:border-${accentColor}-500 transition-colors`}
+              placeholder="Enter access code"
+              disabled={isConnecting}
+              autoFocus
+            />
+            {error && (
+              <p className="text-red-500 text-sm mt-2">{error}</p>
             )}
           </div>
-          <div className="flex flex-col bg-gray-900/30 flex-grow">
-            {showCloud && CLOUD_ENABLED ? (
-              <CloudConnect accentColor={accentColor} />
-            ) : (
-              <TokenConnect
-                accentColor={accentColor}
-                onConnectClicked={onConnectClicked}
-              />
-            )}
-          </div>
+          
+          <Button
+            accentColor={accentColor}
+            className="w-full py-3 rounded-lg font-medium"
+            onClick={handleConnect}
+            disabled={isConnecting || !password}
+          >
+            {isConnecting ? <LoadingSVG /> : "Connect"}
+          </Button>
+        </div>
+
+        {/* Access code link */}
+        <div className="flex items-center gap-2 text-sm text-gray-400">
+          <span>Get access code from</span>
+          <a 
+            href="mailto:i@heytricia.ai?subject=Access%20Code%20Request&body=Hi%2C%0A%0AI%20would%20like%20to%20request%20an%20access%20code%20for%20Tricia.%0A%0AThank%20you!"
+            className={`text-${accentColor}-400 hover:text-${accentColor}-300 underline transition-colors`}
+          >
+            i@heytricia.ai
+          </a>
         </div>
       </div>
     </div>

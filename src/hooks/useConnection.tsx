@@ -6,7 +6,7 @@ import { useCallback } from "react";
 import { useConfig } from "./useConfig";
 import { useToast } from "@/components/toast/ToasterProvider";
 
-export type ConnectionMode = "cloud" | "manual" | "env"
+export type ConnectionMode = "cloud" | "manual" | "env" | "tricia"
 
 type TokenGeneratorData = {
   shouldConnect: boolean;
@@ -65,6 +65,128 @@ export const ConnectionProvider = ({
           res.json()
         );
         token = accessToken;
+      } else if (mode === "tricia") {
+        // Call Tricia API to create chat and get LiveKit details
+        try {
+          // Try using the proxy first to avoid CORS issues
+          const useProxy = true; // Set to false to use direct API call
+          const apiUrl = useProxy ? '/api/tricia-proxy' : `${process.env.NEXT_PUBLIC_TRICIA_BASE_URL || 'https://api.heytricia.ai/api/v1'}/chats`;
+          
+          // Use environment variables with fallback values
+          const agentId = process.env.NEXT_PUBLIC_TRICIA_AGENT_ID || 'aa0b0d4e-bc28-4e4e-88c1-40b829b6fb9d';
+          const userId = process.env.NEXT_PUBLIC_TRICIA_USER_ID || 'Xe9nkrHVetU1lHiK8wt7Ujf6SrH3';
+          
+          const payload = {
+            agent_id: agentId,
+            user_ids: [userId],  // API now expects an array of user IDs
+            metadata: {
+              title: 'Tricia Pilot App Session'
+            }
+          };
+          
+          console.log('Calling Tricia API:', apiUrl);
+          console.log('Using proxy:', useProxy);
+          console.log('Request payload:', JSON.stringify(payload, null, 2));
+          
+          if (!useProxy) {
+            console.log('Request headers:', {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer admin'
+            });
+          }
+          
+          const headers: HeadersInit = {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          };
+          
+          // Only add Authorization header for direct API calls
+          if (!useProxy) {
+            headers['Authorization'] = 'Bearer admin';
+          }
+          
+          const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers,
+            mode: useProxy ? 'same-origin' : 'cors',
+            body: JSON.stringify(payload)
+          });
+
+          console.log('Response status:', response.status);
+          console.log('Response headers:', response.headers);
+          console.log('Response ok:', response.ok);
+
+          const responseText = await response.text();
+          console.log('Raw response:', responseText);
+
+          if (!response.ok) {
+            console.error('API Error - Status:', response.status);
+            console.error('API Error - Response:', responseText);
+            
+            // Try to parse error details
+            let errorMessage = `Failed to create chat: ${response.status} ${response.statusText}`;
+            try {
+              const errorData = JSON.parse(responseText);
+              if (errorData.detail) {
+                errorMessage += `. ${errorData.detail}`;
+              }
+              if (errorData.message) {
+                errorMessage += `. ${errorData.message}`;
+              }
+              if (errorData.error) {
+                errorMessage = errorData.error;
+                if (errorData.message) {
+                  errorMessage += `: ${errorData.message}`;
+                }
+              }
+            } catch (e) {
+              // If response is not JSON, include the raw text
+              errorMessage += `. ${responseText}`;
+            }
+            
+            throw new Error(errorMessage);
+          }
+
+          let data;
+          try {
+            data = JSON.parse(responseText);
+          } catch (e) {
+            console.error('Failed to parse response as JSON:', e);
+            throw new Error('Invalid JSON response from server');
+          }
+          
+          console.log('Parsed API Response data:', data);
+          
+          // Check if response is wrapped in a 'data' object or directly contains the fields
+          const chatData = data.data || data;
+          
+          if (chatData.participant_token && chatData.server_url) {
+            token = chatData.participant_token;
+            url = chatData.server_url;
+            console.log('Successfully got LiveKit credentials');
+            console.log('Token:', token);
+            console.log('Server URL:', url);
+          } else {
+            console.error('Invalid response structure:', data);
+            throw new Error('Invalid response from Tricia API - missing LiveKit credentials');
+          }
+        } catch (error) {
+          console.error('Tricia connection error:', error);
+          
+          // Check if it's a network error
+          if (error instanceof TypeError && error.message.includes('fetch')) {
+            setToastMessage({
+              type: "error",
+              message: `Network error: Unable to reach Tricia API. This might be a CORS issue. ${error.message}`,
+            });
+          } else {
+            setToastMessage({
+              type: "error",
+              message: `Failed to connect to Tricia: ${error instanceof Error ? error.message : 'Unknown error'}`,
+            });
+          }
+          throw error;
+        }
       } else {
         token = config.settings.token;
         url = config.settings.ws_url;

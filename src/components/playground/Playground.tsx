@@ -39,7 +39,7 @@ export interface PlaygroundMeta {
 export interface PlaygroundProps {
   logo?: ReactNode;
   themeColors: string[];
-  onConnect: (connect: boolean, opts?: { token: string; url: string }) => void;
+  onConnect: (connect: boolean) => void;
 }
 
 const headerHeight = 56;

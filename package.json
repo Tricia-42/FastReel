@@ -1,9 +1,11 @@
 {
-  "name": "agents-playground",
+  "name": "tricia-pilot-app",
   "version": "0.1.0",
+  "description": "Tricia AI Assistant - Pilot Application",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 8005",
+    "dev:remote": "next dev -p 8005 -H 0.0.0.0",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"

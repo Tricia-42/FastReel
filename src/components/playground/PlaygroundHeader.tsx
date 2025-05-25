@@ -60,6 +60,7 @@ export const PlaygroundHeader = ({
           }
           disabled={connectionState === ConnectionState.Connecting}
           onClick={() => {
+            console.log('Disconnect button clicked, current state:', connectionState);
             onConnectClicked();
           }}
         >

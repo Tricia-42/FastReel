@@ -166,10 +166,28 @@ export const ConnectionProvider = ({
             console.log('Successfully got LiveKit credentials');
             console.log('Token:', token);
             console.log('Server URL:', url);
+            console.log('Room Name:', chatData.room_name || 'Not provided');
+            console.log('Chat ID:', chatData.id || 'Not provided');
+            
+            // Decode JWT to check agent configuration
+            try {
+              const tokenParts = token.split('.');
+              if (tokenParts.length === 3) {
+                const payload = JSON.parse(atob(tokenParts[1]));
+                console.log('JWT room config:', payload.roomConfig);
+              }
+            } catch (e) {
+              console.log('Could not decode JWT for debugging');
+            }
           } else {
             console.error('Invalid response structure:', data);
             throw new Error('Invalid response from Tricia API - missing LiveKit credentials');
           }
+          
+          // Add a small delay to ensure agent dispatch has time to process
+          // This helps with reconnection scenarios where the agent might not dispatch properly
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          
         } catch (error) {
           console.error('Tricia connection error:', error);
           
@@ -205,7 +223,10 @@ export const ConnectionProvider = ({
   );
 
   const disconnect = useCallback(async () => {
-    setConnectionDetails((prev) => ({ ...prev, shouldConnect: false }));
+    console.log('Disconnecting from LiveKit room...');
+    setConnectionDetails((prev) => ({ ...prev, shouldConnect: false, wsUrl: "", token: "" }));
+    // Give time for LiveKit to properly disconnect
+    await new Promise(resolve => setTimeout(resolve, 100));
   }, []);
 
   return (

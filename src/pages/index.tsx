@@ -58,12 +58,21 @@ export function HomeInner() {
   const { shouldConnect, wsUrl, token, mode, connect, disconnect } = useConnection();
   const { config } = useConfig();
   const { toastMessage, setToastMessage } = useToast();
+  const [isDisconnecting, setIsDisconnecting] = useState(false);
 
   const handleConnect = useCallback(
     async (newMode: ConnectionMode) => {
+      // If already connected, disconnect first
+      if (shouldConnect && !isDisconnecting) {
+        setIsDisconnecting(true);
+        await disconnect();
+        // Wait for disconnect to complete
+        await new Promise(resolve => setTimeout(resolve, 500));
+        setIsDisconnecting(false);
+      }
       await connect(newMode);
     },
-    [connect]
+    [connect, disconnect, shouldConnect, isDisconnecting]
   );
 
   const handleDisconnect = useCallback(

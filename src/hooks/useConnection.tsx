@@ -81,7 +81,7 @@ export const ConnectionProvider = ({
             
             const payload = {
               agent_id: agentId,
-              user_ids: [userId],  // API now expects an array of user IDs
+              user_id: userId,  // API expects user_id (singular)
               metadata: {
                 title: 'Tricia Pilot App Session'
               }

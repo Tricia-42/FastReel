@@ -16,10 +16,8 @@ export const PlaygroundConnect: React.FC<PlaygroundConnectProps> = ({
   const [error, setError] = useState("");
   const [isConnecting, setIsConnecting] = useState(false);
 
-  // Check if we're in test mode
-  const isTestMode = process.env.NEXT_PUBLIC_TEST_MODE === 'true' || 
-                     window.location.hostname === 'localhost' || 
-                     window.location.hostname === '127.0.0.1';
+  // Check if we're in test mode - only use environment variable
+  const isTestMode = process.env.NEXT_PUBLIC_TEST_MODE === 'true';
 
   const handleConnectToPilot = async () => {
     // Skip password check in test mode

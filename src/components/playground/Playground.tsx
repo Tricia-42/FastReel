@@ -524,7 +524,7 @@ export default function Playground({
     ),
   });
 
-  // Conversation tab - clean tiles
+  // Conversation tab - combined agent and user
   mobileTabs.push({
     title: "Conversation", 
     content: (
@@ -532,29 +532,15 @@ export default function Playground({
         {/* Tricia Audio */}
         <PlaygroundTile
           title="Tricia Speaking"
-          className="h-24"
+          className="h-32"
         >
           <AudioInputTile trackRef={voiceAssistant.audioTrack} />
-        </PlaygroundTile>
-        
-        {/* User Audio */}
-        <PlaygroundTile
-          title="Your Voice"
-          className="h-24"
-        >
-          {localMicTrack ? (
-            <AudioInputTile trackRef={localMicTrack} />
-          ) : (
-            <div className="flex items-center justify-center h-full text-gray-500 text-xs">
-              Microphone off
-            </div>
-          )}
         </PlaygroundTile>
         
         {/* User Video */}
         <PlaygroundTile
           title="You"
-          className="flex-1 min-h-[200px]"
+          className="h-48"
         >
           <div className="relative h-full bg-gray-900 rounded-lg overflow-hidden">
             {localCameraTrack ? (
@@ -570,22 +556,37 @@ export default function Playground({
           </div>
         </PlaygroundTile>
         
-        {/* Live Caption */}
+        {/* Combined User Audio & Live Transcriptions */}
         <PlaygroundTile
-          title="Live Caption"
-          className="h-32"
+          title="Your Voice & Transcription"
+          className="flex-1 min-h-[200px]"
         >
-          <div className="flex items-center justify-center h-full p-2">
-            {currentTranscript ? (
-              <div className="animate-fade-in text-center">
-                <div className="text-xs text-gray-400">{currentTranscript.speaker}</div>
-                <div className="text-sm text-white mt-1">{currentTranscript.text}</div>
-              </div>
-            ) : (
-              <div className="text-xs text-gray-500">
-                Captions appear here
-              </div>
-            )}
+          <div className="flex flex-col h-full">
+            {/* User Audio Visualizer */}
+            <div className="h-24 border-b border-gray-800">
+              {localMicTrack ? (
+                <AudioInputTile trackRef={localMicTrack} />
+              ) : (
+                <div className="flex items-center justify-center h-full text-gray-500 text-xs">
+                  Microphone off
+                </div>
+              )}
+            </div>
+            
+            {/* Live Transcription */}
+            <div className="flex-1 flex items-center justify-center p-3">
+              {currentTranscript ? (
+                <div className="animate-fade-in text-center w-full">
+                  <div className="text-xs text-gray-400">{currentTranscript.speaker}</div>
+                  <div className="text-sm font-medium text-white mt-1 px-1">{currentTranscript.text}</div>
+                </div>
+              ) : (
+                <div className="text-xs text-gray-500 text-center">
+                  <div>Speak to see live transcription</div>
+                  <div className="mt-1 text-gray-600 text-xs">Both voices appear here</div>
+                </div>
+              )}
+            </div>
           </div>
         </PlaygroundTile>
       </div>
@@ -634,7 +635,29 @@ export default function Playground({
 
         {/* Desktop Layout - Clean Tile Grid */}
         <div className="hidden lg:flex w-full h-full gap-4">
-          {/* Left Column - Journal */}
+          {/* Left Column - Agent (Tricia) */}
+          <div className="flex flex-col basis-1/4 gap-4">
+            {/* Tricia Audio Visualizer */}
+            <PlaygroundTile
+              title="Tricia Speaking"
+              className="h-48"
+            >
+              <AudioInputTile trackRef={voiceAssistant.audioTrack} />
+            </PlaygroundTile>
+
+            {/* Settings - moved to left column bottom */}
+            <PlaygroundTile
+              title="Settings"
+              padding={false}
+              backgroundColor="gray-950"
+              className="flex-1 overflow-y-auto"
+              childrenClassName="h-full"
+            >
+              {settingsTileContent}
+            </PlaygroundTile>
+          </div>
+
+          {/* Middle Column - Journal */}
           <div className="flex flex-col grow basis-1/2 gap-4">
             {/* Journal Images - 16:9 aspect ratio */}
             <PlaygroundTile
@@ -728,34 +751,12 @@ export default function Playground({
             </PlaygroundTile>
           </div>
 
-          {/* Middle Column - Audio & Video */}
+          {/* Right Column - User Interaction */}
           <div className="flex flex-col basis-1/4 gap-4">
-            {/* Tricia Audio */}
-            <PlaygroundTile
-              title="Tricia Speaking"
-              className="h-32"
-            >
-              <AudioInputTile trackRef={voiceAssistant.audioTrack} />
-            </PlaygroundTile>
-
-            {/* User Audio */}
-            <PlaygroundTile
-              title="Your Voice" 
-              className="h-32"
-            >
-              {localMicTrack ? (
-                <AudioInputTile trackRef={localMicTrack} />
-              ) : (
-                <div className="flex items-center justify-center h-full text-gray-500 text-xs">
-                  Microphone off
-                </div>
-              )}
-            </PlaygroundTile>
-
             {/* User Video */}
             <PlaygroundTile
               title="You"
-              className="flex-1"
+              className="h-48"
             >
               <div className="relative h-full bg-gray-900 rounded-lg overflow-hidden">
                 {localCameraTrack ? (
@@ -771,38 +772,42 @@ export default function Playground({
               </div>
             </PlaygroundTile>
 
-            {/* Live Captions - Shows both speakers */}
+            {/* Combined User Audio & Live Transcriptions */}
             <PlaygroundTile
-              title="Live Caption"
-              className="h-32"
+              title="Your Voice & Transcription"
+              className="flex-1"
             >
-              <div className="flex items-center justify-center h-full">
-                {currentTranscript ? (
-                  <div className="animate-fade-in text-center">
-                    <div className="text-xs text-gray-400 mb-1">{currentTranscript.speaker}</div>
-                    <div className="text-sm font-medium text-white px-2 leading-relaxed">
-                      {currentTranscript.text}
+              <div className="flex flex-col h-full">
+                {/* User Audio Visualizer */}
+                <div className="h-24 border-b border-gray-800">
+                  {localMicTrack ? (
+                    <AudioInputTile trackRef={localMicTrack} />
+                  ) : (
+                    <div className="flex items-center justify-center h-full text-gray-500 text-xs">
+                      Microphone off
                     </div>
-                  </div>
-                ) : (
-                  <div className="text-xs text-gray-500">
-                    Captions appear here
-                  </div>
-                )}
+                  )}
+                </div>
+                
+                {/* Live Transcription */}
+                <div className="flex-1 flex items-center justify-center p-4">
+                  {currentTranscript ? (
+                    <div className="animate-fade-in text-center w-full">
+                      <div className="text-xs text-gray-400 mb-1">{currentTranscript.speaker}</div>
+                      <div className="text-sm font-medium text-white px-2 leading-relaxed">
+                        {currentTranscript.text}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-xs text-gray-500 text-center">
+                      <div>Speak to see live transcription</div>
+                      <div className="mt-1 text-gray-600">Both your voice and Tricia's responses will appear here</div>
+                    </div>
+                  )}
+                </div>
               </div>
             </PlaygroundTile>
           </div>
-
-          {/* Right Column - Settings */}
-          <PlaygroundTile
-            title="Settings"
-            padding={false}
-            backgroundColor="gray-950"
-            className="basis-1/4 overflow-y-auto"
-            childrenClassName="h-full"
-          >
-            {settingsTileContent}
-          </PlaygroundTile>
         </div>
       </div>
     </>

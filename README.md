@@ -283,3 +283,19 @@ Proprietary - Tricia Inc. All rights reserved.
 ---
 
 Built with ❤️ by the Tricia team using Next.js, LiveKit, and modern web technologies.
+
+### Test Mode (Development Only)
+
+To bypass the password requirement during development:
+
+1. Add this line to your `.env.local` file:
+   ```
+   NEXT_PUBLIC_TEST_MODE=true
+   ```
+
+2. Restart your development server:
+   ```bash
+   npm run dev
+   ```
+
+**⚠️ Warning**: Never enable test mode in production deployments!

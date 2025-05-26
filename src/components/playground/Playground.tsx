@@ -316,7 +316,6 @@ export default function Playground({
   }, [
     config.description,
     config.settings,
-    config.show_qr,
     localParticipant,
     name,
     roomState,
@@ -455,7 +454,7 @@ export default function Playground({
               </div>
             ) : (
               <div className="text-xs text-gray-500 text-center">
-                Tricia's responses will appear here
+                Tricia&apos;s responses will appear here
               </div>
             )}
           </div>
@@ -638,7 +637,7 @@ export default function Playground({
                   </div>
                 ) : (
                   <div className="text-xs text-gray-500 text-center">
-                    Tricia's responses will appear here
+                    Tricia&apos;s responses will appear here
                   </div>
                 )}
               </div>

@@ -627,7 +627,7 @@ export default function Playground({
             {/* Tricia Transcription */}
             <PlaygroundTile
               title="Tricia's Words"
-              className="flex-1 min-h-[80px]"
+              className="h-24"
             >
               <div className="flex items-center justify-center h-full p-3">
                 {currentTranscript && currentTranscript.speaker === "Tricia" ? (
@@ -764,10 +764,10 @@ export default function Playground({
             <PlaygroundTile
               title="Journal Tools"
               className="h-auto"
-              padding={true}
+              padding={false}
             >
-              <div className="flex flex-col gap-2 p-3">
-                <div className="text-xs text-gray-500">RPC Methods:</div>
+              <div className="flex flex-col gap-1.5 p-3">
+                <div className="text-xs text-gray-500 mb-1">Quick Actions:</div>
                 <div className="flex flex-wrap gap-1">
                   <button
                     onClick={() => {
@@ -776,7 +776,7 @@ export default function Playground({
                     }}
                     className="text-xs px-2 py-1 bg-gray-800 hover:bg-gray-700 rounded text-gray-300"
                   >
-                    add_memory
+                    Add Memory
                   </button>
                   <button
                     onClick={() => {
@@ -785,7 +785,7 @@ export default function Playground({
                     }}
                     className="text-xs px-2 py-1 bg-gray-800 hover:bg-gray-700 rounded text-gray-300"
                   >
-                    update_journal
+                    Update
                   </button>
                   <button
                     onClick={() => {
@@ -794,16 +794,29 @@ export default function Playground({
                     }}
                     className="text-xs px-2 py-1 bg-gray-800 hover:bg-gray-700 rounded text-gray-300"
                   >
-                    save_journal
+                    Save
                   </button>
                 </div>
-                <input
-                  type="text"
-                  value={rpcMethod}
-                  onChange={(e) => setRpcMethod(e.target.value)}
-                  className="w-full text-white text-xs bg-transparent border border-gray-800 rounded-sm px-2 py-1"
-                  placeholder="Method"
-                />
+                <div className="flex gap-1">
+                  <input
+                    type="text"
+                    value={rpcMethod}
+                    onChange={(e) => setRpcMethod(e.target.value)}
+                    className="flex-1 text-white text-xs bg-transparent border border-gray-800 rounded-sm px-2 py-1"
+                    placeholder="Method"
+                  />
+                  <button
+                    onClick={handleRpcCall}
+                    disabled={!voiceAssistant.agent || !rpcMethod}
+                    className={`px-3 py-1 rounded-sm text-xs font-medium transition-colors
+                      ${voiceAssistant.agent && rpcMethod 
+                        ? `bg-${config.settings.theme_color}-500 hover:bg-${config.settings.theme_color}-600 text-white` 
+                        : 'bg-gray-800 cursor-not-allowed text-gray-500'
+                      }`}
+                  >
+                    Run
+                  </button>
+                </div>
                 <textarea
                   value={rpcPayload}
                   onChange={(e) => setRpcPayload(e.target.value)}
@@ -811,24 +824,13 @@ export default function Playground({
                   placeholder="Payload (JSON)"
                   rows={2}
                 />
-                <button
-                  onClick={handleRpcCall}
-                  disabled={!voiceAssistant.agent || !rpcMethod}
-                  className={`px-2 py-1 rounded-sm text-xs font-medium transition-colors
-                    ${voiceAssistant.agent && rpcMethod 
-                      ? `bg-${config.settings.theme_color}-500 hover:bg-${config.settings.theme_color}-600 text-white` 
-                      : 'bg-gray-800 cursor-not-allowed text-gray-500'
-                    }`}
-                >
-                  Execute
-                </button>
               </div>
             </PlaygroundTile>
 
             {/* User Audio Visualizer */}
             <PlaygroundTile
               title="Your Voice"
-              className="h-24"
+              className="h-28"
             >
               {localMicTrack ? (
                 <AudioInputTile trackRef={localMicTrack} />
@@ -842,12 +844,12 @@ export default function Playground({
             {/* User Transcription */}
             <PlaygroundTile
               title="Your Words"
-              className="h-20"
+              className="h-24"
             >
-              <div className="flex items-center justify-center h-full p-2">
+              <div className="flex items-center justify-center h-full p-3">
                 {currentTranscript && currentTranscript.speaker === "You" ? (
                   <div className="animate-fade-in text-center w-full">
-                    <div className="text-xs font-medium text-white leading-tight">
+                    <div className="text-sm font-medium text-white leading-tight">
                       {currentTranscript.text}
                     </div>
                   </div>

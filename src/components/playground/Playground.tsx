@@ -311,47 +311,6 @@ export default function Playground({
             />
           </ConfigurationPanelItem>
         </div>
-        
-        <div className="w-full">
-          <ConfigurationPanelItem title="Journal Tools">
-            <div className="flex flex-col gap-2">
-              <div className="text-xs text-gray-500 mb-1">RPC Methods:</div>
-              <div className="flex flex-col gap-1 mb-2 text-xs text-gray-400">
-                <div>• add_memory - Capture memory fragments</div>
-                <div>• update_journal - Generate journal entry</div>
-                <div>• save_journal - Save the journal</div>
-                <div>• switch_agent - Change personality style</div>
-              </div>
-              <input
-                type="text"
-                value={rpcMethod}
-                onChange={(e) => setRpcMethod(e.target.value)}
-                className="w-full text-white text-sm bg-transparent border border-gray-800 rounded-sm px-3 py-2"
-                placeholder="RPC method name"
-              />
-              
-              <textarea
-                value={rpcPayload}
-                onChange={(e) => setRpcPayload(e.target.value)}
-                className="w-full text-white text-sm bg-transparent border border-gray-800 rounded-sm px-3 py-2 mt-2"
-                placeholder="RPC payload (JSON)"
-                rows={2}
-              />
-              
-              <button
-                onClick={handleRpcCall}
-                disabled={!voiceAssistant.agent || !rpcMethod}
-                className={`mt-2 px-3 py-1.5 rounded-sm text-xs font-medium transition-colors
-                  ${voiceAssistant.agent && rpcMethod 
-                    ? `bg-${config.settings.theme_color}-500 hover:bg-${config.settings.theme_color}-600 text-white` 
-                    : 'bg-gray-800 cursor-not-allowed text-gray-500'
-                  }`}
-              >
-                Perform RPC Call
-              </button>
-            </div>
-          </ConfigurationPanelItem>
-        </div>
       </div>
     );
   }, [
@@ -364,9 +323,6 @@ export default function Playground({
     themeColors,
     setUserSettings,
     voiceAssistant.agent,
-    rpcMethod,
-    rpcPayload,
-    handleRpcCall,
   ]);
 
   let mobileTabs: PlaygroundTab[] = [];
@@ -511,7 +467,7 @@ export default function Playground({
         {/* User Video */}
         <PlaygroundTile
           title="Your Video"
-          className="h-40"
+          className="h-48"
         >
           <div className="relative h-full bg-gray-900 rounded-lg overflow-hidden">
             {localCameraTrack ? (
@@ -524,6 +480,47 @@ export default function Playground({
                 Camera off
               </div>
             )}
+          </div>
+        </PlaygroundTile>
+        
+        {/* Journal Tools - Mobile version */}
+        <PlaygroundTile
+          title="Journal Tools"
+          className="h-auto"
+        >
+          <div className="flex flex-col gap-2 p-3">
+            <div className="text-xs text-gray-500">Quick Actions:</div>
+            <div className="grid grid-cols-2 gap-1">
+              <button
+                onClick={() => {
+                  setRpcMethod('add_memory');
+                  setRpcPayload('{}');
+                }}
+                className="text-xs px-2 py-1.5 bg-gray-800 hover:bg-gray-700 rounded text-gray-300"
+              >
+                Add Memory
+              </button>
+              <button
+                onClick={() => {
+                  setRpcMethod('update_journal');
+                  setRpcPayload('{}');
+                }}
+                className="text-xs px-2 py-1.5 bg-gray-800 hover:bg-gray-700 rounded text-gray-300"
+              >
+                Update Journal
+              </button>
+            </div>
+            <button
+              onClick={handleRpcCall}
+              disabled={!voiceAssistant.agent || !rpcMethod}
+              className={`w-full px-2 py-1.5 rounded-sm text-xs font-medium transition-colors
+                ${voiceAssistant.agent && rpcMethod 
+                  ? `bg-${config.settings.theme_color}-500 hover:bg-${config.settings.theme_color}-600 text-white` 
+                  : 'bg-gray-800 cursor-not-allowed text-gray-500'
+                }`}
+            >
+              {rpcMethod ? `Execute ${rpcMethod}` : 'Select a method'}
+            </button>
           </div>
         </PlaygroundTile>
         
@@ -613,7 +610,7 @@ export default function Playground({
               title="Settings"
               padding={false}
               backgroundColor="gray-950"
-              className="flex-1 overflow-y-auto"
+              className="h-80 overflow-y-auto"
               childrenClassName="h-full"
             >
               {settingsTileContent}
@@ -622,7 +619,7 @@ export default function Playground({
             {/* Tricia Audio Visualizer */}
             <PlaygroundTile
               title="Tricia Speaking"
-              className="h-32"
+              className="h-28"
             >
               <AudioInputTile trackRef={voiceAssistant.audioTrack} />
             </PlaygroundTile>
@@ -630,7 +627,7 @@ export default function Playground({
             {/* Tricia Transcription */}
             <PlaygroundTile
               title="Tricia's Words"
-              className="h-24"
+              className="flex-1 min-h-[80px]"
             >
               <div className="flex items-center justify-center h-full p-3">
                 {currentTranscript && currentTranscript.speaker === "Tricia" ? (
@@ -744,10 +741,10 @@ export default function Playground({
 
           {/* Right Column - User */}
           <div className="flex flex-col basis-1/4 gap-4">
-            {/* User Video */}
+            {/* User Video - Made larger */}
             <PlaygroundTile
               title="You"
-              className="h-48"
+              className="h-64"
             >
               <div className="relative h-full bg-gray-900 rounded-lg overflow-hidden">
                 {localCameraTrack ? (
@@ -763,10 +760,75 @@ export default function Playground({
               </div>
             </PlaygroundTile>
 
+            {/* Journal Tools - Moved here */}
+            <PlaygroundTile
+              title="Journal Tools"
+              className="h-auto"
+              padding={true}
+            >
+              <div className="flex flex-col gap-2 p-3">
+                <div className="text-xs text-gray-500">RPC Methods:</div>
+                <div className="flex flex-wrap gap-1">
+                  <button
+                    onClick={() => {
+                      setRpcMethod('add_memory');
+                      setRpcPayload('{}');
+                    }}
+                    className="text-xs px-2 py-1 bg-gray-800 hover:bg-gray-700 rounded text-gray-300"
+                  >
+                    add_memory
+                  </button>
+                  <button
+                    onClick={() => {
+                      setRpcMethod('update_journal');
+                      setRpcPayload('{}');
+                    }}
+                    className="text-xs px-2 py-1 bg-gray-800 hover:bg-gray-700 rounded text-gray-300"
+                  >
+                    update_journal
+                  </button>
+                  <button
+                    onClick={() => {
+                      setRpcMethod('save_journal');
+                      setRpcPayload('{}');
+                    }}
+                    className="text-xs px-2 py-1 bg-gray-800 hover:bg-gray-700 rounded text-gray-300"
+                  >
+                    save_journal
+                  </button>
+                </div>
+                <input
+                  type="text"
+                  value={rpcMethod}
+                  onChange={(e) => setRpcMethod(e.target.value)}
+                  className="w-full text-white text-xs bg-transparent border border-gray-800 rounded-sm px-2 py-1"
+                  placeholder="Method"
+                />
+                <textarea
+                  value={rpcPayload}
+                  onChange={(e) => setRpcPayload(e.target.value)}
+                  className="w-full text-white text-xs bg-transparent border border-gray-800 rounded-sm px-2 py-1"
+                  placeholder="Payload (JSON)"
+                  rows={2}
+                />
+                <button
+                  onClick={handleRpcCall}
+                  disabled={!voiceAssistant.agent || !rpcMethod}
+                  className={`px-2 py-1 rounded-sm text-xs font-medium transition-colors
+                    ${voiceAssistant.agent && rpcMethod 
+                      ? `bg-${config.settings.theme_color}-500 hover:bg-${config.settings.theme_color}-600 text-white` 
+                      : 'bg-gray-800 cursor-not-allowed text-gray-500'
+                    }`}
+                >
+                  Execute
+                </button>
+              </div>
+            </PlaygroundTile>
+
             {/* User Audio Visualizer */}
             <PlaygroundTile
               title="Your Voice"
-              className="h-32"
+              className="h-24"
             >
               {localMicTrack ? (
                 <AudioInputTile trackRef={localMicTrack} />
@@ -780,18 +842,18 @@ export default function Playground({
             {/* User Transcription */}
             <PlaygroundTile
               title="Your Words"
-              className="h-24"
+              className="h-20"
             >
-              <div className="flex items-center justify-center h-full p-3">
+              <div className="flex items-center justify-center h-full p-2">
                 {currentTranscript && currentTranscript.speaker === "You" ? (
                   <div className="animate-fade-in text-center w-full">
-                    <div className="text-sm font-medium text-white leading-tight">
+                    <div className="text-xs font-medium text-white leading-tight">
                       {currentTranscript.text}
                     </div>
                   </div>
                 ) : (
                   <div className="text-xs text-gray-500 text-center">
-                    Your words will appear here as you speak
+                    Your words will appear here
                   </div>
                 )}
               </div>

@@ -173,9 +173,10 @@ export const ConnectionProvider = ({
               console.log('Room Name:', chatData.room_name || 'Not provided');
               console.log('Chat ID:', chatData.id || 'Not provided');
               
-              // Add a delay to ensure agent has time to initialize
+              // Add a longer delay to ensure agent has time to fully initialize
+              // This is especially important for first-time connections where the agent needs to cold start
               console.log('Waiting for agent to initialize...');
-              await new Promise(resolve => setTimeout(resolve, 2000));
+              await new Promise(resolve => setTimeout(resolve, 5000));
               
               // Decode JWT to check agent configuration
               try {

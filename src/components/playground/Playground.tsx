@@ -430,135 +430,131 @@ export default function Playground({
   mobileTabs.push({
     title: "Journal",
     content: (
-      <PlaygroundTile
-        className="w-full h-full"
-        childrenClassName="flex flex-col p-0"
-      >
-        {journalContent ? (
-          <>
-            {/* Images Section - 60% */}
-            <div className="flex-[6] bg-gray-900 border-b border-gray-800 p-4">
-              {journalContent.images && journalContent.images.length > 0 ? (
-                <div className="h-full flex flex-col">
-                  <div className="flex-1 flex items-center justify-center relative">
-                    <img
-                      src={journalContent.images[currentImageIndex]}
-                      alt={`Memory ${currentImageIndex + 1}`}
-                      className="max-h-full max-w-full object-contain rounded-lg"
+      <div className="flex flex-col gap-4 h-full overflow-y-auto">
+        {/* Journal Images - 16:9 */}
+        <PlaygroundTile
+          title="Memory Images"
+          className="w-full h-auto"
+          childrenClassName="p-4 bg-gray-900"
+        >
+          {journalContent?.images && journalContent.images.length > 0 ? (
+            <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <img
+                  src={journalContent.images[currentImageIndex]}
+                  alt={`Memory ${currentImageIndex + 1}`}
+                  className="w-full h-full object-contain rounded-lg"
+                />
+                {journalContent.images.length > 1 && (
+                  <>
+                    <button
+                      onClick={() => setCurrentImageIndex((prev) => 
+                        prev > 0 ? prev - 1 : journalContent.images!.length - 1
+                      )}
+                      className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-1.5 rounded-full text-sm"
+                    >
+                      ←
+                    </button>
+                    <button
+                      onClick={() => setCurrentImageIndex((prev) => 
+                        prev < journalContent.images!.length - 1 ? prev + 1 : 0
+                      )}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-1.5 rounded-full text-sm"
+                    >
+                      →
+                    </button>
+                  </>
+                )}
+              </div>
+              {journalContent.images.length > 1 && (
+                <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1.5">
+                  {journalContent.images.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentImageIndex(index)}
+                      className={`w-1.5 h-1.5 rounded-full transition-colors ${
+                        index === currentImageIndex ? 'bg-white' : 'bg-gray-600'
+                      }`}
                     />
-                    {journalContent.images.length > 1 && (
-                      <>
-                        <button
-                          onClick={() => setCurrentImageIndex((prev) => 
-                            prev > 0 ? prev - 1 : journalContent.images!.length - 1
-                          )}
-                          className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-1.5 rounded-full text-sm"
-                        >
-                          ←
-                        </button>
-                        <button
-                          onClick={() => setCurrentImageIndex((prev) => 
-                            prev < journalContent.images!.length - 1 ? prev + 1 : 0
-                          )}
-                          className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-1.5 rounded-full text-sm"
-                        >
-                          →
-                        </button>
-                      </>
-                    )}
-                  </div>
-                  {journalContent.images.length > 1 && (
-                    <div className="flex justify-center gap-1.5 mt-2">
-                      {journalContent.images.map((_, index) => (
-                        <button
-                          key={index}
-                          onClick={() => setCurrentImageIndex(index)}
-                          className={`w-1.5 h-1.5 rounded-full transition-colors ${
-                            index === currentImageIndex ? 'bg-white' : 'bg-gray-600'
-                          }`}
-                        />
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="h-full flex items-center justify-center text-gray-500">
-                  <div className="text-center">
-                    <div className="text-sm">No images yet</div>
-                    <div className="text-xs mt-1">Images will appear as you share memories</div>
-                  </div>
+                  ))}
                 </div>
               )}
             </div>
-            
-            {/* Text Section - 40% */}
-            <div className="flex-[4] overflow-y-auto p-4">
+          ) : (
+            <div className="relative w-full bg-gray-800 rounded-lg" style={{ paddingBottom: '56.25%' }}>
+              <div className="absolute inset-0 flex items-center justify-center text-gray-500">
+                <div className="text-center">
+                  <div className="text-sm">No images yet</div>
+                  <div className="text-xs mt-1">Images will appear as you share memories</div>
+                </div>
+              </div>
+            </div>
+          )}
+        </PlaygroundTile>
+        
+        {/* Journal Text */}
+        <PlaygroundTile
+          title="Memory Story"
+          className="min-h-[200px]"
+        >
+          {journalContent ? (
+            <div className="p-4">
               {journalContent.title && (
                 <h3 className="text-lg font-bold mb-3 text-white">{journalContent.title}</h3>
               )}
               {journalContent.text ? (
-                <p className="text-gray-200 whitespace-pre-wrap text-sm">{journalContent.text}</p>
+                <p className="text-gray-200 whitespace-pre-wrap text-sm leading-relaxed">{journalContent.text}</p>
               ) : (
                 <div className="text-gray-500 text-center mt-4">
                   <div className="text-sm">Your story will appear here</div>
                 </div>
               )}
             </div>
-          </>
-        ) : (
-          <div className="flex items-center justify-center h-full text-gray-500">
-            <div className="text-center">
-              <LoadingSVG />
-              <div className="text-sm mt-4">Ready to capture memories</div>
-              <div className="text-xs mt-2">Tell Tricia about a special moment</div>
+          ) : (
+            <div className="flex items-center justify-center h-full text-gray-500 p-4">
+              <div className="text-center">
+                <LoadingSVG />
+                <div className="text-sm mt-4">Ready to capture memories</div>
+                <div className="text-xs mt-2">Tell Tricia about a special moment</div>
+              </div>
             </div>
-          </div>
-        )}
-      </PlaygroundTile>
+          )}
+        </PlaygroundTile>
+      </div>
     ),
   });
 
   // Conversation tab - clean tiles
   mobileTabs.push({
-    title: "Conversation",
+    title: "Conversation", 
     content: (
-      <div className="flex flex-col gap-4 h-full">
-        {/* Tricia Video */}
+      <div className="flex flex-col gap-4 h-full overflow-y-auto">
+        {/* Tricia Audio */}
         <PlaygroundTile
-          title="Tricia"
-          className="flex-1"
+          title="Tricia Speaking"
+          className="h-24"
         >
-          <div className="relative h-full bg-gray-900 rounded-lg overflow-hidden">
-            {agentVideoTrack ? (
-              <>
-                <VideoTrack
-                  trackRef={agentVideoTrack}
-                  className="absolute inset-0 w-full h-full object-cover"
-                />
-                {voiceAssistant.audioTrack && (
-                  <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-black/70 to-transparent flex items-end justify-center pb-2">
-                    <BarVisualizer
-                      state={voiceAssistant.state}
-                      trackRef={voiceAssistant.audioTrack}
-                      barCount={5}
-                      options={{ minHeight: 8 }}
-                      className="h-6 w-20"
-                    />
-                  </div>
-                )}
-              </>
-            ) : (
-              <div className="flex items-center justify-center h-full text-gray-500 text-sm">
-                Waiting for Tricia...
-              </div>
-            )}
-          </div>
+          <AudioInputTile trackRef={voiceAssistant.audioTrack} />
+        </PlaygroundTile>
+        
+        {/* User Audio */}
+        <PlaygroundTile
+          title="Your Voice"
+          className="h-24"
+        >
+          {localMicTrack ? (
+            <AudioInputTile trackRef={localMicTrack} />
+          ) : (
+            <div className="flex items-center justify-center h-full text-gray-500 text-xs">
+              Microphone off
+            </div>
+          )}
         </PlaygroundTile>
         
         {/* User Video */}
         <PlaygroundTile
           title="You"
-          className="h-40"
+          className="flex-1 min-h-[200px]"
         >
           <div className="relative h-full bg-gray-900 rounded-lg overflow-hidden">
             {localCameraTrack ? (
@@ -579,7 +575,7 @@ export default function Playground({
           title="Live Caption"
           className="h-32"
         >
-          <div className="flex items-center justify-center h-full">
+          <div className="flex items-center justify-center h-full p-2">
             {currentTranscript ? (
               <div className="animate-fade-in text-center">
                 <div className="text-xs text-gray-400">{currentTranscript.speaker}</div>
@@ -640,82 +636,86 @@ export default function Playground({
         <div className="hidden lg:flex w-full h-full gap-4">
           {/* Left Column - Journal */}
           <div className="flex flex-col grow basis-1/2 gap-4">
+            {/* Journal Images - 16:9 aspect ratio */}
             <PlaygroundTile
-              title="Memory Journal"
-              className="w-full h-full"
-              childrenClassName="flex flex-col p-0"
+              title="Memory Images"
+              className="w-full h-auto"
+              childrenClassName="p-4 bg-gray-900"
+            >
+              {journalContent?.images && journalContent.images.length > 0 ? (
+                <div className="relative w-full" style={{ paddingBottom: '56.25%' }}> {/* 16:9 aspect ratio */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <img
+                      src={journalContent.images[currentImageIndex]}
+                      alt={`Memory ${currentImageIndex + 1}`}
+                      className="w-full h-full object-contain rounded-lg"
+                    />
+                    {journalContent.images.length > 1 && (
+                      <>
+                        <button
+                          onClick={() => setCurrentImageIndex((prev) => 
+                            prev > 0 ? prev - 1 : journalContent.images!.length - 1
+                          )}
+                          className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full"
+                        >
+                          ←
+                        </button>
+                        <button
+                          onClick={() => setCurrentImageIndex((prev) => 
+                            prev < journalContent.images!.length - 1 ? prev + 1 : 0
+                          )}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full"
+                        >
+                          →
+                        </button>
+                      </>
+                    )}
+                  </div>
+                  {journalContent.images.length > 1 && (
+                    <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
+                      {journalContent.images.map((_, index) => (
+                        <button
+                          key={index}
+                          onClick={() => setCurrentImageIndex(index)}
+                          className={`w-2 h-2 rounded-full transition-colors ${
+                            index === currentImageIndex ? 'bg-white' : 'bg-gray-600'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="relative w-full bg-gray-800 rounded-lg flex items-center justify-center text-gray-500" style={{ paddingBottom: '56.25%' }}>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="text-center">
+                      <div className="text-sm">No images yet</div>
+                      <div className="text-xs mt-1">Images will appear as you share memories</div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </PlaygroundTile>
+
+            {/* Journal Text Content */}
+            <PlaygroundTile
+              title="Memory Story"
+              className="flex-1 overflow-hidden"
+              childrenClassName="overflow-y-auto"
             >
               {journalContent ? (
-                <>
-                  {/* Image Gallery - 60% */}
-                  <div className="flex-[6] bg-gray-900 border-b border-gray-800 p-4">
-                    {journalContent.images && journalContent.images.length > 0 ? (
-                      <div className="h-full flex flex-col">
-                        <div className="flex-1 flex items-center justify-center relative">
-                          <img
-                            src={journalContent.images[currentImageIndex]}
-                            alt={`Memory ${currentImageIndex + 1}`}
-                            className="max-h-full max-w-full object-contain rounded-lg"
-                          />
-                          {journalContent.images.length > 1 && (
-                            <>
-                              <button
-                                onClick={() => setCurrentImageIndex((prev) => 
-                                  prev > 0 ? prev - 1 : journalContent.images!.length - 1
-                                )}
-                                className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full"
-                              >
-                                ←
-                              </button>
-                              <button
-                                onClick={() => setCurrentImageIndex((prev) => 
-                                  prev < journalContent.images!.length - 1 ? prev + 1 : 0
-                                )}
-                                className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full"
-                              >
-                                →
-                              </button>
-                            </>
-                          )}
-                        </div>
-                        {journalContent.images.length > 1 && (
-                          <div className="flex justify-center gap-2 mt-2">
-                            {journalContent.images.map((_, index) => (
-                              <button
-                                key={index}
-                                onClick={() => setCurrentImageIndex(index)}
-                                className={`w-2 h-2 rounded-full transition-colors ${
-                                  index === currentImageIndex ? 'bg-white' : 'bg-gray-600'
-                                }`}
-                              />
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="h-full flex items-center justify-center text-gray-500">
-                        <div className="text-center">
-                          <div className="text-sm">No images yet</div>
-                          <div className="text-xs mt-1">Images will appear as you share memories</div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  
-                  {/* Text Narrative - 40% */}
-                  <div className="flex-[4] overflow-y-auto p-4">
-                    {journalContent.title && (
-                      <h2 className="text-xl font-bold mb-3 text-white">{journalContent.title}</h2>
-                    )}
-                    {journalContent.text ? (
-                      <p className="text-gray-200 whitespace-pre-wrap text-sm">{journalContent.text}</p>
-                    ) : (
-                      <div className="text-gray-500 text-center mt-4">
-                        <div className="text-sm">Your story will appear here</div>
-                      </div>
-                    )}
-                  </div>
-                </>
+                <div className="p-4">
+                  {journalContent.title && (
+                    <h2 className="text-xl font-bold mb-3 text-white">{journalContent.title}</h2>
+                  )}
+                  {journalContent.text ? (
+                    <p className="text-gray-200 whitespace-pre-wrap text-sm leading-relaxed">{journalContent.text}</p>
+                  ) : (
+                    <div className="text-gray-500 text-center mt-4">
+                      <div className="text-sm">Your story will appear here</div>
+                    </div>
+                  )}
+                </div>
               ) : (
                 <div className="flex items-center justify-center h-full text-gray-500">
                   <div className="text-center">
@@ -728,44 +728,34 @@ export default function Playground({
             </PlaygroundTile>
           </div>
 
-          {/* Middle Column - Conversation */}
+          {/* Middle Column - Audio & Video */}
           <div className="flex flex-col basis-1/4 gap-4">
-            {/* Agent Video */}
+            {/* Tricia Audio */}
             <PlaygroundTile
-              title="Tricia"
-              className="flex-1"
+              title="Tricia Speaking"
+              className="h-32"
             >
-              <div className="relative h-full bg-gray-900 rounded-lg overflow-hidden">
-                {agentVideoTrack ? (
-                  <>
-                    <VideoTrack
-                      trackRef={agentVideoTrack}
-                      className="absolute inset-0 w-full h-full object-cover"
-                    />
-                    {voiceAssistant.audioTrack && (
-                      <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/70 to-transparent flex items-end justify-center pb-2">
-                        <BarVisualizer
-                          state={voiceAssistant.state}
-                          trackRef={voiceAssistant.audioTrack}
-                          barCount={5}
-                          options={{ minHeight: 10 }}
-                          className="h-8 w-24"
-                        />
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <div className="flex items-center justify-center h-full text-gray-500 text-sm">
-                    Waiting for Tricia...
-                  </div>
-                )}
-              </div>
+              <AudioInputTile trackRef={voiceAssistant.audioTrack} />
+            </PlaygroundTile>
+
+            {/* User Audio */}
+            <PlaygroundTile
+              title="Your Voice" 
+              className="h-32"
+            >
+              {localMicTrack ? (
+                <AudioInputTile trackRef={localMicTrack} />
+              ) : (
+                <div className="flex items-center justify-center h-full text-gray-500 text-xs">
+                  Microphone off
+                </div>
+              )}
             </PlaygroundTile>
 
             {/* User Video */}
             <PlaygroundTile
               title="You"
-              className="h-48"
+              className="flex-1"
             >
               <div className="relative h-full bg-gray-900 rounded-lg overflow-hidden">
                 {localCameraTrack ? (
@@ -781,7 +771,7 @@ export default function Playground({
               </div>
             </PlaygroundTile>
 
-            {/* Live Caption */}
+            {/* Live Captions - Shows both speakers */}
             <PlaygroundTile
               title="Live Caption"
               className="h-32"
@@ -790,7 +780,7 @@ export default function Playground({
                 {currentTranscript ? (
                   <div className="animate-fade-in text-center">
                     <div className="text-xs text-gray-400 mb-1">{currentTranscript.speaker}</div>
-                    <div className="text-sm font-medium text-white px-2">
+                    <div className="text-sm font-medium text-white px-2 leading-relaxed">
                       {currentTranscript.text}
                     </div>
                   </div>

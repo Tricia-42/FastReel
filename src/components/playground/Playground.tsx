@@ -151,11 +151,19 @@ export default function Playground({
   // Get agent transcriptions
   const agentTranscriptions = useTrackTranscription(voiceAssistant.audioTrack);
   
+  // Debug: Check agent audio track
+  useEffect(() => {
+    console.log('Voice Assistant agent:', voiceAssistant.agent);
+    console.log('Voice Assistant audioTrack:', voiceAssistant.audioTrack);
+  }, [voiceAssistant.agent, voiceAssistant.audioTrack]);
+  
   // Update subtitle when agent speaks
   useEffect(() => {
     if (agentTranscriptions && agentTranscriptions.segments && agentTranscriptions.segments.length > 0) {
       const latestSegment = agentTranscriptions.segments[agentTranscriptions.segments.length - 1];
+      console.log('Agent transcription segment:', latestSegment);
       if (latestSegment && latestSegment.final) {
+        console.log('Agent transcription from LiveKit:', latestSegment.text);
         setCurrentTranscript({
           text: latestSegment.text,
           speaker: "Tricia",
@@ -175,7 +183,9 @@ export default function Playground({
   // Clear transcript after 5 seconds (increased from 3)
   useEffect(() => {
     if (currentTranscript) {
+      console.log('Setting timer to clear transcript for:', currentTranscript.speaker);
       const timer = setTimeout(() => {
+        console.log('Clearing transcript for:', currentTranscript.speaker);
         setCurrentTranscript(null);
       }, 5000);
       return () => clearTimeout(timer);

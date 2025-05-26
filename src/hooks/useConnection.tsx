@@ -76,16 +76,13 @@ export const ConnectionProvider = ({
             const apiUrl = useProxy ? '/api/tricia-proxy' : `${process.env.NEXT_PUBLIC_TRICIA_BASE_URL || 'https://api.heytricia.ai/api/v1'}/chats`;
             
             // Use environment variables with fallback values
-            const agentId = process.env.NEXT_PUBLIC_TRICIA_AGENT_ID || 'aa0b0d4e-bc28-4e4e-88c1-40b829b6fb9d';
             const userId = process.env.NEXT_PUBLIC_TRICIA_USER_ID || 'Xe9nkrHVetU1lHiK8wt7Ujf6SrH3';
             
             const payload = {
-              agent_id: agentId,
-              user_id: userId,  // Send both user_id and user_ids
-              user_ids: [userId],  // API seems to require both fields
               metadata: {
                 title: 'Tricia Pilot App Session'
-              }
+              },
+              user_id: userId
             };
             
             console.log('Calling Tricia API:', apiUrl);
@@ -160,18 +157,22 @@ export const ConnectionProvider = ({
             }
             
             console.log('Parsed API Response data:', data);
+            console.log('Response structure keys:', Object.keys(data));
             
             // Check if response is wrapped in a 'data' object or directly contains the fields
             const chatData = data.data || data;
+            console.log('Chat data keys:', Object.keys(chatData));
             
+            // Expected response fields: id, participant_name, participant_token, room_name, server_url
             if (chatData.participant_token && chatData.server_url) {
               token = chatData.participant_token;
               url = chatData.server_url;
               console.log('Successfully got LiveKit credentials');
-              console.log('Token:', token);
+              console.log('Chat ID:', chatData.id);
+              console.log('Participant Name:', chatData.participant_name);
+              console.log('Participant Token:', token.substring(0, 20) + '...');
+              console.log('Room Name:', chatData.room_name);
               console.log('Server URL:', url);
-              console.log('Room Name:', chatData.room_name || 'Not provided');
-              console.log('Chat ID:', chatData.id || 'Not provided');
               
               // Add a longer delay to ensure agent has time to fully initialize
               // This is especially important for first-time connections where the agent needs to cold start

@@ -205,6 +205,35 @@ export default function Playground({
   const localMicTrack = localTracks.find(
     ({ source }) => source === Track.Source.Microphone
   );
+  
+  // Get user transcriptions using the microphone track
+  const userTranscriptions = useTrackTranscription(localMicTrack);
+  
+  // Update subtitle when user speaks (using LiveKit transcription)
+  useEffect(() => {
+    if (userTranscriptions && userTranscriptions.segments && userTranscriptions.segments.length > 0) {
+      const latestSegment = userTranscriptions.segments[userTranscriptions.segments.length - 1];
+      if (latestSegment && latestSegment.final) {
+        console.log('User transcription from LiveKit:', latestSegment.text);
+        setCurrentTranscript({
+          text: latestSegment.text,
+          speaker: "You",
+          timestamp: Date.now()
+        });
+        
+        // Also add to transcript history
+        setTranscripts((prevTranscripts) => [
+          ...prevTranscripts,
+          {
+            name: "You",
+            message: latestSegment.text,
+            timestamp: Date.now(),
+            isSelf: true,
+          },
+        ]);
+      }
+    }
+  }, [userTranscriptions]);
 
   const onDataReceived = useCallback(
     (msg: any) => {

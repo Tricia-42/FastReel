@@ -529,18 +529,44 @@ export default function Playground({
     title: "Conversation", 
     content: (
       <div className="flex flex-col gap-4 h-full overflow-y-auto">
+        {/* Tricia Section */}
+        <div className="text-xs text-gray-400 px-4 pt-2">Tricia</div>
+        
         {/* Tricia Audio */}
         <PlaygroundTile
           title="Tricia Speaking"
-          className="h-32"
+          className="h-24"
         >
           <AudioInputTile trackRef={voiceAssistant.audioTrack} />
         </PlaygroundTile>
         
+        {/* Tricia Transcription */}
+        <PlaygroundTile
+          title="Tricia's Words"
+          className="h-32"
+        >
+          <div className="flex items-center justify-center h-full p-3">
+            {currentTranscript && currentTranscript.speaker === "Tricia" ? (
+              <div className="animate-fade-in text-center w-full">
+                <div className="text-sm font-medium text-white">
+                  {currentTranscript.text}
+                </div>
+              </div>
+            ) : (
+              <div className="text-xs text-gray-500 text-center">
+                Tricia's responses will appear here
+              </div>
+            )}
+          </div>
+        </PlaygroundTile>
+        
+        {/* User Section */}
+        <div className="text-xs text-gray-400 px-4 pt-2">You</div>
+        
         {/* User Video */}
         <PlaygroundTile
-          title="You"
-          className="h-48"
+          title="Your Video"
+          className="h-40"
         >
           <div className="relative h-full bg-gray-900 rounded-lg overflow-hidden">
             {localCameraTrack ? (
@@ -556,37 +582,37 @@ export default function Playground({
           </div>
         </PlaygroundTile>
         
-        {/* Combined User Audio & Live Transcriptions */}
+        {/* User Audio */}
         <PlaygroundTile
-          title="Your Voice & Transcription"
-          className="flex-1 min-h-[200px]"
+          title="Your Voice"
+          className="h-24"
         >
-          <div className="flex flex-col h-full">
-            {/* User Audio Visualizer */}
-            <div className="h-24 border-b border-gray-800">
-              {localMicTrack ? (
-                <AudioInputTile trackRef={localMicTrack} />
-              ) : (
-                <div className="flex items-center justify-center h-full text-gray-500 text-xs">
-                  Microphone off
-                </div>
-              )}
+          {localMicTrack ? (
+            <AudioInputTile trackRef={localMicTrack} />
+          ) : (
+            <div className="flex items-center justify-center h-full text-gray-500 text-xs">
+              Microphone off
             </div>
-            
-            {/* Live Transcription */}
-            <div className="flex-1 flex items-center justify-center p-3">
-              {currentTranscript ? (
-                <div className="animate-fade-in text-center w-full">
-                  <div className="text-xs text-gray-400">{currentTranscript.speaker}</div>
-                  <div className="text-sm font-medium text-white mt-1 px-1">{currentTranscript.text}</div>
+          )}
+        </PlaygroundTile>
+        
+        {/* User Transcription */}
+        <PlaygroundTile
+          title="Your Words"
+          className="h-32"
+        >
+          <div className="flex items-center justify-center h-full p-3">
+            {currentTranscript && currentTranscript.speaker === "You" ? (
+              <div className="animate-fade-in text-center w-full">
+                <div className="text-sm font-medium text-white">
+                  {currentTranscript.text}
                 </div>
-              ) : (
-                <div className="text-xs text-gray-500 text-center">
-                  <div>Speak to see live transcription</div>
-                  <div className="mt-1 text-gray-600 text-xs">Both voices appear here</div>
-                </div>
-              )}
-            </div>
+              </div>
+            ) : (
+              <div className="text-xs text-gray-500 text-center">
+                Your words will appear here as you speak
+              </div>
+            )}
           </div>
         </PlaygroundTile>
       </div>
@@ -640,9 +666,29 @@ export default function Playground({
             {/* Tricia Audio Visualizer */}
             <PlaygroundTile
               title="Tricia Speaking"
-              className="h-48"
+              className="h-32"
             >
               <AudioInputTile trackRef={voiceAssistant.audioTrack} />
+            </PlaygroundTile>
+
+            {/* Tricia Transcription */}
+            <PlaygroundTile
+              title="Tricia's Words"
+              className="h-48"
+            >
+              <div className="flex items-center justify-center h-full p-4">
+                {currentTranscript && currentTranscript.speaker === "Tricia" ? (
+                  <div className="animate-fade-in text-center w-full">
+                    <div className="text-sm font-medium text-white leading-relaxed">
+                      {currentTranscript.text}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-xs text-gray-500 text-center">
+                    <div>Tricia's responses will appear here</div>
+                  </div>
+                )}
+              </div>
             </PlaygroundTile>
 
             {/* Settings - moved to left column bottom */}
@@ -751,7 +797,7 @@ export default function Playground({
             </PlaygroundTile>
           </div>
 
-          {/* Right Column - User Interaction */}
+          {/* Right Column - User */}
           <div className="flex flex-col basis-1/4 gap-4">
             {/* User Video */}
             <PlaygroundTile
@@ -772,39 +818,37 @@ export default function Playground({
               </div>
             </PlaygroundTile>
 
-            {/* Combined User Audio & Live Transcriptions */}
+            {/* User Audio Visualizer */}
             <PlaygroundTile
-              title="Your Voice & Transcription"
+              title="Your Voice"
+              className="h-32"
+            >
+              {localMicTrack ? (
+                <AudioInputTile trackRef={localMicTrack} />
+              ) : (
+                <div className="flex items-center justify-center h-full text-gray-500 text-xs">
+                  Microphone off
+                </div>
+              )}
+            </PlaygroundTile>
+
+            {/* User Transcription */}
+            <PlaygroundTile
+              title="Your Words"
               className="flex-1"
             >
-              <div className="flex flex-col h-full">
-                {/* User Audio Visualizer */}
-                <div className="h-24 border-b border-gray-800">
-                  {localMicTrack ? (
-                    <AudioInputTile trackRef={localMicTrack} />
-                  ) : (
-                    <div className="flex items-center justify-center h-full text-gray-500 text-xs">
-                      Microphone off
+              <div className="flex items-center justify-center h-full p-4">
+                {currentTranscript && currentTranscript.speaker === "You" ? (
+                  <div className="animate-fade-in text-center w-full">
+                    <div className="text-sm font-medium text-white leading-relaxed">
+                      {currentTranscript.text}
                     </div>
-                  )}
-                </div>
-                
-                {/* Live Transcription */}
-                <div className="flex-1 flex items-center justify-center p-4">
-                  {currentTranscript ? (
-                    <div className="animate-fade-in text-center w-full">
-                      <div className="text-xs text-gray-400 mb-1">{currentTranscript.speaker}</div>
-                      <div className="text-sm font-medium text-white px-2 leading-relaxed">
-                        {currentTranscript.text}
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="text-xs text-gray-500 text-center">
-                      <div>Speak to see live transcription</div>
-                      <div className="mt-1 text-gray-600">Both your voice and Tricia's responses will appear here</div>
-                    </div>
-                  )}
-                </div>
+                  </div>
+                ) : (
+                  <div className="text-xs text-gray-500 text-center">
+                    <div>Your words will appear here as you speak</div>
+                  </div>
+                )}
               </div>
             </PlaygroundTile>
           </div>

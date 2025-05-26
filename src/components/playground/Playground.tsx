@@ -488,12 +488,12 @@ export default function Playground({
         {/* Tricia Transcription */}
         <PlaygroundTile
           title="Tricia's Words"
-          className="h-32"
+          className="h-24"
         >
           <div className="flex items-center justify-center h-full p-3">
             {currentTranscript && currentTranscript.speaker === "Tricia" ? (
               <div className="animate-fade-in text-center w-full">
-                <div className="text-sm font-medium text-white">
+                <div className="text-sm font-medium text-white leading-tight">
                   {currentTranscript.text}
                 </div>
               </div>
@@ -544,12 +544,12 @@ export default function Playground({
         {/* User Transcription */}
         <PlaygroundTile
           title="Your Words"
-          className="h-32"
+          className="h-24"
         >
           <div className="flex items-center justify-center h-full p-3">
             {currentTranscript && currentTranscript.speaker === "You" ? (
               <div className="animate-fade-in text-center w-full">
-                <div className="text-sm font-medium text-white">
+                <div className="text-sm font-medium text-white leading-tight">
                   {currentTranscript.text}
                 </div>
               </div>
@@ -613,7 +613,7 @@ export default function Playground({
               title="Settings"
               padding={false}
               backgroundColor="gray-950"
-              className="h-72 overflow-y-auto"
+              className="flex-1 overflow-y-auto"
               childrenClassName="h-full"
             >
               {settingsTileContent}
@@ -630,18 +630,18 @@ export default function Playground({
             {/* Tricia Transcription */}
             <PlaygroundTile
               title="Tricia's Words"
-              className="flex-1"
+              className="h-24"
             >
-              <div className="flex items-center justify-center h-full p-4">
+              <div className="flex items-center justify-center h-full p-3">
                 {currentTranscript && currentTranscript.speaker === "Tricia" ? (
                   <div className="animate-fade-in text-center w-full">
-                    <div className="text-sm font-medium text-white leading-relaxed">
+                    <div className="text-sm font-medium text-white leading-tight">
                       {currentTranscript.text}
                     </div>
                   </div>
                 ) : (
                   <div className="text-xs text-gray-500 text-center">
-                    <div>Tricia's responses will appear here</div>
+                    Tricia's responses will appear here
                   </div>
                 )}
               </div>
@@ -780,18 +780,18 @@ export default function Playground({
             {/* User Transcription */}
             <PlaygroundTile
               title="Your Words"
-              className="flex-1"
+              className="h-24"
             >
-              <div className="flex items-center justify-center h-full p-4">
+              <div className="flex items-center justify-center h-full p-3">
                 {currentTranscript && currentTranscript.speaker === "You" ? (
                   <div className="animate-fade-in text-center w-full">
-                    <div className="text-sm font-medium text-white leading-relaxed">
+                    <div className="text-sm font-medium text-white leading-tight">
                       {currentTranscript.text}
                     </div>
                   </div>
                 ) : (
                   <div className="text-xs text-gray-500 text-center">
-                    <div>Your words will appear here as you speak</div>
+                    Your words will appear here as you speak
                   </div>
                 )}
               </div>

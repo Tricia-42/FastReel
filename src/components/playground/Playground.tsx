@@ -89,6 +89,65 @@ export default function Playground({
   // State for current image index in carousel
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
+  // Register RPC handlers for receiving calls from the agent
+  useEffect(() => {
+    if (!room || roomState !== ConnectionState.Connected) return;
+
+    // Handler for journal generated event
+    const handleJournalGenerated = async (data: any) => {
+      console.log('Received journal generated RPC:', data);
+      try {
+        // The payload should be in data.payload
+        const payload = typeof data.payload === 'string' ? data.payload : JSON.stringify(data.payload);
+        const journalData = JSON.parse(payload);
+        console.log('Parsed journal data:', journalData);
+        
+        // Update journal content with the received data
+        setJournalContent({
+          title: journalData.title,
+          text: journalData.narrative,
+          images: journalData.images || [],
+          createdAt: journalData.createdAt
+        });
+        
+        // Return success response
+        return JSON.stringify({ status: 'success', message: 'Journal received' });
+      } catch (error: any) {
+        console.error('Error handling journal generated:', error);
+        return JSON.stringify({ status: 'error', message: error?.message || 'Unknown error' });
+      }
+    };
+
+    // Handler for journal saved event
+    const handleJournalSaved = async (data: any) => {
+      console.log('Received journal saved RPC:', data);
+      try {
+        // The payload should be in data.payload
+        const payload = typeof data.payload === 'string' ? data.payload : JSON.stringify(data.payload);
+        const savedData = JSON.parse(payload);
+        console.log('Journal saved successfully:', savedData);
+        
+        // You can show a success notification here
+        // For now, just log it
+        
+        return JSON.stringify({ status: 'success', message: 'Journal save acknowledged' });
+      } catch (error: any) {
+        console.error('Error handling journal saved:', error);
+        return JSON.stringify({ status: 'error', message: error?.message || 'Unknown error' });
+      }
+    };
+
+    // Register the RPC handlers
+    room.localParticipant.registerRpcMethod('agent.journal_generated', handleJournalGenerated);
+    room.localParticipant.registerRpcMethod('agent.journal_saved', handleJournalSaved);
+
+    // Cleanup function to unregister handlers
+    return () => {
+      room.localParticipant.unregisterRpcMethod('agent.journal_generated');
+      room.localParticipant.unregisterRpcMethod('agent.journal_saved');
+    };
+  }, [room, roomState]);
+
   // Get agent transcriptions
   const agentTranscriptions = useTrackTranscription(voiceAssistant.audioTrack);
   
@@ -149,10 +208,12 @@ export default function Playground({
 
   const onDataReceived = useCallback(
     (msg: any) => {
+      console.log('Data received:', msg); // Debug log
       if (msg.topic === "transcription") {
         const decoded = JSON.parse(
           new TextDecoder("utf-8").decode(msg.payload)
         );
+        console.log('Transcription decoded:', decoded); // Debug log
         let timestamp = new Date().getTime();
         if ("timestamp" in decoded && decoded.timestamp > 0) {
           timestamp = decoded.timestamp;
@@ -165,9 +226,9 @@ export default function Playground({
           timestamp: timestamp
         });
         
-        // Also add to transcript history
-        setTranscripts([
-          ...transcripts,
+        // Also add to transcript history - Use functional update
+        setTranscripts((prevTranscripts) => [
+          ...prevTranscripts,
           {
             name: "You",
             message: decoded.text,
@@ -177,7 +238,7 @@ export default function Playground({
         ]);
       }
     },
-    [transcripts]
+    [] // Remove transcripts from dependencies
   );
 
   useDataChannel(onDataReceived);
@@ -337,7 +398,16 @@ export default function Playground({
           className="w-full h-auto"
           childrenClassName="p-4 bg-gray-900"
         >
-          {journalContent?.images && journalContent.images.length > 0 ? (
+          {agentVideoTrack ? (
+            <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+              <div className="absolute inset-0">
+                <VideoTrack
+                  trackRef={agentVideoTrack}
+                  className="w-full h-full object-contain rounded-lg"
+                />
+              </div>
+            </div>
+          ) : journalContent?.images && journalContent.images.length > 0 ? (
             <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
               <div className="absolute inset-0 flex items-center justify-center">
                 <img
@@ -442,7 +512,7 @@ export default function Playground({
         
         {/* Tricia Transcription */}
         <PlaygroundTile
-          title="Tricia's Words"
+          title="Tricia&apos;s Words"
           className="h-24"
         >
           <div className="flex items-center justify-center h-full p-3">
@@ -492,21 +562,21 @@ export default function Playground({
             <div className="grid grid-cols-2 gap-1">
               <button
                 onClick={() => {
-                  setRpcMethod('add_memory');
-                  setRpcPayload('{}');
+                  setRpcMethod('update_journal');
+                  setRpcPayload('{"action": "generate"}');
                 }}
                 className="text-xs px-2 py-1.5 bg-gray-800 hover:bg-gray-700 rounded text-gray-300"
               >
-                Add Memory
+                Generate Journal
               </button>
               <button
                 onClick={() => {
                   setRpcMethod('update_journal');
-                  setRpcPayload('{}');
+                  setRpcPayload('{"action": "preview"}');
                 }}
                 className="text-xs px-2 py-1.5 bg-gray-800 hover:bg-gray-700 rounded text-gray-300"
               >
-                Update Journal
+                Preview Journal
               </button>
             </div>
             <button
@@ -625,7 +695,7 @@ export default function Playground({
 
             {/* Tricia Transcription */}
             <PlaygroundTile
-              title="Tricia's Words"
+              title="Tricia&apos;s Words"
               className="h-24"
             >
               <div className="flex items-center justify-center h-full p-3">
@@ -652,8 +722,17 @@ export default function Playground({
               className="w-full h-auto"
               childrenClassName="p-4 bg-gray-900"
             >
-              {journalContent?.images && journalContent.images.length > 0 ? (
-                <div className="relative w-full" style={{ paddingBottom: '56.25%' }}> {/* 16:9 aspect ratio */}
+              {agentVideoTrack ? (
+                <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+                  <div className="absolute inset-0">
+                    <VideoTrack
+                      trackRef={agentVideoTrack}
+                      className="w-full h-full object-contain rounded-lg"
+                    />
+                  </div>
+                </div>
+              ) : journalContent?.images && journalContent.images.length > 0 ? (
+                <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
                   <div className="absolute inset-0 flex items-center justify-center">
                     <img
                       src={journalContent.images[currentImageIndex]}
@@ -666,7 +745,7 @@ export default function Playground({
                           onClick={() => setCurrentImageIndex((prev) => 
                             prev > 0 ? prev - 1 : journalContent.images!.length - 1
                           )}
-                          className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full"
+                          className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-1.5 rounded-full text-sm"
                         >
                           ←
                         </button>
@@ -674,7 +753,7 @@ export default function Playground({
                           onClick={() => setCurrentImageIndex((prev) => 
                             prev < journalContent.images!.length - 1 ? prev + 1 : 0
                           )}
-                          className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full"
+                          className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-1.5 rounded-full text-sm"
                         >
                           →
                         </button>
@@ -682,12 +761,12 @@ export default function Playground({
                     )}
                   </div>
                   {journalContent.images.length > 1 && (
-                    <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
+                    <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1.5">
                       {journalContent.images.map((_, index) => (
                         <button
                           key={index}
                           onClick={() => setCurrentImageIndex(index)}
-                          className={`w-2 h-2 rounded-full transition-colors ${
+                          className={`w-1.5 h-1.5 rounded-full transition-colors ${
                             index === currentImageIndex ? 'bg-white' : 'bg-gray-600'
                           }`}
                         />
@@ -696,8 +775,8 @@ export default function Playground({
                   )}
                 </div>
               ) : (
-                <div className="relative w-full bg-gray-800 rounded-lg flex items-center justify-center text-gray-500" style={{ paddingBottom: '56.25%' }}>
-                  <div className="absolute inset-0 flex items-center justify-center">
+                <div className="relative w-full bg-gray-800 rounded-lg" style={{ paddingBottom: '56.25%' }}>
+                  <div className="absolute inset-0 flex items-center justify-center text-gray-500">
                     <div className="text-center">
                       <div className="text-sm">No images yet</div>
                       <div className="text-xs mt-1">Images will appear as you share memories</div>
@@ -770,21 +849,21 @@ export default function Playground({
                 <div className="flex flex-wrap gap-1">
                   <button
                     onClick={() => {
-                      setRpcMethod('add_memory');
-                      setRpcPayload('{}');
+                      setRpcMethod('update_journal');
+                      setRpcPayload('{"action": "generate"}');
                     }}
                     className="text-xs px-2 py-1 bg-gray-800 hover:bg-gray-700 rounded text-gray-300"
                   >
-                    Add Memory
+                    Generate Journal
                   </button>
                   <button
                     onClick={() => {
                       setRpcMethod('update_journal');
-                      setRpcPayload('{}');
+                      setRpcPayload('{"action": "preview"}');
                     }}
                     className="text-xs px-2 py-1 bg-gray-800 hover:bg-gray-700 rounded text-gray-300"
                   >
-                    Update
+                    Preview Journal
                   </button>
                   <button
                     onClick={() => {
@@ -796,33 +875,17 @@ export default function Playground({
                     Save
                   </button>
                 </div>
-                <div className="flex gap-1">
-                  <input
-                    type="text"
-                    value={rpcMethod}
-                    onChange={(e) => setRpcMethod(e.target.value)}
-                    className="flex-1 text-white text-xs bg-transparent border border-gray-800 rounded-sm px-2 py-1"
-                    placeholder="Method"
-                  />
-                  <button
-                    onClick={handleRpcCall}
-                    disabled={!voiceAssistant.agent || !rpcMethod}
-                    className={`px-3 py-1 rounded-sm text-xs font-medium transition-colors
-                      ${voiceAssistant.agent && rpcMethod 
-                        ? `bg-${config.settings.theme_color}-500 hover:bg-${config.settings.theme_color}-600 text-white` 
-                        : 'bg-gray-800 cursor-not-allowed text-gray-500'
-                      }`}
-                  >
-                    Run
-                  </button>
-                </div>
-                <textarea
-                  value={rpcPayload}
-                  onChange={(e) => setRpcPayload(e.target.value)}
-                  className="w-full text-white text-xs bg-transparent border border-gray-800 rounded-sm px-2 py-1"
-                  placeholder="Payload (JSON)"
-                  rows={2}
-                />
+                <button
+                  onClick={handleRpcCall}
+                  disabled={!voiceAssistant.agent || !rpcMethod}
+                  className={`px-3 py-1 rounded-sm text-xs font-medium transition-colors
+                    ${voiceAssistant.agent && rpcMethod 
+                      ? `bg-${config.settings.theme_color}-500 hover:bg-${config.settings.theme_color}-600 text-white` 
+                      : 'bg-gray-800 cursor-not-allowed text-gray-500'
+                    }`}
+                >
+                  Run
+                </button>
               </div>
             </PlaygroundTile>
 

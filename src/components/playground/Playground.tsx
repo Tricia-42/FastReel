@@ -24,6 +24,7 @@ import {
   useTracks,
   useVoiceAssistant,
   useRoomContext,
+  useTrackTranscription,
 } from "@livekit/components-react";
 import { ConnectionState, LocalParticipant, Track } from "livekit-client";
 import { QRCodeSVG } from "qrcode.react";
@@ -74,6 +75,36 @@ export default function Playground({
   
   // State for journal content
   const [journalContent, setJournalContent] = useState<JournalContent | null>(null);
+  
+  // State for subtitle-style transcription
+  const [currentTranscript, setCurrentTranscript] = useState<{
+    text: string;
+    speaker: string;
+    timestamp: number;
+  } | null>(null);
+  
+  // State for settings drawer
+  const [showSettings, setShowSettings] = useState(false);
+  
+  // State for current image index in carousel
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  // Get agent transcriptions
+  const agentTranscriptions = useTrackTranscription(voiceAssistant.audioTrack);
+  
+  // Update subtitle when agent speaks
+  useEffect(() => {
+    if (agentTranscriptions && agentTranscriptions.segments && agentTranscriptions.segments.length > 0) {
+      const latestSegment = agentTranscriptions.segments[agentTranscriptions.segments.length - 1];
+      if (latestSegment && latestSegment.final) {
+        setCurrentTranscript({
+          text: latestSegment.text,
+          speaker: "Tricia",
+          timestamp: Date.now()
+        });
+      }
+    }
+  }, [agentTranscriptions]);
 
   useEffect(() => {
     if (roomState === ConnectionState.Connected) {
@@ -81,6 +112,21 @@ export default function Playground({
       localParticipant.setMicrophoneEnabled(config.settings.inputs.mic);
     }
   }, [config, localParticipant, roomState]);
+
+  // Clear transcript after 5 seconds (increased from 3)
+  useEffect(() => {
+    if (currentTranscript) {
+      const timer = setTimeout(() => {
+        setCurrentTranscript(null);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [currentTranscript]);
+
+  // Reset image index when journal content changes
+  useEffect(() => {
+    setCurrentImageIndex(0);
+  }, [journalContent]);
 
   const agentVideoTrack = tracks.find(
     (trackRef) =>
@@ -111,6 +157,15 @@ export default function Playground({
         if ("timestamp" in decoded && decoded.timestamp > 0) {
           timestamp = decoded.timestamp;
         }
+        
+        // Update subtitle-style transcription
+        setCurrentTranscript({
+          text: decoded.text,
+          speaker: "You",
+          timestamp: timestamp
+        });
+        
+        // Also add to transcript history
         setTranscripts([
           ...transcripts,
           {
@@ -127,90 +182,6 @@ export default function Playground({
 
   useDataChannel(onDataReceived);
 
-  const videoTileContent = useMemo(() => {
-    const videoFitClassName = `object-${config.video_fit || "cover"}`;
-
-    const disconnectedContent = (
-      <div className="flex items-center justify-center text-gray-700 text-center w-full h-full">
-        Connect to start your memory journey
-      </div>
-    );
-
-    const loadingContent = (
-      <div className="flex flex-col items-center justify-center gap-2 text-gray-700 text-center h-full w-full">
-        <LoadingSVG />
-        <div className="text-sm">Waiting for journal generation</div>
-        <div className="text-xs mt-2">Ask Tricia to capture your memories</div>
-      </div>
-    );
-
-    const videoContent = (
-      <VideoTrack
-        trackRef={agentVideoTrack}
-        className={`absolute top-1/2 -translate-y-1/2 ${videoFitClassName} object-position-center w-full h-full`}
-      />
-    );
-
-    const journalDisplayContent = (
-      <div className="flex flex-col h-full w-full overflow-y-auto p-6 text-white">
-        {journalContent?.title && (
-          <h2 className="text-2xl font-bold mb-4">{journalContent.title}</h2>
-        )}
-        
-        {journalContent?.text && (
-          <div className="prose prose-invert max-w-none mb-4">
-            <p className="whitespace-pre-wrap">{journalContent.text}</p>
-          </div>
-        )}
-        
-        {journalContent?.images && journalContent.images.length > 0 && (
-          <div className="grid grid-cols-2 gap-4 mb-4">
-            {journalContent.images.map((imageUrl, index) => (
-              <img
-                key={index}
-                src={imageUrl}
-                alt={`Journal image ${index + 1}`}
-                className="w-full h-auto rounded-lg"
-              />
-            ))}
-          </div>
-        )}
-        
-        {journalContent?.video && (
-          <video
-            src={journalContent.video}
-            controls
-            className="w-full max-w-2xl mx-auto rounded-lg"
-          />
-        )}
-        
-        {journalContent?.createdAt && (
-          <p className="text-sm text-gray-400 mt-4">
-            Created: {new Date(journalContent.createdAt).toLocaleString()}
-          </p>
-        )}
-      </div>
-    );
-
-    let content = null;
-    if (roomState === ConnectionState.Disconnected) {
-      content = disconnectedContent;
-    } else if (journalContent) {
-      // Show journal content if available
-      content = journalDisplayContent;
-    } else if (agentVideoTrack) {
-      content = videoContent;
-    } else {
-      content = loadingContent;
-    }
-
-    return (
-      <div className="flex flex-col w-full grow text-gray-950 bg-black rounded-sm border border-gray-800 relative">
-        {content}
-      </div>
-    );
-  }, [agentVideoTrack, config, roomState, journalContent]);
-
   useEffect(() => {
     document.body.style.setProperty(
       "--lk-theme-color",
@@ -222,61 +193,6 @@ export default function Playground({
       `var(--lk-theme-color) 0px 0px 18px`
     );
   }, [config.settings.theme_color]);
-
-  const audioTileContent = useMemo(() => {
-    const disconnectedContent = (
-      <div className="flex flex-col items-center justify-center gap-2 text-gray-700 text-center w-full">
-        No audio track. Connect to get started.
-      </div>
-    );
-
-    const waitingContent = (
-      <div className="flex flex-col items-center gap-2 text-gray-700 text-center w-full">
-        <LoadingSVG />
-        Waiting for audio track
-      </div>
-    );
-
-    const visualizerContent = (
-      <div
-        className={`flex items-center justify-center w-full h-48 [--lk-va-bar-width:30px] [--lk-va-bar-gap:20px] [--lk-fg:var(--lk-theme-color)]`}
-      >
-        <BarVisualizer
-          state={voiceAssistant.state}
-          trackRef={voiceAssistant.audioTrack}
-          barCount={5}
-          options={{ minHeight: 20 }}
-        />
-      </div>
-    );
-
-    if (roomState === ConnectionState.Disconnected) {
-      return disconnectedContent;
-    }
-
-    if (!voiceAssistant.audioTrack) {
-      return waitingContent;
-    }
-
-    return visualizerContent;
-  }, [
-    voiceAssistant.audioTrack,
-    config.settings.theme_color,
-    roomState,
-    voiceAssistant.state,
-  ]);
-
-  const chatTileContent = useMemo(() => {
-    if (voiceAssistant.agent) {
-      return (
-        <TranscriptionTile
-          agentAudioTrack={voiceAssistant.audioTrack}
-          accentColor={config.settings.theme_color}
-        />
-      );
-    }
-    return <></>;
-  }, [config.settings.theme_color, voiceAssistant.audioTrack, voiceAssistant.agent]);
 
   const handleRpcCall = useCallback(async () => {
     if (!voiceAssistant.agent || !room) return;
@@ -509,40 +425,169 @@ export default function Playground({
   ]);
 
   let mobileTabs: PlaygroundTab[] = [];
-  if (config.settings.outputs.video) {
-    mobileTabs.push({
-      title: "Journal",
-      content: (
-        <PlaygroundTile
-          className="w-full h-full grow"
-          childrenClassName="justify-center"
-        >
-          {videoTileContent}
-        </PlaygroundTile>
-      ),
-    });
-  }
+  
+  // Journal tab - main focus
+  mobileTabs.push({
+    title: "Journal",
+    content: (
+      <PlaygroundTile
+        className="w-full h-full grow"
+        childrenClassName="p-0"
+      >
+        {journalContent ? (
+          <div className="flex flex-col h-full">
+            {/* Images Section */}
+            <div className="h-1/2 bg-gray-900 border-b border-gray-800 p-4 overflow-hidden">
+              {journalContent.images && journalContent.images.length > 0 ? (
+                <div className="h-full flex flex-col">
+                  <div className="flex-1 flex items-center justify-center relative">
+                    <img
+                      src={journalContent.images[currentImageIndex]}
+                      alt={`Journal memory ${currentImageIndex + 1}`}
+                      className="max-h-full max-w-full object-contain rounded-lg"
+                    />
+                    {/* Image navigation for mobile */}
+                    {journalContent.images.length > 1 && (
+                      <>
+                        <button
+                          onClick={() => setCurrentImageIndex((prev) => 
+                            prev > 0 ? prev - 1 : journalContent.images!.length - 1
+                          )}
+                          className="absolute left-1 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-1 rounded-full text-sm"
+                        >
+                          ←
+                        </button>
+                        <button
+                          onClick={() => setCurrentImageIndex((prev) => 
+                            prev < journalContent.images!.length - 1 ? prev + 1 : 0
+                          )}
+                          className="absolute right-1 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-1 rounded-full text-sm"
+                        >
+                          →
+                        </button>
+                      </>
+                    )}
+                  </div>
+                  {/* Image indicators for mobile */}
+                  {journalContent.images.length > 1 && (
+                    <div className="flex justify-center gap-1 mt-2">
+                      {journalContent.images.map((_, index) => (
+                        <button
+                          key={index}
+                          onClick={() => setCurrentImageIndex(index)}
+                          className={`w-1.5 h-1.5 rounded-full transition-colors ${
+                            index === currentImageIndex ? 'bg-white' : 'bg-gray-600'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="h-full flex items-center justify-center text-gray-600">
+                  <div className="text-center">
+                    <div className="text-sm">No images yet</div>
+                    <div className="text-xs mt-1">Images will appear as you share memories</div>
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            {/* Text Section */}
+            <div className="h-1/2 overflow-y-auto p-4">
+              {journalContent.title && (
+                <h3 className="text-xl font-bold mb-3 text-white">{journalContent.title}</h3>
+              )}
+              {journalContent.text ? (
+                <p className="text-gray-200 whitespace-pre-wrap">{journalContent.text}</p>
+              ) : (
+                <div className="text-gray-500 text-center mt-8">
+                  <div className="text-sm">Your story will appear here</div>
+                </div>
+              )}
+            </div>
+          </div>
+        ) : (
+          <div className="flex items-center justify-center h-full text-gray-600">
+            <div className="text-center">
+              <LoadingSVG />
+              <div className="text-sm mt-4">Ready to capture memories</div>
+              <div className="text-xs mt-2">Tell Tricia about a special moment</div>
+            </div>
+          </div>
+        )}
+      </PlaygroundTile>
+    ),
+  });
 
-  if (config.settings.outputs.audio) {
-    mobileTabs.push({
-      title: "Audio",
-      content: (
-        <PlaygroundTile
-          className="w-full h-full grow"
-          childrenClassName="justify-center"
-        >
-          {audioTileContent}
-        </PlaygroundTile>
-      ),
-    });
-  }
-
-  if (config.settings.chat) {
-    mobileTabs.push({
-      title: "Chat",
-      content: chatTileContent,
-    });
-  }
+  // Conversation tab - combined video and transcription
+  mobileTabs.push({
+    title: "Conversation",
+    content: (
+      <PlaygroundTile
+        className="w-full h-full grow"
+        childrenClassName="flex flex-col p-2 gap-2"
+      >
+        {/* Videos */}
+        <div className="flex-1 flex flex-col gap-2">
+          {/* Tricia */}
+          <div className="flex-1 relative bg-gray-900 rounded-lg overflow-hidden">
+            {agentVideoTrack ? (
+              <>
+                <VideoTrack
+                  trackRef={agentVideoTrack}
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+                {voiceAssistant.audioTrack && (
+                  <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-black/70 to-transparent flex items-end justify-center pb-2">
+                    <BarVisualizer
+                      state={voiceAssistant.state}
+                      trackRef={voiceAssistant.audioTrack}
+                      barCount={5}
+                      options={{ minHeight: 8 }}
+                      className="h-6 w-20"
+                    />
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="flex items-center justify-center h-full text-gray-600 text-sm">
+                Waiting for Tricia...
+              </div>
+            )}
+          </div>
+          
+          {/* User */}
+          <div className="h-32 relative bg-gray-900 rounded-lg overflow-hidden">
+            {localCameraTrack ? (
+              <VideoTrack
+                trackRef={localCameraTrack}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            ) : (
+              <div className="flex items-center justify-center h-full text-gray-600 text-xs">
+                Camera off
+              </div>
+            )}
+          </div>
+        </div>
+        
+        {/* Live Caption */}
+        <div className="h-24 bg-gray-900/50 rounded-lg p-3 flex items-center justify-center">
+          {currentTranscript ? (
+            <div className="animate-fade-in text-center">
+              <div className="text-xs text-gray-400">{currentTranscript.speaker}</div>
+              <div className="text-sm text-white mt-1">{currentTranscript.text}</div>
+            </div>
+          ) : (
+            <div className="text-xs text-gray-500">
+              Live captions
+            </div>
+          )}
+        </div>
+      </PlaygroundTile>
+    ),
+  });
 
   mobileTabs.push({
     title: "Settings",
@@ -572,60 +617,215 @@ export default function Playground({
         }
       />
       <div
-        className={`flex gap-4 py-4 grow w-full selection:bg-${config.settings.theme_color}-900`}
+        className={`flex gap-4 p-4 grow w-full selection:bg-${config.settings.theme_color}-900`}
         style={{ height: `calc(100% - ${headerHeight}px)` }}
       >
-        <div className="flex flex-col grow basis-1/2 gap-4 h-full lg:hidden">
+        {/* Mobile Layout */}
+        <div className="flex flex-col grow gap-4 h-full lg:hidden">
           <PlaygroundTabbedTile
             className="h-full"
             tabs={mobileTabs}
-            initialTab={mobileTabs.length - 1}
+            initialTab={0}
           />
         </div>
-        <div
-          className={`flex-col grow basis-1/2 gap-4 h-full hidden lg:${
-            !config.settings.outputs.audio && !config.settings.outputs.video
-              ? "hidden"
-              : "flex"
-          }`}
-        >
-          {config.settings.outputs.video && (
+
+        {/* Desktop Layout - Guided Journaling Experience */}
+        <div className="hidden lg:flex w-full h-full gap-4">
+          {/* Main Journal Area - 70% width */}
+          <div className="flex flex-col grow basis-[70%] gap-4">
+            {/* Journal Content Display */}
             <PlaygroundTile
-              title="Journal"
+              title="Your Memory Journal"
               className="w-full h-full grow"
-              childrenClassName="justify-center"
+              childrenClassName="p-0"
             >
-              {videoTileContent}
+              {journalContent ? (
+                <div className="flex flex-col h-full">
+                  {/* Image Gallery Section - 50% height */}
+                  <div className="h-1/2 bg-gray-900 border-b border-gray-800 p-4 overflow-hidden">
+                    {journalContent.images && journalContent.images.length > 0 ? (
+                      <div className="h-full flex flex-col">
+                        <div className="flex-1 flex items-center justify-center relative">
+                          <img
+                            src={journalContent.images[currentImageIndex]}
+                            alt={`Journal memory ${currentImageIndex + 1}`}
+                            className="max-h-full max-w-full object-contain rounded-lg"
+                          />
+                          {/* Image navigation */}
+                          {journalContent.images.length > 1 && (
+                            <>
+                              <button
+                                onClick={() => setCurrentImageIndex((prev) => 
+                                  prev > 0 ? prev - 1 : journalContent.images!.length - 1
+                                )}
+                                className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full"
+                              >
+                                ←
+                              </button>
+                              <button
+                                onClick={() => setCurrentImageIndex((prev) => 
+                                  prev < journalContent.images!.length - 1 ? prev + 1 : 0
+                                )}
+                                className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full"
+                              >
+                                →
+                              </button>
+                            </>
+                          )}
+                        </div>
+                        {/* Image indicators */}
+                        {journalContent.images.length > 1 && (
+                          <div className="flex justify-center gap-2 mt-2">
+                            {journalContent.images.map((_, index) => (
+                              <button
+                                key={index}
+                                onClick={() => setCurrentImageIndex(index)}
+                                className={`w-2 h-2 rounded-full transition-colors ${
+                                  index === currentImageIndex ? 'bg-white' : 'bg-gray-600'
+                                }`}
+                              />
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="h-full flex items-center justify-center text-gray-600">
+                        <div className="text-center">
+                          <div className="text-sm">No images yet</div>
+                          <div className="text-xs mt-1">Images will appear here as you share memories</div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Text Narrative Section - 50% height */}
+                  <div className="h-1/2 overflow-y-auto p-6">
+                    {journalContent.title && (
+                      <h2 className="text-2xl font-bold mb-4 text-white">{journalContent.title}</h2>
+                    )}
+                    {journalContent.text ? (
+                      <div className="prose prose-invert max-w-none">
+                        <p className="whitespace-pre-wrap text-gray-200">{journalContent.text}</p>
+                      </div>
+                    ) : (
+                      <div className="text-gray-500 text-center mt-8">
+                        <div className="text-sm">Your story will appear here</div>
+                        <div className="text-xs mt-1">Start sharing memories with Tricia</div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center justify-center h-full text-gray-600">
+                  <div className="text-center">
+                    <LoadingSVG />
+                    <div className="text-sm mt-4">Ready to capture your memories</div>
+                    <div className="text-xs mt-2">Tell Tricia about a special moment</div>
+                  </div>
+                </div>
+              )}
             </PlaygroundTile>
-          )}
-          {config.settings.outputs.audio && (
+          </div>
+
+          {/* Conversation Area - 30% width */}
+          <div className="flex flex-col basis-[30%] gap-4">
+            {/* Settings Button */}
+            <button
+              onClick={() => setShowSettings(!showSettings)}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                showSettings 
+                  ? `bg-${config.settings.theme_color}-500 text-white` 
+                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+              }`}
+            >
+              {showSettings ? 'Hide Settings' : 'Show Settings'}
+            </button>
+
+            {/* Tricia & User Video */}
             <PlaygroundTile
-              title="Audio"
-              className="w-full h-full grow"
-              childrenClassName="justify-center"
+              title="Conversation"
+              className="h-2/3"
+              childrenClassName="flex flex-col gap-2 p-2"
             >
-              {audioTileContent}
+              {/* Tricia's Video with Audio Visualizer */}
+              <div className="flex-1 relative bg-gray-900 rounded-lg overflow-hidden">
+                {agentVideoTrack ? (
+                  <>
+                    <VideoTrack
+                      trackRef={agentVideoTrack}
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                    {/* Audio Visualizer Overlay */}
+                    {voiceAssistant.audioTrack && (
+                      <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/70 to-transparent flex items-end justify-center pb-2">
+                        <BarVisualizer
+                          state={voiceAssistant.state}
+                          trackRef={voiceAssistant.audioTrack}
+                          barCount={5}
+                          options={{ minHeight: 10 }}
+                          className="h-8 w-24"
+                        />
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="flex items-center justify-center h-full text-gray-600 text-sm">
+                    Waiting for Tricia...
+                  </div>
+                )}
+              </div>
+
+              {/* User's Camera */}
+              <div className="h-1/3 relative bg-gray-900 rounded-lg overflow-hidden">
+                {localCameraTrack ? (
+                  <VideoTrack
+                    trackRef={localCameraTrack}
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="flex items-center justify-center h-full text-gray-600 text-xs">
+                    Camera off
+                  </div>
+                )}
+              </div>
             </PlaygroundTile>
+
+            {/* Live Transcription - Subtitle Style */}
+            <PlaygroundTile
+              title="Live Caption"
+              className="h-1/3"
+              childrenClassName="flex items-center justify-center p-4"
+            >
+              <div className="text-center w-full">
+                {currentTranscript ? (
+                  <div className="animate-fade-in">
+                    <div className="text-xs text-gray-400 mb-1">{currentTranscript.speaker}</div>
+                    <div className="text-lg font-medium text-white px-4">
+                      {currentTranscript.text}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-sm text-gray-500">
+                    Captions will appear here during conversation
+                  </div>
+                )}
+              </div>
+            </PlaygroundTile>
+          </div>
+
+          {/* Settings Panel - Overlay */}
+          {showSettings && (
+            <div className="absolute right-0 top-0 h-full w-96 bg-gray-950 border-l border-gray-800 p-4 overflow-y-auto z-50">
+              <button
+                onClick={() => setShowSettings(false)}
+                className="absolute top-4 right-4 text-gray-400 hover:text-white"
+              >
+                ✕
+              </button>
+              {settingsTileContent}
+            </div>
           )}
         </div>
-
-        {config.settings.chat && (
-          <PlaygroundTile
-            title="Chat"
-            className="h-full grow basis-1/4 hidden lg:flex"
-          >
-            {chatTileContent}
-          </PlaygroundTile>
-        )}
-        
-        <PlaygroundTile
-          padding={false}
-          backgroundColor="gray-950"
-          className="h-full w-full basis-1/4 items-start overflow-y-auto hidden max-w-[480px] lg:flex"
-          childrenClassName="h-full grow items-start"
-        >
-          {settingsTileContent}
-        </PlaygroundTile>
       </div>
     </>
   );

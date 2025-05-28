@@ -8,7 +8,8 @@
     "dev:remote": "next dev -p 8005 -H 0.0.0.0",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test:oauth": "node test-oauth.js"
   },
   "dependencies": {
     "@livekit/components-react": "^2.9.3",
@@ -21,6 +22,7 @@
     "livekit-server-sdk": "^2.6.1",
     "lodash": "^4.17.21",
     "next": "^14.0.4",
+    "next-auth": "^4.24.5",
     "next-plugin-preval": "^1.2.6",
     "qrcode.react": "^4.0.0",
     "react": "^18",

@@ -4,6 +4,7 @@ import { SettingsDropdown } from "@/components/playground/SettingsDropdown";
 import { useConfig } from "@/hooks/useConfig";
 import { ConnectionState } from "livekit-client";
 import { ReactNode } from "react";
+import { signOut, useSession } from "next-auth/react";
 
 type PlaygroundHeader = {
   logo?: ReactNode;
@@ -25,6 +26,16 @@ export const PlaygroundHeader = ({
   connectionState,
 }: PlaygroundHeader) => {
   const { config } = useConfig();
+  const { data: session } = useSession();
+  
+  const handleSignOut = async () => {
+    // If connected, disconnect first
+    if (connectionState === ConnectionState.Connected) {
+      onConnectClicked();
+    }
+    // Then sign out
+    await signOut();
+  };
   
   return (
     <div
@@ -54,6 +65,15 @@ export const PlaygroundHeader = ({
           </a>
         )}
         {config.settings.editable && <SettingsDropdown />}
+        
+        {/* Show user email if signed in */}
+        {session?.user?.email && (
+          <span className="text-xs text-gray-400 hidden lg:inline">
+            {session.user.email}
+          </span>
+        )}
+        
+        {/* Connection button */}
         <Button
           accentColor={
             connectionState === ConnectionState.Connected ? "red" : accentColor
@@ -72,6 +92,17 @@ export const PlaygroundHeader = ({
             "Connect"
           )}
         </Button>
+        
+        {/* Sign out button */}
+        {session && (
+          <Button
+            accentColor="gray"
+            onClick={handleSignOut}
+            className="text-xs"
+          >
+            Sign Out
+          </Button>
+        )}
       </div>
     </div>
   );

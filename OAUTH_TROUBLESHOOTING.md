@@ -4,7 +4,7 @@
 
 ### 1. Check Environment Variables in Vercel
 
-Visit your debug endpoint: `https://demo.heytricia.ai/api/auth/debug?secret=debug-tricia-oauth`
+Visit your debug endpoint: `https://demo.heytricia.ai/api/debug-oauth?secret=debug-tricia-oauth`
 
 This will show you:
 - If NEXTAUTH_URL is set (it should NOT be set in production)

@@ -40,5 +40,6 @@
     "postcss": "^8.4.31",
     "tailwindcss": "^3.3.5",
     "typescript": "^5.3.3"
-  }
+  },
+  "_comment_eslint": "ESLint 8.57.1 shows deprecation warnings but we must use it because eslint-config-next doesn't support ESLint 9 yet. Will upgrade when Next.js adds support."
 }

@@ -55,37 +55,76 @@ src/
    npm install
    ```
 
-3. **Get environment variables from Vercel**
-   
-   Since you're part of the Vercel team, pull the environment variables:
+3. **Configure environment variables**
    ```bash
-   vercel env pull .env.local
-   ```
+   # Copy the example environment file
+   cp .env.example .env.local
    
-   This will download all production environment variables to your local `.env.local` file.
-
-4. **Verify your `.env.local`**
-   
-   Ensure these critical variables are present:
-   ```env
-   # Tricia API (Required)
-   NEXT_PUBLIC_TRICIA_BASE_URL=https://api.heytricia.ai/api/v1
-   NEXT_PUBLIC_TRICIA_AGENT_ID=<agent-id>
-   NEXT_PUBLIC_TRICIA_USER_ID=<user-id>
-   TRICIA_API_BEARER_TOKEN=<bearer-token>
-   
-   # Optional: LiveKit fallback
-   LIVEKIT_API_KEY=<if-using-env-mode>
-   LIVEKIT_API_SECRET=<if-using-env-mode>
-   NEXT_PUBLIC_LIVEKIT_URL=<if-using-env-mode>
+   # Edit .env.local with your credentials
    ```
 
-5. **Run the development server**
+4. **Run the development server**
    ```bash
    npm run dev
    ```
    
-   Open [http://localhost:8005](http://localhost:8005) (note: custom port 8005)
+   Open [http://localhost:8005](http://localhost:8005) to see the app.
+
+## 🔐 Authentication Setup (Google OAuth)
+
+The app uses Google OAuth for authentication via NextAuth.js.
+
+### Local Development Setup
+
+1. **Environment Variables**
+   Add these to your `.env.local`:
+   ```env
+   # Google OAuth
+   GOOGLE_CLIENT_ID=your-google-client-id
+   GOOGLE_CLIENT_SECRET=your-google-client-secret
+   NEXTAUTH_SECRET=your-generated-secret  # Generate with: openssl rand -base64 32
+   NEXTAUTH_URL=http://localhost:8005     # Only for local development!
+   ```
+
+2. **Google Cloud Console Configuration**
+   - Go to [Google Cloud Console](https://console.cloud.google.com)
+   - Create or select your project
+   - Enable Google+ API
+   - Create OAuth 2.0 credentials with:
+     - **Authorized JavaScript origins**: 
+       - `http://localhost:8005` (for development)
+       - `https://demo.heytricia.ai` (for production)
+     - **Authorized redirect URIs**: 
+       - `http://localhost:8005/api/auth/callback/google`
+       - `https://demo.heytricia.ai/api/auth/callback/google`
+
+3. **Test OAuth Configuration**
+   ```bash
+   node test-oauth-config.js
+   ```
+
+### Production Deployment (Vercel)
+
+1. **Environment Variables**
+   In Vercel dashboard, add ONLY these variables:
+   - `GOOGLE_CLIENT_ID`
+   - `GOOGLE_CLIENT_SECRET`
+   - `NEXTAUTH_SECRET`
+   
+   ⚠️ **DO NOT** set `NEXTAUTH_URL` in production - NextAuth auto-detects it!
+
+2. **Troubleshooting 401 Errors**
+   - Check Vercel Function logs for `[NextAuth]` entries
+   - Verify Google OAuth redirect URIs match exactly
+   - Ensure `NEXTAUTH_URL` is NOT set in production
+   - Clear browser cookies for the domain
+
+### Test Mode (Skip Authentication)
+
+For development without Google sign-in:
+```env
+NEXT_PUBLIC_TEST_MODE=true
+```
 
 ## 🔑 Key Features & Implementation Details
 
@@ -193,6 +232,11 @@ vercel env pull .env.local
 | `NEXT_PUBLIC_TRICIA_AGENT_ID` | Agent identifier | ✅ |
 | `NEXT_PUBLIC_TRICIA_USER_ID` | User identifier | ✅ |
 | `TRICIA_API_BEARER_TOKEN` | API authentication token | ✅ |
+| `GOOGLE_CLIENT_ID` | Google OAuth client ID | ✅ |
+| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret | ✅ |
+| `NEXTAUTH_SECRET` | NextAuth encryption secret | ✅ |
+| `NEXTAUTH_URL` | Auth callback URL (dev only) | ❌ |
+| `NEXT_PUBLIC_TEST_MODE` | Skip auth for testing | ❌ |
 | `NEXT_PUBLIC_SUPABASE_*` | Supabase config (if using) | ❌ |
 | `LIVEKIT_*` | LiveKit config (dev mode) | ❌ |
 

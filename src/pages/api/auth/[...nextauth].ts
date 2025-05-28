@@ -85,6 +85,15 @@ export const authOptions: NextAuthOptions = {
     debug(code, metadata) {
       console.log('[NextAuth] Debug:', code, metadata)
     }
+  },
+  // Add session configuration
+  session: {
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
+  // Add JWT configuration
+  jwt: {
+    maxAge: 30 * 24 * 60 * 60, // 30 days
   }
 }
 

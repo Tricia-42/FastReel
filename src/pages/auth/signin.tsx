@@ -8,19 +8,20 @@ export default function SignIn() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const isTestMode = process.env.NEXT_PUBLIC_TEST_MODE === 'true'
 
-  const handleGoogleSignIn = async () => {
+  const handleSignIn = async (provider: string) => {
     setIsLoading(true)
     setError(null)
     
     try {
-      const result = await signIn("google", {
+      const result = await signIn(provider, {
         callbackUrl: router.query.callbackUrl as string || "/",
         redirect: false,
       })
       
       if (result?.error) {
-        setError("Failed to sign in with Google. Please try again.")
+        setError(`Failed to sign in. Please try again.`)
         setIsLoading(false)
       } else if (result?.url) {
         // Redirect to the callback URL
@@ -48,7 +49,7 @@ export default function SignIn() {
           <Button
             accentColor="blue"
             className="w-full flex items-center justify-center gap-3"
-            onClick={handleGoogleSignIn}
+            onClick={() => handleSignIn("google")}
             disabled={isLoading}
           >
             {isLoading ? (
@@ -69,6 +70,24 @@ export default function SignIn() {
               </>
             )}
           </Button>
+
+          {isTestMode && (
+            <Button
+              accentColor="gray"
+              className="w-full"
+              onClick={() => handleSignIn("credentials")}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <LoadingSVG />
+                  <span>Signing in...</span>
+                </>
+              ) : (
+                <span>Sign in with Test Mode</span>
+              )}
+            </Button>
+          )}
 
           {error && (
             <p className="text-red-500 text-sm text-center">{error}</p>

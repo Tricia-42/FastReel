@@ -1,8 +1,10 @@
 import NextAuth, { NextAuthOptions } from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
+import CredentialsProvider from "next-auth/providers/credentials"
 
 export const authOptions: NextAuthOptions = {
   providers: [
+    // Google provider for production
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!.trim(),
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!.trim(),
@@ -13,7 +15,22 @@ export const authOptions: NextAuthOptions = {
           response_type: "code"
         }
       }
-    })
+    }),
+    // Test mode provider for local development
+    ...(process.env.NEXT_PUBLIC_TEST_MODE === 'true' ? [
+      CredentialsProvider({
+        name: "Test Mode",
+        credentials: {},
+        async authorize() {
+          // In test mode, automatically sign in as test user
+          return {
+            id: "test-user-id",
+            name: "Test User",
+            email: "test@example.com",
+          }
+        }
+      })
+    ] : [])
   ],
   pages: {
     signIn: '/auth/signin',

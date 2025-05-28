@@ -129,9 +129,9 @@ NEXT_PUBLIC_TEST_MODE=true
 ## 🔑 Key Features & Implementation Details
 
 ### Authentication Flow
-- **Password-based**: Simple password authentication (default: "tricia")
-- **Implementation**: `src/components/PlaygroundConnect.tsx`
-- **No database required**: Authentication is handled client-side for simplicity
+- **OAuth-based**: Google OAuth or test mode for local development
+- **Implementation**: NextAuth.js with custom sign-in page
+- **Session management**: JWT tokens with 30-day expiration
 
 ### Connection Management
 - **Automatic connection**: Connects to Tricia backend upon authentication
@@ -327,18 +327,4 @@ Proprietary - Tricia Inc. All rights reserved.
 
 Built with ❤️ by the Tricia team using Next.js, LiveKit, and modern web technologies.
 
-### Test Mode (Development Only)
 
-To bypass the password requirement during development:
-
-1. Add this line to your `.env.local` file:
-   ```
-   NEXT_PUBLIC_TEST_MODE=true
-   ```
-
-2. Restart your development server:
-   ```bash
-   npm run dev
-   ```
-
-**⚠️ Warning**: Never enable test mode in production deployments!

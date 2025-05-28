@@ -9,11 +9,6 @@ export default withAuth(
   {
     callbacks: {
       authorized: ({ req, token }) => {
-        // Allow test mode to bypass authentication
-        if (process.env.NEXT_PUBLIC_TEST_MODE === 'true') {
-          return true
-        }
-        
         // Check if the user is authenticated
         return !!token
       },

@@ -2,14 +2,14 @@
 
 ## Debugging 401: invalid_client Error
 
-### 1. Check Environment Variables in Vercel
+### 1. Check Logs in Vercel
 
-Visit your debug endpoint: `https://demo.heytricia.ai/api/debug-oauth?secret=debug-tricia-oauth`
+Go to your Vercel dashboard → Functions tab → View logs
 
-This will show you:
-- If NEXTAUTH_URL is set (it should NOT be set in production)
-- If all required environment variables are present
-- What URL NextAuth is constructing
+Look for NextAuth log entries:
+- `[NextAuth] Sign in attempt:` - Shows when someone tries to sign in
+- `[NextAuth] Error:` - Shows any authentication errors
+- `[NextAuth] Debug:` - Shows detailed debug information
 
 ### 2. Verify Vercel Environment Variables
 
@@ -52,7 +52,7 @@ Verify these settings:
 
 #### Issue: Works on localhost but not production
 **Cause**: Different environment variable configuration
-**Solution**: Use the debug endpoint to compare environments
+**Solution**: Check Vercel logs to see what URLs NextAuth is using
 
 ### 5. Testing OAuth Flow
 
@@ -98,20 +98,18 @@ openssl rand -base64 32
 3. Ensure the OAuth consent screen is published (not in testing mode)
 4. Check if your Google Workspace has any restrictions
 
-## Debug Information
+## Expected Log Messages
 
-After visiting the debug endpoint, you should see something like:
-```json
-{
-  "environment": "production",
-  "nextAuthUrl": "(not set - auto-detected)",
-  "nextAuthUrlSet": false,  // ← This MUST be false in production
-  "googleClientIdSet": true,
-  "googleClientSecretSet": true,
-  "nextAuthSecretSet": true,
-  "clientIdPrefix": "1886159601...",
-  "host": "demo.heytricia.ai",
-  "protocol": "https",
-  "constructedUrl": "https://demo.heytricia.ai"
-}
-``` 
+In Vercel Functions logs, you should see:
+```
+[NextAuth] Sign in attempt: { user: 'user@example.com', provider: 'google', timestamp: '2025-01-27T...' }
+[NextAuth] JWT token created for: user@example.com
+[NextAuth] User signed in: user@example.com
+[NextAuth] Session callback: { userEmail: 'user@example.com', hasToken: true }
+```
+
+If you see errors like:
+```
+[NextAuth] Error: invalid_client
+```
+This indicates a mismatch between your Google OAuth configuration and environment variables. 

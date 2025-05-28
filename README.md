@@ -229,7 +229,6 @@ vercel env pull .env.local
 | Variable | Description | Required |
 |----------|-------------|----------|
 | `NEXT_PUBLIC_TRICIA_BASE_URL` | Tricia API base URL | ✅ |
-| `NEXT_PUBLIC_TRICIA_AGENT_ID` | Agent identifier | ✅ |
 | `NEXT_PUBLIC_TRICIA_USER_ID` | User identifier | ✅ |
 | `TRICIA_API_BEARER_TOKEN` | API authentication token | ✅ |
 | `GOOGLE_CLIENT_ID` | Google OAuth client ID | ✅ |

@@ -77,12 +77,19 @@ export const ConnectionProvider = ({
             
             // Use environment variables with fallback values
             const userId = process.env.NEXT_PUBLIC_TRICIA_USER_ID || 'Xe9nkrHVetU1lHiK8wt7Ujf6SrH3';
+            const agentId = process.env.NEXT_PUBLIC_TRICIA_AGENT_ID;
+            
+            if (!agentId) {
+              console.error('NEXT_PUBLIC_TRICIA_AGENT_ID is not set');
+              throw new Error('Agent ID is required but not configured. Please set NEXT_PUBLIC_TRICIA_AGENT_ID in your environment variables.');
+            }
             
             const payload = {
+              user_id: userId,
+              agent_id: agentId,
               metadata: {
                 title: 'Tricia Pilot App Session'
-              },
-              user_id: userId
+              }
             };
             
             console.log('Calling Tricia API:', apiUrl);

@@ -31,6 +31,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import tailwindTheme from "../../lib/tailwindTheme.preval";
 import { EditableNameValueRow } from "@/components/config/NameValueRow";
+import Image from 'next/image'
 
 export interface PlaygroundMeta {
   name: string;
@@ -69,6 +70,38 @@ export default function Playground({
   const roomState = useConnectionState();
   const tracks = useTracks();
   const room = useRoomContext();
+  
+  // Log room and agent state changes
+  useEffect(() => {
+    // console.log('=== Room State Changed ===');
+    // console.log('Room State:', roomState);
+    // console.log('Room:', room);
+    // console.log('Room Name:', room?.name);
+    // console.log('Local Participant:', room?.localParticipant?.identity);
+    // console.log('Participants Count:', room?.remoteParticipants?.size);
+    if (room?.remoteParticipants) {
+      room.remoteParticipants.forEach((participant) => {
+        // Only log agent connections
+        if (participant.isAgent) {
+          console.log(`Agent connected:`, {
+            identity: participant.identity,
+            name: participant.name,
+          });
+        }
+      });
+    }
+  }, [roomState, room]);
+  
+  // Log voice assistant state changes
+  useEffect(() => {
+    // console.log('=== Voice Assistant State Changed ===');
+    // console.log('Voice Assistant Agent:', voiceAssistant.agent);
+    // console.log('Voice Assistant State:', voiceAssistant.state);
+    // console.log('Voice Assistant Audio Track:', voiceAssistant.audioTrack);
+    if (voiceAssistant.agent) {
+      console.log('Voice Assistant connected:', voiceAssistant.agent.identity);
+    }
+  }, [voiceAssistant.agent, voiceAssistant.state, voiceAssistant.audioTrack]);
 
   const [rpcMethod, setRpcMethod] = useState("");
   const [rpcPayload, setRpcPayload] = useState("");
@@ -95,12 +128,12 @@ export default function Playground({
 
     // Handler for journal generated event
     const handleJournalGenerated = async (data: any) => {
-      console.log('Received journal generated RPC:', data);
+      console.log('Received journal generated RPC');
       try {
         // The payload should be in data.payload
         const payload = typeof data.payload === 'string' ? data.payload : JSON.stringify(data.payload);
         const journalData = JSON.parse(payload);
-        console.log('Parsed journal data:', journalData);
+        // console.log('Parsed journal data:', journalData);
         
         // Update journal content with the received data
         setJournalContent({
@@ -120,12 +153,12 @@ export default function Playground({
 
     // Handler for journal saved event
     const handleJournalSaved = async (data: any) => {
-      console.log('Received journal saved RPC:', data);
+      console.log('Received journal saved RPC');
       try {
         // The payload should be in data.payload
         const payload = typeof data.payload === 'string' ? data.payload : JSON.stringify(data.payload);
         const savedData = JSON.parse(payload);
-        console.log('Journal saved successfully:', savedData);
+        // console.log('Journal saved successfully:', savedData);
         
         // You can show a success notification here
         // For now, just log it
@@ -161,9 +194,7 @@ export default function Playground({
   useEffect(() => {
     if (agentTranscriptions && agentTranscriptions.segments && agentTranscriptions.segments.length > 0) {
       const latestSegment = agentTranscriptions.segments[agentTranscriptions.segments.length - 1];
-      console.log('Agent transcription segment:', latestSegment);
       if (latestSegment && latestSegment.final) {
-        console.log('Agent transcription from LiveKit:', latestSegment.text);
         setCurrentTranscript({
           text: latestSegment.text,
           speaker: "Tricia",
@@ -183,9 +214,9 @@ export default function Playground({
   // Clear transcript after 5 seconds (increased from 3)
   useEffect(() => {
     if (currentTranscript) {
-      console.log('Setting timer to clear transcript for:', currentTranscript.speaker);
+      // console.log('Setting timer to clear transcript for:', currentTranscript.speaker);
       const timer = setTimeout(() => {
-        console.log('Clearing transcript for:', currentTranscript.speaker);
+        // console.log('Clearing transcript for:', currentTranscript.speaker);
         setCurrentTranscript(null);
       }, 5000);
       return () => clearTimeout(timer);
@@ -224,7 +255,6 @@ export default function Playground({
     if (userTranscriptions && userTranscriptions.segments && userTranscriptions.segments.length > 0) {
       const latestSegment = userTranscriptions.segments[userTranscriptions.segments.length - 1];
       if (latestSegment && latestSegment.final) {
-        console.log('User transcription from LiveKit:', latestSegment.text);
         setCurrentTranscript({
           text: latestSegment.text,
           speaker: "You",
@@ -247,12 +277,12 @@ export default function Playground({
 
   const onDataReceived = useCallback(
     (msg: any) => {
-      console.log('Data received:', msg); // Debug log
+      // console.log('Data received:', msg); // Debug log
       if (msg.topic === "transcription") {
         const decoded = JSON.parse(
           new TextDecoder("utf-8").decode(msg.payload)
         );
-        console.log('Transcription decoded:', decoded); // Debug log
+        // console.log('Transcription decoded:', decoded); // Debug log
         let timestamp = new Date().getTime();
         if ("timestamp" in decoded && decoded.timestamp > 0) {
           timestamp = decoded.timestamp;
@@ -449,10 +479,12 @@ export default function Playground({
           ) : journalContent?.images && journalContent.images.length > 0 ? (
             <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
               <div className="absolute inset-0 flex items-center justify-center">
-                <img
+                <Image
                   src={journalContent.images[currentImageIndex]}
                   alt={`Memory ${currentImageIndex + 1}`}
                   className="w-full h-full object-contain rounded-lg"
+                  width={1000}
+                  height={1000}
                 />
                 {journalContent.images.length > 1 && (
                   <>
@@ -649,7 +681,7 @@ export default function Playground({
         {/* User Transcription */}
         <PlaygroundTile
           title="Your Words"
-          className="h-24"
+          className="h-20"
         >
           <div className="flex items-center justify-center h-full p-3">
             {currentTranscript && currentTranscript.speaker === "You" ? (
@@ -660,7 +692,7 @@ export default function Playground({
               </div>
             ) : (
               <div className="text-xs text-gray-500 text-center">
-                Your words will appear here as you speak
+                Your words will appear here
               </div>
             )}
           </div>
@@ -675,13 +707,101 @@ export default function Playground({
       <PlaygroundTile
         padding={false}
         backgroundColor="gray-950"
-        className="h-full w-full basis-1/4 items-start overflow-y-auto flex"
-        childrenClassName="h-full grow items-start"
+        className="h-96 overflow-y-auto"
+        childrenClassName="h-full"
       >
         {settingsTileContent}
       </PlaygroundTile>
     ),
   });
+
+  // Monitor room events for participant connections
+  useEffect(() => {
+    if (!room) return;
+    
+    const roomId = room.name;
+    const startTime = Date.now();
+    console.log('=== Setting up room event listeners ===');
+    console.log(`[${new Date().toISOString()}] Room connected, waiting for agent...`);
+    // console.log('Room details:', {
+    //   name: room.name,
+    //   state: room.state,
+    //   localParticipant: room.localParticipant?.identity,
+    //   participantCount: room.remoteParticipants.size
+    // });
+    
+    // Monitor room state changes
+    const handleRoomStateChanged = (state: any) => {
+      // console.log(`[${new Date().toISOString()}] Room state changed to: ${state}`);
+    };
+    
+    // Set up a timeout to warn if agent doesn't join
+    const agentTimeout = setTimeout(() => {
+      if (room.remoteParticipants.size === 0) {
+        console.error('⚠️ WARNING: Agent has not joined after 5 seconds!');
+        console.error('This usually means:');
+        console.error('1. The agent worker is not running on the backend');
+        console.error('2. The agent worker is not registered with LiveKit Cloud');
+        console.error('3. The agent name "tricia-agent" doesn\'t match the registered worker');
+        console.error('4. The LiveKit Cloud project might have agent dispatch disabled');
+        console.error('');
+        console.error('Debug info:');
+        console.error('- Room name:', room.name);
+        console.error('- Local participant:', room.localParticipant?.identity);
+        console.error('- Remote participants:', room.remoteParticipants.size);
+        console.error('');
+        console.error('Check the Tricia backend logs for agent worker errors');
+      }
+    }, 5000);
+    
+    const handleParticipantConnected = (participant: any) => {
+      const elapsed = Date.now() - startTime;
+      // console.log(`[${new Date().toISOString()}] Participant Connected after ${elapsed}ms:`, {
+      //   identity: participant.identity,
+      //   sid: participant.sid,
+      //   isAgent: participant.isAgent,
+      //   name: participant.name,
+      //   metadata: participant.metadata
+      // });
+      
+      if (participant.isAgent) {
+        console.log(`!!! AGENT CONNECTED after ${elapsed}ms !!!`);
+        // console.log('Agent dispatch successful');
+        clearTimeout(agentTimeout);
+      }
+    };
+    
+    const handleParticipantDisconnected = (participant: any) => {
+      // console.log('=== Participant Disconnected ===', {
+      //   identity: participant.identity,
+      //   sid: participant.sid,
+      //   isAgent: participant.isAgent
+      // });
+    };
+    
+    const handleRoomDisconnected = () => {
+      console.log('=== Room Disconnected - Will create new room on next connection ===');
+    };
+    
+    // Subscribe to room events
+    room.on('participantConnected', handleParticipantConnected);
+    room.on('participantDisconnected', handleParticipantDisconnected);
+    room.on('disconnected', handleRoomDisconnected);
+    
+    // Check if agent is already in room
+    // console.log('=== Checking existing participants ===');
+    // console.log('Local participant:', room.localParticipant?.identity);
+    room.remoteParticipants.forEach((participant) => {
+      handleParticipantConnected(participant);
+    });
+    
+    return () => {
+      clearTimeout(agentTimeout);
+      room.off('participantConnected', handleParticipantConnected);
+      room.off('participantDisconnected', handleParticipantDisconnected);  
+      room.off('disconnected', handleRoomDisconnected);
+    };
+  }, [room]);
 
   return (
     <>
@@ -713,29 +833,29 @@ export default function Playground({
         <div className="hidden lg:flex w-full h-full gap-4">
           {/* Left Column - Agent (Tricia) & Settings */}
           <div className="flex flex-col basis-1/4 gap-4">
-            {/* Settings - at the top */}
+            {/* Settings - Extended height */}
             <PlaygroundTile
               title="Settings"
               padding={false}
               backgroundColor="gray-950"
-              className="h-80 overflow-y-auto"
+              className="h-[32rem] overflow-y-auto"
               childrenClassName="h-full"
             >
               {settingsTileContent}
             </PlaygroundTile>
 
-            {/* Tricia Audio Visualizer */}
+            {/* Tricia Audio Visualizer - Moved lower */}
             <PlaygroundTile
               title="Tricia Speaking"
-              className="h-28"
+              className="h-24"
             >
               <AudioInputTile trackRef={voiceAssistant.audioTrack} />
             </PlaygroundTile>
 
-            {/* Tricia Transcription */}
+            {/* Tricia Transcription - Moved lower */}
             <PlaygroundTile
               title="Tricia&apos;s Words"
-              className="h-24"
+              className="h-20"
             >
               <div className="flex items-center justify-center h-full p-3">
                 {currentTranscript && currentTranscript.speaker === "Tricia" ? (
@@ -931,7 +1051,7 @@ export default function Playground({
             {/* User Audio Visualizer */}
             <PlaygroundTile
               title="Your Voice"
-              className="h-28"
+              className="h-24"
             >
               {localMicTrack ? (
                 <AudioInputTile trackRef={localMicTrack} />
@@ -945,7 +1065,7 @@ export default function Playground({
             {/* User Transcription */}
             <PlaygroundTile
               title="Your Words"
-              className="h-24"
+              className="h-20"
             >
               <div className="flex items-center justify-center h-full p-3">
                 {currentTranscript && currentTranscript.speaker === "You" ? (

@@ -5,6 +5,7 @@ import React, { createContext, useState } from "react";
 import { useCallback } from "react";
 import { useConfig } from "./useConfig";
 import { useToast } from "@/components/toast/ToasterProvider";
+import { useSession } from "next-auth/react";
 
 export type ConnectionMode = "cloud" | "manual" | "env" | "tricia"
 
@@ -27,6 +28,7 @@ export const ConnectionProvider = ({
   const { generateToken, wsUrl: cloudWSUrl } = useCloud();
   const { setToastMessage } = useToast();
   const { config } = useConfig();
+  const { data: session } = useSession();
   const [connectionDetails, setConnectionDetails] = useState<{
     wsUrl: string;
     token: string;
@@ -69,31 +71,47 @@ export const ConnectionProvider = ({
           );
           token = accessToken;
         } else if (mode === "tricia") {
+          console.log('[Connection] Connecting in tricia mode...');
           // Call Tricia API to create chat and get LiveKit details
           try {
             // Try using the proxy first to avoid CORS issues
             const useProxy = true; // Set to false to use direct API call
             const apiUrl = useProxy ? '/api/tricia-proxy' : `${process.env.NEXT_PUBLIC_TRICIA_BASE_URL || 'https://api.heytricia.ai/api/v1'}/chats`;
             
-            // Use environment variables with fallback values
-            const userId = process.env.NEXT_PUBLIC_TRICIA_USER_ID || 'Xe9nkrHVetU1lHiK8wt7Ujf6SrH3';
+            // Use authenticated user ID if available, otherwise use environment variable or fallback
+            let userId = process.env.NEXT_PUBLIC_TRICIA_USER_ID || 'Xe9nkrHVetU1lHiK8wt7Ujf6SrH3';
+            
+            // If user is authenticated, use their ID
+            if (session?.user) {
+              // Use NextAuth user ID which matches Firebase UID
+              userId = session.user.id || userId;
+              
+              console.log('Using authenticated user ID:', session.user.id);
+              console.log('User email:', session.user.email);
+            } else {
+              console.log('No authenticated user, using default user ID');
+            }
             
             const payload = {
               user_id: userId,
               metadata: {
-                title: 'Tricia Pilot App Session'
+                title: 'Tricia Pilot App Session',
+                // Include authenticated user info in metadata
+                user_email: session?.user?.email,
+                user_name: session?.user?.name,
+                auth_provider: session ? 'google' : 'anonymous'
               }
             };
             
             console.log('Calling Tricia API:', apiUrl);
             console.log('Using proxy:', useProxy);
-            console.log('Request payload:', JSON.stringify(payload, null, 2));
+            // console.log('Request payload:', JSON.stringify(payload, null, 2));
             
             if (!useProxy) {
-              console.log('Request headers:', {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer admin'
-              });
+              // console.log('Request headers:', {
+              //   'Content-Type': 'application/json',
+              //   'Authorization': 'Bearer admin'
+              // });
             }
             
             const headers: HeadersInit = {
@@ -114,11 +132,11 @@ export const ConnectionProvider = ({
             });
 
             console.log('Response status:', response.status);
-            console.log('Response headers:', response.headers);
-            console.log('Response ok:', response.ok);
+            // console.log('Response headers:', response.headers);
+            // console.log('Response ok:', response.ok);
 
             const responseText = await response.text();
-            console.log('Raw response:', responseText);
+            // console.log('Raw response:', responseText);
 
             if (!response.ok) {
               console.error('API Error - Status:', response.status);
@@ -157,11 +175,11 @@ export const ConnectionProvider = ({
             }
             
             console.log('Parsed API Response data:', data);
-            console.log('Response structure keys:', Object.keys(data));
+            // console.log('Response structure keys:', Object.keys(data));
             
             // Check if response is wrapped in a 'data' object or directly contains the fields
             const chatData = data.data || data;
-            console.log('Chat data keys:', Object.keys(chatData));
+            // console.log('Chat data keys:', Object.keys(chatData));
             
             // Expected response fields: id, participant_name, participant_token, room_name, server_url
             if (chatData.participant_token && chatData.server_url) {
@@ -174,19 +192,58 @@ export const ConnectionProvider = ({
               console.log('Room Name:', chatData.room_name);
               console.log('Server URL:', url);
               
-              // Add a longer delay to ensure agent has time to fully initialize
-              // This is especially important for first-time connections where the agent needs to cold start
-              console.log('Waiting for agent to initialize...');
-              await new Promise(resolve => setTimeout(resolve, 5000));
-              
               // Decode JWT to check agent configuration
               try {
                 const tokenParts = token.split('.');
                 if (tokenParts.length === 3) {
                   const payload = JSON.parse(atob(tokenParts[1]));
-                  console.log('JWT room config:', payload.roomConfig);
+                  // console.log('JWT payload:', payload);
+                  // console.log('JWT room config:', payload.roomConfig);
+                  // console.log('JWT agent dispatch:', payload.roomConfig?.agents);
                   console.log('JWT issuer (API Key):', payload.iss);
-                  console.log('JWT video grant:', payload.video);
+                  // console.log('JWT video grant:', payload.video);
+                  console.log('JWT room name from grant:', payload.video?.room);
+                  console.log('JWT participant identity:', payload.sub);
+                  
+                  // Check video grant and agent config
+                  if (payload.video) {
+                    // console.log('=== JWT Token Video Grant ===');
+                    // console.log('Room:', payload.video.room);
+                    // console.log('Room Join:', payload.video.roomJoin);
+                    // console.log('Can Publish:', payload.video.canPublish);
+                    // console.log('Can Subscribe:', payload.video.canSubscribe);
+                  }
+                  
+                  // Check room config for agent dispatch
+                  if (payload.roomConfig) {
+                    // console.log('=== JWT Token Room Config ===');
+                    // console.log('Full roomConfig:', JSON.stringify(payload.roomConfig, null, 2));
+                    
+                    if (payload.roomConfig.agents && Array.isArray(payload.roomConfig.agents)) {
+                      console.log(`Found ${payload.roomConfig.agents.length} agent(s) configured:`);
+                      payload.roomConfig.agents.forEach((agent: any, index: number) => {
+                        console.log(`Agent ${index + 1}:`, {
+                          agentName: agent.agentName,
+                          // metadata: agent.metadata
+                        });
+                        
+                        // Try to parse agent metadata if it's a string
+                        // if (agent.metadata && typeof agent.metadata === 'string') {
+                        //   try {
+                        //     const agentMeta = JSON.parse(agent.metadata);
+                        //     console.log(`Agent ${index + 1} parsed metadata:`, agentMeta);
+                        //   } catch (e) {
+                        //     console.log(`Agent ${index + 1} metadata is not valid JSON`);
+                        //   }
+                        // }
+                      });
+                      console.log('✅ Agent dispatch is configured in token');
+                    } else {
+                      console.warn('⚠️ No agents configured in roomConfig');
+                    }
+                  } else {
+                    console.warn('⚠️ No roomConfig in JWT token - agent dispatch may not work');
+                  }
                   
                   // Extract LiveKit server from URL
                   const serverMatch = url.match(/wss:\/\/([^\/]+)/);
@@ -195,7 +252,7 @@ export const ConnectionProvider = ({
                   }
                 }
               } catch (e) {
-                console.log('Could not decode JWT for debugging');
+                console.log('Could not decode JWT for debugging:', e);
               }
             } else {
               console.error('Invalid response structure:', data);
@@ -227,9 +284,23 @@ export const ConnectionProvider = ({
         // Only set connection details if we have both token and URL
         if (token && url) {
           console.log('Setting connection details - URL:', url, 'Mode:', mode);
+          console.log(`[${new Date().toISOString()}] Token acquired, preparing to connect...`);
+          
+          // Optional: Add a small delay to allow agent dispatch to initialize
+          // This is a test to see if it's a race condition
+          const AGENT_DISPATCH_DELAY = 0; // Set to 1000-2000ms to test
+          if (AGENT_DISPATCH_DELAY > 0) {
+            console.log(`Waiting ${AGENT_DISPATCH_DELAY}ms before connecting to allow agent dispatch...`);
+            await new Promise(resolve => setTimeout(resolve, AGENT_DISPATCH_DELAY));
+          }
+          
+          console.log(`[${new Date().toISOString()}] Connecting to LiveKit room...`);
           setConnectionDetails({ wsUrl: url, token, shouldConnect: true, mode });
+          console.log('Connection details SET - LiveKit should now connect');
         } else {
           console.error('Missing token or URL, not connecting');
+          console.error('Token:', token ? 'present' : 'missing');
+          console.error('URL:', url ? url : 'missing');
           setToastMessage({
             type: "error",
             message: "Failed to get connection credentials",
@@ -251,14 +322,20 @@ export const ConnectionProvider = ({
       config.settings.participant_name,
       generateToken,
       setToastMessage,
+      session,
     ]
   );
 
   const disconnect = useCallback(async () => {
-    console.log('Disconnecting from LiveKit room...');
-    setConnectionDetails((prev) => ({ ...prev, shouldConnect: false, wsUrl: "", token: "" }));
-    // Give time for LiveKit to properly disconnect
-    await new Promise(resolve => setTimeout(resolve, 100));
+    console.log('=== Disconnecting from LiveKit ===');
+    console.log('Clearing connection details and state');
+    setConnectionDetails({ 
+      wsUrl: "", 
+      token: "", 
+      shouldConnect: false, 
+      mode: "manual" 
+    });
+    console.log('Disconnection complete');
   }, []);
 
   return (

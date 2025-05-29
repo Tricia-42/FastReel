@@ -41,3 +41,7 @@ next-env.d.ts
 # Google OAuth credentials
 client_secret_*.json
 *client_secret*.json
+
+# Firebase service account credentials
+*firebase-adminsdk*.json
+tricia-*.json

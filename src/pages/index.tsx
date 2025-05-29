@@ -8,7 +8,7 @@ import { ConnectionState } from "livekit-client";
 import { AnimatePresence, motion } from "framer-motion";
 import { Inter } from "next/font/google";
 import Head from "next/head";
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 
 import Playground from "@/components/playground/Playground";
 import { PlaygroundToast } from "@/components/toast/PlaygroundToast";
@@ -16,6 +16,7 @@ import { ConfigProvider, useConfig } from "@/hooks/useConfig";
 import { ConnectionMode, ConnectionProvider, useConnection } from "@/hooks/useConnection";
 import { PlaygroundConnect } from "@/components/PlaygroundConnect";
 import { ToastProvider, useToast } from "@/components/toast/ToasterProvider";
+import { useFirebaseAuth } from "@/hooks/useFirebaseAuth";
 
 const themeColors = [
   "cyan",
@@ -59,17 +60,65 @@ export function HomeInner() {
   const { config } = useConfig();
   const { toastMessage, setToastMessage } = useToast();
   const [isDisconnecting, setIsDisconnecting] = useState(false);
+  const [isReady, setIsReady] = useState(false);
+  
+  // Sync Firebase Auth with NextAuth session
+  const { firebaseUser, isLoading: isFirebaseLoading, error: firebaseError } = useFirebaseAuth();
+  
+  // Show Firebase auth errors
+  useEffect(() => {
+    if (firebaseError) {
+      console.error('Firebase auth error:', firebaseError);
+      // You can show a toast here if needed
+      // setToastMessage({ message: 'Firebase auth sync failed', type: 'error' });
+    }
+  }, [firebaseError]);
+  
+  // Log Firebase auth state
+  useEffect(() => {
+    if (firebaseUser) {
+      // console.log('Firebase authenticated as:', firebaseUser.uid);
+    }
+  }, [firebaseUser]);
+
+  // Clean up on unmount to prevent connection issues with HMR
+  useEffect(() => {
+    return () => {
+      if (shouldConnect) {
+        // console.log('[HMR] Component unmounting, cleaning up LiveKit connection');
+        disconnect();
+      }
+    };
+  }, []);
+
+  // Add a small delay after getting connection details to ensure clean connection
+  useEffect(() => {
+    if (shouldConnect && wsUrl && token) {
+      // console.log('[Connection] Delaying LiveKitRoom render for clean connection...');
+      setIsReady(false);
+      const timer = setTimeout(() => {
+        // console.log('[Connection] Ready to render LiveKitRoom');
+        setIsReady(true);
+      }, 100); // Small delay to ensure state is settled
+      
+      return () => clearTimeout(timer);
+    } else {
+      setIsReady(false);
+    }
+  }, [shouldConnect, wsUrl, token]);
 
   const handleConnect = useCallback(
     async (mode: ConnectionMode) => {
       // If already connected, disconnect first
       if (shouldConnect && !isDisconnecting) {
         setIsDisconnecting(true);
+        // console.log('[Connection] Disconnecting existing connection before reconnecting...');
         await disconnect();
         // Wait for disconnect to complete
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Increased from 500ms
         setIsDisconnecting(false);
       }
+      console.log(`[Connection] Connecting in ${mode} mode...`);
       connect(mode);
     },
     [connect, disconnect, shouldConnect, isDisconnecting]
@@ -130,15 +179,26 @@ export function HomeInner() {
             accentColor={config.settings.theme_color}
             onConnectClicked={handleConnect}
           />
+        ) : !isReady ? (
+          <div className="flex items-center justify-center h-full">
+            <div className="text-white">Initializing connection...</div>
+          </div>
         ) : (
           <LiveKitRoom
+            key={`${wsUrl}-${token?.substring(0, 10)}`}
             className="flex flex-col h-full w-full"
             serverUrl={wsUrl}
             token={token}
-            connect={shouldConnect}
+            connect={true}
+            onConnected={() => {
+              console.log(`[${new Date().toISOString()}] ✅ LiveKitRoom connected successfully`);
+            }}
+            onDisconnected={(reason) => {
+              console.log(`[${new Date().toISOString()}] ❌ LiveKitRoom disconnected`);
+            }}
             onError={(e) => {
+              console.error(`[${new Date().toISOString()}] ❌ LiveKitRoom error:`, e);
               setToastMessage({ message: e.message, type: "error" });
-              console.error(e);
             }}
           >
             <Playground

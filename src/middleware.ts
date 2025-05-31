@@ -28,9 +28,11 @@ export const config = {
      * - auth (sign in/out pages)
      * - _next/static (static files)
      * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
+     * - favicon.ico, favicon.png (favicon files)
+     * - apple-touch-icon (iOS icons)
      * - public folder
+     * - manifest.json
      */
-    "/((?!api/auth|auth|_next/static|_next/image|favicon.ico|public).*)",
+    "/((?!api/auth|auth|_next/static|_next/image|favicon\\.ico|favicon\\.png|apple-touch-icon.*|public|manifest\\.json).*)",
   ],
 } 

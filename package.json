@@ -1,7 +1,7 @@
 {
-  "name": "tricia-pilot-app",
+  "name": "stayreel",
   "version": "0.1.0",
-  "description": "Tricia - Guided memory capture through conversation",
+  "description": "StayReel - AI-powered memory preservation through guided conversations",
   "private": true,
   "scripts": {
     "dev": "next dev -p 8005 -H 0.0.0.0",

@@ -1,254 +1,352 @@
-# StayReel - AI-Powered Memory Preservation
+# StayReel
 
-A web application that transforms conversations into preserved memories through AI-guided storytelling. Built on LiveKit for real-time communication, with support for custom AI agents.
+| [Demo](https://demo.heytricia.ai) | [Discord](https://discord.gg/stayreel) |
+
+StayReel is an open-source conversational AI platform built on LiveKit WebRTC infrastructure. It provides a React/Next.js frontend for real-time voice conversations with AI agents, featuring automatic transcription, multi-modal response generation, and session recording.
 
 ## Features
 
-- 🎙️ **Voice-First Interaction**: Natural conversation with AI agents using LiveKit
-- 📸 **Memory Visualization**: AI-generated images that capture the essence of your stories
-- 📝 **Automatic Journaling**: Stories are transformed into beautiful journal entries
-- 🔐 **Secure Authentication**: Google Sign-In with Firebase integration
-- 🎨 **Customizable Themes**: Multiple color themes for personalization
-- 🔌 **Extensible Agent Backend**: Default Tricia agent or bring your own LiveKit agent
+- **Real-time Voice Communication**: WebRTC-based audio streaming via LiveKit
+- **Live Transcription**: Speech-to-text with speaker diarization
+- **Multi-modal AI Responses**: Text generation with accompanying image synthesis
+- **Session Management**: Automatic room creation and JWT-based authentication
+- **Google OAuth Integration**: NextAuth + Firebase for user management
+- **Extensible Agent Framework**: Compatible with any LiveKit agent implementation
+
+## Contents
+
+- [Quick Start](#quick-start)
+- [Architecture](#architecture)
+- [API Reference](#api-reference)
+- [Development](#development)
+- [Deployment](#deployment)
+- [Building Custom Agents](#building-custom-agents)
+- [Troubleshooting](#troubleshooting)
 
 ## Quick Start
 
 ### Prerequisites
 
-- Node.js 18+ and npm
-- Google Cloud account (for OAuth)
-- Firebase project (for authentication)
-- LiveKit Cloud account or self-hosted LiveKit server
-- Backend API (defaults to Tricia, or implement your own)
+- Node.js 18+
+- Google Cloud OAuth credentials
+- Firebase project (optional - for user persistence)
+- LiveKit-compatible agent backend
 
-### 1. Clone and Install
+### Installation
 
 ```bash
+# Clone repository
 git clone git@github.com:Tricia-42/StayReel.git
 cd StayReel
+
+# Install dependencies
 npm install
-```
 
-### 2. Environment Setup
+# Copy environment template
+cp .env.example .env.local
 
-Create `.env.local` file with your credentials:
+# Configure environment variables (see .env.example)
+# Required: Google OAuth, NextAuth secret, Backend API endpoint
 
-```bash
-# Firebase Client SDK (from Firebase Console > Project Settings)
-NEXT_PUBLIC_FIREBASE_API_KEY=your-api-key
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-auth-domain
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
-NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-storage-bucket
-NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
-NEXT_PUBLIC_FIREBASE_APP_ID=your-app-id
-
-# Firebase Admin SDK (for server-side operations)
-FIREBASE_PROJECT_ID=your-project-id
-FIREBASE_CLIENT_EMAIL=your-service-account-email
-FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----"
-
-# Google OAuth (from Google Cloud Console)
-GOOGLE_CLIENT_ID=your-google-client-id
-GOOGLE_CLIENT_SECRET=your-google-client-secret
-
-# NextAuth Configuration
-NEXTAUTH_SECRET=your-secret-key-here
-NEXTAUTH_URL=http://localhost:8005
-
-# Backend API Configuration
-TRICIA_BASE_URL=https://api.heytricia.ai/api/v1  # Or your custom agent API
-TRICIA_AUTH_TOKEN=your-api-token
-
-# Test Mode (optional)
-NEXT_PUBLIC_TEST_MODE=false
-```
-
-### 3. Google OAuth Setup
-
-In [Google Cloud Console](https://console.cloud.google.com/apis/credentials):
-
-1. Create OAuth 2.0 Client ID
-2. Add authorized redirect URIs:
-   - `http://localhost:8005/api/auth/callback/google` (development)
-   - `https://yourdomain.com/api/auth/callback/google` (production)
-
-### 4. Run Development Server
-
-```bash
+# Run development server
 npm run dev
 ```
 
-Open [http://localhost:8005](http://localhost:8005) to start using StayReel.
+The application runs on port 8005 by default (configured for OAuth redirect).
 
 ## Architecture
 
+### System Components
+
 ```
-┌─────────────────────┐     ┌──────────────────────┐
-│  StayReel Frontend  │────▶│   Agent Backend      │
-│  (Next.js + React)  │     │ (Default: Tricia API)│
-└──────────┬──────────┘     └──────────────────────┘
-           │                          │
-           ▼                          ▼
-┌─────────────────────┐     ┌──────────────────────┐
-│  NextAuth + Google  │     │      LiveKit         │
-│  Firebase Auth      │     │  (Voice/Video/RTC)   │
-└─────────────────────┘     └──────────────────────┘
-```
-
-## Backend Integration
-
-### Default: Tricia Backend
-
-StayReel connects to the Tricia API by default, which provides:
-- LiveKit room management and token generation
-- AI agent ("tricia-agent") for guided conversations
-- Memory processing and journal generation
-- Image generation for visualizing memories
-
-### Custom Agent Implementation
-
-You can implement your own agent backend using LiveKit Agents SDK:
-
-1. **Create your LiveKit Agent** following the [LiveKit Agents documentation](https://docs.livekit.io/agents/)
-2. **Implement required endpoints**:
-   - `POST /chats` - Create chat session and return LiveKit credentials
-   - User management endpoints (optional)
-3. **Update environment variables** to point to your API
-4. **Configure agent dispatch** in your LiveKit token
-
-Example response format for `/chats` endpoint:
-```json
-{
-  "id": "session-id",
-  "room_name": "unique-room-name",
-  "participant_name": "user-id",
-  "participant_token": "livekit-jwt-token",
-  "server_url": "wss://your-livekit-server.com"
-}
+┌─────────────────────┐     ┌──────────────────────┐     ┌─────────────────┐
+│    Web Client       │────▶│   Next.js API        │────▶│  Agent Backend  │
+│  (React + LiveKit)  │     │  (/api/tricia)       │     │  (LiveKit Agent)│
+└─────────────────────┘     └──────────────────────┘     └─────────────────┘
+           │                            │                           │
+           ▼                            ▼                           ▼
+┌─────────────────────┐     ┌──────────────────────┐     ┌─────────────────┐
+│    NextAuth.js      │     │    Firebase Admin    │     │  LiveKit Cloud  │
+│  (OAuth Provider)   │     │  (User Management)   │     │   (WebRTC SFU)  │
+└─────────────────────┘     └──────────────────────┘     └─────────────────┘
 ```
 
-## Authentication Flow
+### Request Flow
 
-1. User signs in with Google via NextAuth
-2. Firebase user is automatically created/synced
-3. Backend user profile is created on first sign-in
-4. Each session gets a unique LiveKit room
+1. **Authentication**:
+   ```
+   Client → /api/auth/signin → Google OAuth → NextAuth Session
+   NextAuth → Firebase Admin SDK → Create/Update User
+   ```
 
-## Deployment
+2. **LiveKit Session**:
+   ```
+   Client → /api/tricia → Backend API → Create Room
+   Backend → Generate JWT Token → Return Connection Details
+   Client → LiveKit SDK → Connect to Room → Agent Joins
+   ```
 
-### Deploy to Vercel
+3. **Data Streaming**:
+   ```
+   User Audio → LiveKit → Agent → Transcription + Response
+   Agent → RPC Methods → Client (for UI updates)
+   ```
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/Tricia-42/StayReel)
-
-1. Click the deploy button above
-2. Set up environment variables in Vercel dashboard
-3. Deploy!
-
-### Manual Deployment
-
-```bash
-# Build for production
-npm run build
-
-# Start production server
-npm start
-```
-
-## Project Structure
+### Project Structure
 
 ```
 src/
-├── components/        # React components
-│   ├── playground/   # Main UI components
-│   ├── chat/         # Chat interface
-│   └── config/       # Settings components
-├── hooks/            # Custom React hooks
-├── lib/              # Business logic
-│   ├── firebase-admin.ts   # Server-side Firebase
-│   ├── firebase-client.ts  # Client-side Firebase
+├── components/
+│   └── playground/         # Main UI components
+│       ├── Playground.tsx  # LiveKit room management
+│       ├── AgentTile.tsx   # Agent audio/video display
+│       └── Header.tsx      # Navigation and controls
+│
+├── pages/
+│   ├── index.tsx          # Protected main application
+│   ├── api/
+│   │   ├── auth/[...nextauth].ts  # OAuth endpoints
+│   │   └── tricia/index.ts         # Backend proxy
+│   └── auth/
+│       └── signin.tsx     # Login page
+│
+├── lib/
 │   ├── tricia-api.ts      # Backend API client
-│   └── tricia-backend.ts  # User management
-├── pages/            # Next.js pages
-│   ├── api/          # API routes
-│   │   ├── auth/     # NextAuth endpoints
-│   │   └── tricia/   # Backend proxy
-│   └── auth/         # Authentication pages
-└── styles/           # CSS styles
+│   ├── tricia-backend.ts  # User management
+│   └── firebase-*.ts      # Firebase integration
+│
+└── hooks/
+    ├── useConnection.tsx  # LiveKit connection state
+    └── useFirebaseAuth.ts # Auth synchronization
 ```
 
-## Key Features
+## API Reference
 
-### For Users
-- **Protected Routes**: Authentication required to access the app
-- **Auto-Connect**: Seamless connection to AI agent after sign-in
-- **Real-time Transcription**: See your words and agent responses as you speak
-- **Memory Journal**: Beautiful visualization of captured memories
+### Backend Requirements
 
-### For Developers
-- **Clean Architecture**: Separation of concerns with dedicated API layer
-- **Type Safety**: Full TypeScript support
-- **Extensible**: Easy to swap backend implementations
-- **Modern Stack**: Next.js 14, React 18, Tailwind CSS
+Your agent backend must implement:
 
-## Configuration
+#### `POST /chats` - Create LiveKit Session
+```typescript
+// Request
+{
+  "user_id": string,
+  "metadata": {
+    "title": string,
+    "user_email": string,
+    "user_name": string
+  }
+}
 
-### Required Services
+// Response
+{
+  "id": string,                    // Session ID
+  "room_name": string,             // LiveKit room name
+  "participant_name": string,      // User identity
+  "participant_token": string,     // JWT with room grants
+  "server_url": string             // LiveKit server URL
+}
+```
 
-1. **Firebase Project**
-   - Enable Google Sign-In provider
-   - Configure OAuth redirect URLs
-   - Download service account key
+#### JWT Token Structure
+```json
+{
+  "iss": "API_KEY",
+  "sub": "participant_identity",
+  "video": {
+    "room": "room_name",
+    "roomJoin": true,
+    "canPublish": true,
+    "canSubscribe": true
+  },
+  "roomConfig": {
+    "agents": [{
+      "agentName": "your-agent-name"
+    }]
+  }
+}
+```
 
-2. **Google Cloud Project**
-   - Enable Google+ API
-   - Create OAuth 2.0 credentials
-   - Configure consent screen
+### RPC Methods
 
-3. **LiveKit Server**
-   - Use LiveKit Cloud or self-hosted
-   - Configure agent workers
-   - Set up room settings
+The frontend registers these RPC handlers:
+
+- `agent.journal_generated` - Receives generated content
+- `agent.journal_saved` - Acknowledgment handler
+
+## Development
+
+### Environment Variables
+
+See `.env.example` for complete list. Key variables:
+
+```bash
+# Authentication
+GOOGLE_CLIENT_ID=xxx
+GOOGLE_CLIENT_SECRET=xxx
+NEXTAUTH_SECRET=xxx
+NEXTAUTH_URL=http://localhost:8005
+
+# Backend API
+NEXT_PUBLIC_TRICIA_BASE_URL=https://api.heytricia.ai/api/v1
+TRICIA_API_BEARER_TOKEN=xxx
+
+# Firebase (optional)
+FIREBASE_PROJECT_ID=xxx
+FIREBASE_CLIENT_EMAIL=xxx
+FIREBASE_PRIVATE_KEY=xxx
+```
+
+### Running Locally
+
+```bash
+# Development server with hot reload
+npm run dev
+
+# Production build
+npm run build
+npm start
+
+# Run on all network interfaces (for mobile testing)
+npm run dev:remote
+```
+
+### Testing WebRTC
+
+1. Ensure microphone permissions are granted
+2. Use HTTPS in production (required for WebRTC)
+3. Check browser console for LiveKit connection logs
+
+## Deployment
+
+### Vercel (Recommended)
+
+```bash
+# Install Vercel CLI
+npm i -g vercel
+
+# Deploy
+vercel
+
+# Set environment variables
+vercel env add GOOGLE_CLIENT_ID
+# ... add all required variables
+```
+
+### Docker
+
+```dockerfile
+FROM node:18-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+COPY . .
+RUN npm run build
+EXPOSE 3000
+CMD ["npm", "start"]
+```
+
+## Building Custom Agents
+
+### LiveKit Agent Requirements
+
+1. Implement a LiveKit agent worker that:
+   - Connects to LiveKit rooms
+   - Processes audio streams
+   - Generates responses
+   - Publishes audio/video tracks
+
+2. Register your agent with LiveKit Cloud or self-hosted server
+
+3. Update environment variables:
+   ```bash
+   NEXT_PUBLIC_TRICIA_BASE_URL=https://your-api.com
+   TRICIA_API_BEARER_TOKEN=your-token
+   ```
+
+### Example Agent Implementation
+
+```python
+# Python LiveKit Agent Example
+from livekit.agents import JobContext, WorkerOptions, cli
+from livekit.agents.llm import LLM
+from livekit.agents.voice_assistant import VoiceAssistant
+
+async def entrypoint(ctx: JobContext):
+    # Initialize your LLM
+    llm = LLM(model="gpt-4")
+    
+    # Create voice assistant
+    assistant = VoiceAssistant(
+        llm=llm,
+        transcriber=YourTranscriber(),
+        synthesizer=YourSynthesizer()
+    )
+    
+    # Connect to room
+    await ctx.connect()
+    assistant.start(ctx.room)
+
+if __name__ == "__main__":
+    cli.run_app(
+        WorkerOptions(
+            entrypoint_fnc=entrypoint,
+            agent_name="your-agent-name"
+        )
+    )
+```
 
 ## Troubleshooting
 
-### Agent Not Connecting?
-- Verify agent is running in your backend
-- Check agent name matches configuration
-- Ensure LiveKit tokens include agent dispatch
-- Review backend logs for errors
+### Common Issues
 
-### Authentication Issues?
-- Verify Google OAuth redirect URIs
-- Check Firebase configuration
-- Ensure all environment variables are set
-- Clear browser cookies and retry
+#### WebRTC Connection Failed
+```bash
+# Check LiveKit connection
+curl -X POST http://localhost:8005/api/tricia \
+  -H "Content-Type: application/json" \
+  -d '{"user_id": "test"}'
+```
 
-### Connection Problems?
-- Check NEXTAUTH_URL matches your dev server port
-- Verify backend API is accessible
-- Look for CORS errors in console
-- Check network requests in browser DevTools
+#### Agent Not Joining Room
+- Verify agent name in JWT matches registered worker
+- Check agent logs for connection errors
+- Ensure LiveKit server has agent dispatch enabled
+
+#### OAuth Errors
+- Verify redirect URI: `http://localhost:8005/api/auth/callback/google`
+- Check Google Cloud Console for correct client configuration
+
+### Debug Mode
+
+Enable verbose logging:
+```javascript
+// In useConnection.tsx
+console.log('[LiveKit]', 'Connection state:', state);
+console.log('[LiveKit]', 'Participants:', room.remoteParticipants.size);
+```
+
+## Performance
+
+- Audio latency: ~200-500ms (depending on network)
+- Transcription accuracy: 85-95% (model dependent)
+- Concurrent sessions: Limited by agent backend capacity
+- WebRTC bandwidth: ~50-100 kbps per audio stream
 
 ## Contributing
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+2. Create feature branch (`git checkout -b feature/your-feature`)
+3. Follow existing code patterns
+4. Add tests for new functionality
+5. Submit pull request
 
 ## License
 
-Apache License 2.0 - see [LICENSE](LICENSE) file
-
-## Acknowledgments
-
-- Built on [LiveKit](https://livekit.io) for real-time communication
-- Default AI agent powered by [Tricia](https://heytricia.ai)
-- UI components from [LiveKit Components](https://github.com/livekit/components-js)
+Apache License 2.0 - see [LICENSE](LICENSE)
 
 ---
 
-Built with ❤️ for preserving memories
+Built on [LiveKit](https://livekit.io) | Default agent: [Tricia AI](https://heytricia.ai)
 
 

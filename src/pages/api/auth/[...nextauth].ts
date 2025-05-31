@@ -41,8 +41,8 @@ export const authOptions: NextAuthOptions = {
   providers: [
     // Google provider for production
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!.trim(),
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!.trim(),
+      clientId: process.env.GOOGLE_CLIENT_ID || '',
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
       authorization: {
         params: {
           prompt: "consent",

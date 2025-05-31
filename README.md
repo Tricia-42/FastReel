@@ -1,12 +1,29 @@
 # StayReel 🎬
 
-> Real-time AI conversations with multi-modal content generation
+> Preserving memories through AI-powered conversations
 
 [![Demo](https://img.shields.io/badge/demo-live-brightgreen)](https://demo.heytricia.ai)
-[![Discord](https://img.shields.io/discord/1234567890?color=7289da&label=discord)](https://discord.gg/stayreel)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
 
-StayReel transforms conversations into visual stories. Built on LiveKit WebRTC, it enables real-time voice interactions with AI agents that generate images, videos, and reels on the fly.
+StayReel transforms conversations into lasting memories. Built by [Tricia, Inc](https://heytricia.ai), it's an open-source platform that helps people with dementia and their caregivers create meaningful connections through AI-guided storytelling and memory preservation.
+
+---
+
+## 🌐 Explore StayReel
+
+- **Live Demo**: [demo.heytricia.ai](https://demo.heytricia.ai)
+- **Company Website**: [heytricia.ai](https://heytricia.ai)
+- **Join Our Slack Community**: [StayReel Developers](https://join.slack.com/t/stayreel-community/shared_invite/xyz)
+
+---
+
+## 🎯 Our Mission
+
+At Tricia, we believe technology should strengthen human connections, not replace them. StayReel empowers:
+
+- **People with dementia** to share their stories and preserve memories
+- **Unpaid caregivers** to capture precious moments and understand their loved ones better
+- **Families** to build a digital legacy that spans generations
 
 ## 🚀 Quick Start
 
@@ -21,8 +38,8 @@ cd StayReel
 
 The setup script will:
 - Check Node.js version
-- Install dependencies
-- Configure environment variables (Vercel or manual)
+- Install dependencies  
+- Configure environment variables
 - Provide next steps
 
 ### Manual Setup
@@ -32,7 +49,6 @@ The setup script will:
 If you have access to the Vercel project:
 
 ```bash
-# Clone and setup
 git clone git@github.com:Tricia-42/StayReel.git
 cd StayReel
 npm install
@@ -41,14 +57,12 @@ npm install
 vercel link
 vercel env pull .env.local
 
-# Run locally
 npm run dev
 ```
 
 #### External Contributors
 
 ```bash
-# Clone repository
 git clone git@github.com:Tricia-42/StayReel.git
 cd StayReel
 npm install
@@ -60,169 +74,119 @@ cp .env.example .env.local
 npm run dev
 ```
 
-#### Required Services
+Visit http://localhost:8005 after starting the server.
 
-1. **Google OAuth**: [Create credentials](https://console.cloud.google.com/apis/credentials)
-   - Add redirect URI: `http://localhost:8005/api/auth/callback/google`
-
-2. **Firebase** (optional): For user persistence
-   - Download service account JSON
-   - Or add credentials to `.env.local`
-
-3. **Agent Backend**: Any LiveKit-compatible agent
-   - Default: Tricia AI API
-   - Or build your own (see below)
+---
 
 ## 🏗️ Architecture
 
 ```mermaid
 graph LR
-    A[React Client] -->|WebRTC| B[LiveKit Cloud]
-    A -->|API| C[Next.js Backend]
-    C -->|Create Room| D[Agent API]
-    B <-->|Audio/Video| E[AI Agent]
-    E -->|Generate| F[Content APIs]
+    A[Caregiver/User] -->|Voice| B[StayReel Web App]
+    B -->|WebRTC| C[LiveKit Cloud]
+    C <-->|Real-time Audio| D[AI Companion]
+    D -->|Generate| E[Memory Artifacts]
+    E -->|Store| F[Family Archive]
 ```
 
-## 🎯 Current Features
+---
 
-- **Voice Conversations**: Real-time WebRTC audio with AI agents
-- **Live Transcription**: See what you and the AI are saying
-- **Session Recording**: Automatic conversation history
-- **Multi-turn Context**: Agents remember your conversation
-- **Google Sign-in**: Secure authentication with Firebase
+## ✨ Core Features
 
-## 🔮 Next Steps: Multi-Modal Generation
+- **Guided Conversations**: AI companions that gently prompt memory sharing
+- **Real-time Transcription**: Capture every word for future generations
+- **Memory Synthesis**: Transform conversations into shareable stories
+- **Caregiver Tools**: Session notes, mood tracking, and care insights
+- **Privacy First**: Your memories stay yours - fully encrypted and private
 
-### 1. Google Veo3 Integration (Video Generation)
+---
 
-Enable short-form video creation during conversations:
+## 🔮 Roadmap: Multi-Modal Memories
 
+### Phase 1: Visual Memory Creation (Q1 2025)
+
+**Photo-to-Story Generation**
 ```typescript
-// src/lib/veo3-client.ts
-export async function generateVideo(prompt: string, context: ConversationContext) {
-  // Implement Veo3 API integration
-  // Handle multi-turn refinement
-  // Stream progress to client
+// Transform old photos into narrated memories
+export async function createPhotoMemory(photo: File, audioNarration: Blob) {
+  // AI analyzes photo context
+  // Combines with voice narration
+  // Creates shareable memory video
 }
-
-// In your agent:
-rpc.register("video.generate", async (params) => {
-  const video = await veo3.generate(params.prompt, params.style)
-  return { url: video.url, duration: video.duration }
-})
 ```
 
-### 2. OpenAI Multi-Turn Image Editing
+### Phase 2: Memory Reel Builder (Q2 2025)
 
-Create reels through conversational image generation:
-
+**Conversational Video Creation**
 ```typescript
-// src/lib/openai-vision.ts
-export async function createReel(messages: Message[]) {
-  // DALL-E 3 for initial generation
-  // GPT-4V for editing instructions
-  // Chain multiple edits into reel sequence
-}
-
-// Frontend hook:
-const { images, addFrame, editFrame } = useReelCreation()
+// Build video reels through natural conversation
+const { reel, addScene, narrate } = useMemoryReel()
+// "Tell me about your wedding day..."
+// AI helps reconstruct and visualize memories
 ```
 
-### Implementation Roadmap
+### Phase 3: Legacy Platform (Q3 2025)
 
-1. **Week 1-2**: Veo3 API integration
-   - [ ] API client implementation
-   - [ ] Streaming video preview
-   - [ ] Multi-turn refinement UI
+- Family member access controls
+- Memory timeline visualization
+- Care coordination features
+- Integration with care facilities
 
-2. **Week 3-4**: Image reel creator
-   - [ ] DALL-E 3 integration
-   - [ ] Frame-by-frame editor
-   - [ ] Export to video format
+---
 
-3. **Week 5-6**: Production features
-   - [ ] CDN for media storage
-   - [ ] Background processing
-   - [ ] Social sharing
-
-## 🛠️ Development
-
-### Project Structure
+## 🛠️ Technical Stack
 
 ```
 src/
-├── components/playground/  # LiveKit UI components
-├── pages/api/             # Backend endpoints
-├── lib/                   # API clients & utilities
-└── hooks/                 # React hooks
+├── components/     # React UI components
+├── pages/api/     # Backend API routes
+├── lib/           # Core utilities
+├── agents/        # AI companion logic
+└── hooks/         # React hooks
 ```
 
-### Key Integrations
+**Key Technologies:**
+- **LiveKit**: Real-time voice infrastructure
+- **Next.js**: Full-stack React framework
+- **AI Agents**: Customizable conversation companions
+- **Secure Storage**: End-to-end encrypted memories
 
-- **LiveKit**: WebRTC infrastructure
-- **NextAuth**: Authentication
-- **Firebase**: User management
-- **Tricia API**: Default AI agent
-
-### Building Custom Agents
-
-Your agent needs to:
-
-1. Connect to LiveKit rooms
-2. Process audio streams
-3. Generate responses
-4. Implement RPC methods
-
-Example Python agent:
-
-```python
-from livekit.agents import JobContext, WorkerOptions, cli
-
-async def entrypoint(ctx: JobContext):
-    # Your agent logic here
-    await ctx.connect()
-    
-cli.run_app(WorkerOptions(entrypoint_fnc=entrypoint))
-```
-
-## 📝 API Reference
-
-### Create Session
-
-```http
-POST /api/tricia
-{
-  "title": "New Conversation"
-}
-
-Response:
-{
-  "room_name": "room_abc123",
-  "participant_token": "jwt...",
-  "server_url": "wss://livekit.server"
-}
-```
-
-### RPC Methods
-
-Register these in your frontend:
-
-- `agent.journal_generated` - Content ready
-- `video.progress` - Generation updates
-- `image.frame_added` - Reel frame created
+---
 
 ## 🤝 Contributing
 
-We're looking for help with:
+We welcome contributions that align with our mission. Priority areas:
 
-- [ ] Veo3 integration
-- [ ] Image editing pipeline
-- [ ] UI/UX improvements
-- [ ] Agent examples
-- [ ] Documentation
+- **Accessibility**: Making StayReel easier for seniors
+- **Caregiver Features**: Tools that reduce caregiver burden
+- **Memory Formats**: New ways to preserve and share memories
+- **Language Support**: Reaching more families globally
+- **Clinical Integration**: Working with care professionals
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+---
+
+## 🔒 Privacy & Ethics
+
+StayReel is built with privacy and dignity at its core:
+
+- All conversations are encrypted
+- Families own their data completely
+- No training on user conversations
+- Transparent AI interactions
+- Caregiver consent protocols
+
+---
+
+## 📞 Get Involved
+
+- **Developers**: Join our [Slack workspace](https://join.slack.com/t/stayreel-community/shared_invite/xyz)
+- **Caregivers**: Share your needs at feedback@heytricia.ai
+- **Researchers**: Collaborate at research@heytricia.ai
+- **Care Facilities**: Partner with us at partnerships@heytricia.ai
+
+---
 
 ## 📄 License
 
@@ -231,7 +195,8 @@ Apache 2.0 - see [LICENSE](LICENSE)
 ---
 
 <p align="center">
-  Built with ❤️ by <a href="https://heytricia.ai">Tricia AI</a> on <a href="https://livekit.io">LiveKit</a>
+  <strong>Building technology that preserves what matters most</strong><br>
+  Made with ❤️ by <a href="https://heytricia.ai">Tricia, Inc</a>
 </p>
 
 

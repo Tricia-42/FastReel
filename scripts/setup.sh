@@ -5,7 +5,7 @@
 
 set -e
 
-echo "🎬 Setting up StayReel development environment..."
+echo "🎬 Setting up StayReel - Memory preservation platform..."
 
 # Check Node.js version
 NODE_VERSION=$(node -v | cut -d'v' -f2 | cut -d'.' -f1)
@@ -45,8 +45,9 @@ if [ ! -f .env.local ]; then
         echo ""
         echo "⚠️  Please edit .env.local with your credentials:"
         echo "   - Google OAuth (https://console.cloud.google.com)"
-        echo "   - Firebase (optional)"
-        echo "   - Backend API endpoint"
+        echo "   - Tricia AI Backend API token"
+        echo ""
+        echo "📧 Need API access? Contact support@heytricia.ai"
         echo ""
     fi
 else
@@ -66,7 +67,9 @@ echo "✨ Setup complete! Run 'npm run dev' to start the development server."
 echo "🌐 Visit http://localhost:8005 after starting the server."
 echo ""
 echo "📚 Next steps:"
-echo "   - Read the README.md for architecture overview"
-echo "   - Check CONTRIBUTING.md for development guidelines"
-echo "   - Join our Discord: https://discord.gg/stayreel"
+echo "   - Read the README.md to understand our mission"
+echo "   - Check CONTRIBUTING.md for contribution guidelines"
+echo "   - Join our Slack: https://join.slack.com/t/stayreel-community/shared_invite/xyz"
+echo ""
+echo "💙 Thank you for helping us preserve memories and support families!"
 echo "" 

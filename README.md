@@ -10,7 +10,24 @@ StayReel transforms conversations into visual stories. Built on LiveKit WebRTC, 
 
 ## 🚀 Quick Start
 
-### Tricia Community Members
+### One-Command Setup
+
+```bash
+# Clone and run setup script
+git clone git@github.com:Tricia-42/StayReel.git
+cd StayReel
+./scripts/setup.sh
+```
+
+The setup script will:
+- Check Node.js version
+- Install dependencies
+- Configure environment variables (Vercel or manual)
+- Provide next steps
+
+### Manual Setup
+
+#### Tricia Community Members
 
 If you have access to the Vercel project:
 
@@ -28,9 +45,7 @@ vercel env pull .env.local
 npm run dev
 ```
 
-Visit http://localhost:8005 and sign in with Google.
-
-### External Contributors
+#### External Contributors
 
 ```bash
 # Clone repository

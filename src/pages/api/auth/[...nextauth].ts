@@ -38,7 +38,7 @@ interface GoogleProfile {
 }
 
 export const authOptions: NextAuthOptions = {
-  useSecureCookies: process.env.NODE_ENV === 'production',
+  secret: process.env.NEXTAUTH_SECRET,
   providers: [
     // Google provider for production
     GoogleProvider({
@@ -248,7 +248,7 @@ export const authOptions: NextAuthOptions = {
       }
     }
   },
-  debug: true, // Enable debug messages in production temporarily
+  debug: false, // Disable debug messages in production
   logger: {
     error(code, metadata) {
       console.error('[NextAuth] Error:', code, metadata)
@@ -268,35 +268,6 @@ export const authOptions: NextAuthOptions = {
   // Add JWT configuration
   jwt: {
     maxAge: 30 * 24 * 60 * 60, // 30 days
-  },
-  // Add cookie configuration for production
-  cookies: {
-    sessionToken: {
-      name: `next-auth.session-token`,
-      options: {
-        httpOnly: true,
-        sameSite: 'lax',
-        path: '/',
-        secure: process.env.NODE_ENV === 'production'
-      }
-    },
-    callbackUrl: {
-      name: `next-auth.callback-url`,
-      options: {
-        sameSite: 'lax',
-        path: '/',
-        secure: process.env.NODE_ENV === 'production'
-      }
-    },
-    csrfToken: {
-      name: `next-auth.csrf-token`,
-      options: {
-        httpOnly: true,
-        sameSite: 'lax',
-        path: '/',
-        secure: process.env.NODE_ENV === 'production'
-      }
-    },
   }
 }
 

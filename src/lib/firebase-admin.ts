@@ -1,30 +1,66 @@
 import * as admin from 'firebase-admin';
+import * as fs from 'fs';
+import * as path from 'path';
 
-// Check if Firebase Admin credentials are available
+// Try to load service account from file if environment variables are not set
+let serviceAccount: any = null;
+
+// First, try to use environment variables
 const hasFirebaseCredentials = 
   process.env.FIREBASE_PROJECT_ID && 
   process.env.FIREBASE_CLIENT_EMAIL && 
   process.env.FIREBASE_PRIVATE_KEY;
 
+// If environment variables are not available, try to load from service account file
+if (!hasFirebaseCredentials) {
+  try {
+    const serviceAccountPath = path.join(process.cwd(), 'tricia-e00ce-689fa22ff901.json');
+    if (fs.existsSync(serviceAccountPath)) {
+      serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, 'utf8'));
+      console.log('Loaded Firebase service account from file');
+    }
+  } catch (error) {
+    console.error('Failed to load service account file:', error);
+  }
+}
+
 let isInitialized = false;
 
-// Initialize Firebase Admin SDK only if credentials are available
-if (!admin.apps.length && hasFirebaseCredentials) {
+// Initialize Firebase Admin SDK
+if (!admin.apps.length) {
   try {
-    admin.initializeApp({
-      credential: admin.credential.cert({
-        projectId: process.env.FIREBASE_PROJECT_ID as string,
-        clientEmail: process.env.FIREBASE_CLIENT_EMAIL as string,
-        privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n') as string,
-      }),
-    });
-    isInitialized = true;
-    console.log('Firebase Admin initialized successfully');
+    if (serviceAccount) {
+      // Use service account from file
+      admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount),
+      });
+      isInitialized = true;
+      console.log('Firebase Admin initialized successfully with service account file');
+    } else if (hasFirebaseCredentials) {
+      // Use environment variables
+      admin.initializeApp({
+        credential: admin.credential.cert({
+          projectId: process.env.FIREBASE_PROJECT_ID as string,
+          clientEmail: process.env.FIREBASE_CLIENT_EMAIL as string,
+          privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n') as string,
+        }),
+      });
+      isInitialized = true;
+      console.log('Firebase Admin initialized successfully with environment variables');
+    } else {
+      console.warn('Firebase Admin credentials not found. Firebase features will be disabled.');
+    }
   } catch (error) {
     console.error('Firebase Admin initialization error:', error);
+    // Log more details about the error
+    if (error instanceof Error) {
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+    }
   }
-} else if (!hasFirebaseCredentials) {
-  console.warn('Firebase Admin credentials not found. Firebase features will be disabled.');
+} else {
+  isInitialized = true;
+  console.log('Firebase Admin already initialized');
 }
 
 export const adminAuth = isInitialized ? admin.auth() : null;

@@ -1,13 +1,12 @@
 import React, { useState } from "react";
 import { Button } from "./button/Button";
 import { LoadingSVG } from "./button/LoadingSVG";
-import { ConnectionMode } from "@/hooks/useConnection";
 import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 
 interface PlaygroundConnectProps {
   accentColor: string;
-  onConnectClicked: (mode: ConnectionMode) => void;
+  onConnectClicked: () => void;
 }
 
 export const PlaygroundConnect: React.FC<PlaygroundConnectProps> = ({
@@ -24,8 +23,10 @@ export const PlaygroundConnect: React.FC<PlaygroundConnectProps> = ({
 
   const handleConnectToPilot = async () => {
     if (!session && !isTestMode) {
-      // Redirect to sign in if not authenticated
-      signIn();
+      // Direct Google sign-in, skipping the sign-in page
+      signIn("google", {
+        callbackUrl: "/",
+      });
       return;
     }
 
@@ -34,7 +35,7 @@ export const PlaygroundConnect: React.FC<PlaygroundConnectProps> = ({
     
     try {
       // User is authenticated or in test mode, initiate Tricia connection
-      await onConnectClicked("tricia");
+      await onConnectClicked();
     } catch (error) {
       setError("Connection failed. Please try again.");
       setIsConnecting(false);
@@ -42,7 +43,9 @@ export const PlaygroundConnect: React.FC<PlaygroundConnectProps> = ({
   };
 
   const handleSignIn = () => {
-    signIn("google");
+    signIn("google", {
+      callbackUrl: "/",
+    });
   };
 
   // Show loading state while checking authentication

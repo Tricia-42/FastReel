@@ -29,12 +29,9 @@ export const PlaygroundHeader = ({
   const { data: session } = useSession();
   
   const handleSignOut = async () => {
-    // If connected, disconnect first
-    if (connectionState === ConnectionState.Connected) {
-      onConnectClicked();
-    }
-    // Then sign out
-    await signOut();
+    // Just sign out directly - no need to disconnect first
+    // The page will redirect and cleanup will happen automatically
+    await signOut({ callbackUrl: '/auth/signin' });
   };
   
   return (
@@ -73,32 +70,27 @@ export const PlaygroundHeader = ({
           </span>
         )}
         
-        {/* Connection button */}
-        <Button
-          accentColor={
-            connectionState === ConnectionState.Connected ? "red" : accentColor
-          }
-          disabled={connectionState === ConnectionState.Connecting}
-          onClick={() => {
-            console.log('Disconnect button clicked, current state:', connectionState);
-            onConnectClicked();
-          }}
-        >
-          {connectionState === ConnectionState.Connecting ? (
-            <LoadingSVG />
-          ) : connectionState === ConnectionState.Connected ? (
-            "Disconnect"
-          ) : (
-            "Connect"
-          )}
-        </Button>
+        {/* Show connection status */}
+        {connectionState === ConnectionState.Connecting && (
+          <div className="flex items-center gap-2 text-xs text-gray-400">
+            <LoadingSVG diameter={16} />
+            <span>Connecting...</span>
+          </div>
+        )}
+        
+        {connectionState === ConnectionState.Connected && (
+          <div className="flex items-center gap-1 text-xs text-green-500">
+            <div className="w-2 h-2 rounded-full bg-green-500"></div>
+            <span>Connected</span>
+          </div>
+        )}
         
         {/* Sign out button */}
         {session && (
           <Button
-            accentColor="gray"
+            accentColor={connectionState === ConnectionState.Connected ? "red" : "gray"}
             onClick={handleSignOut}
-            className="text-xs"
+            className="text-sm"
           >
             Sign Out
           </Button>

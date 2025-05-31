@@ -3,6 +3,9 @@ import { useRouter } from "next/router"
 import { useState } from "react"
 import { Button } from "@/components/button/Button"
 import { LoadingSVG } from "@/components/button/LoadingSVG"
+import { GetServerSideProps } from "next"
+import { getServerSession } from "next-auth/next"
+import { authOptions } from "../api/auth/[...nextauth]"
 
 export default function SignIn() {
   const router = useRouter()
@@ -15,8 +18,9 @@ export default function SignIn() {
     setError(null)
     
     try {
+      // Always redirect to homepage after sign-in
       const result = await signIn(provider, {
-        callbackUrl: router.query.callbackUrl as string || "/",
+        callbackUrl: "/",
         redirect: false,
       })
       
@@ -100,4 +104,23 @@ export default function SignIn() {
       </div>
     </div>
   )
+}
+
+// Server-side check: if already authenticated, redirect to homepage
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const session = await getServerSession(context.req, context.res, authOptions)
+  
+  // If already authenticated, redirect to homepage
+  if (session) {
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false,
+      },
+    }
+  }
+  
+  return {
+    props: {},
+  }
 } 

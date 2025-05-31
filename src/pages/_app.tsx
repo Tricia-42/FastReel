@@ -1,4 +1,3 @@
-import { CloudProvider } from "@/cloud/useCloud";
 import "@livekit/components-styles/components/participant";
 import "@/styles/globals.css";
 import type { AppProps } from "next/app";
@@ -10,9 +9,7 @@ export default function App({
 }: AppProps) {
   return (
     <SessionProvider session={session}>
-      <CloudProvider>
-        <Component {...pageProps} />
-      </CloudProvider>
+      <Component {...pageProps} />
     </SessionProvider>
   );
 }

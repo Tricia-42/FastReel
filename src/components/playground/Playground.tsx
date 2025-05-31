@@ -92,16 +92,12 @@ export default function Playground({
     }
   }, [roomState, room]);
   
-  // Log voice assistant state changes
+  // Log voice assistant state changes - only when agent first connects
   useEffect(() => {
-    // console.log('=== Voice Assistant State Changed ===');
-    // console.log('Voice Assistant Agent:', voiceAssistant.agent);
-    // console.log('Voice Assistant State:', voiceAssistant.state);
-    // console.log('Voice Assistant Audio Track:', voiceAssistant.audioTrack);
     if (voiceAssistant.agent) {
       console.log('Voice Assistant connected:', voiceAssistant.agent.identity);
     }
-  }, [voiceAssistant.agent, voiceAssistant.state, voiceAssistant.audioTrack]);
+  }, [voiceAssistant.agent?.identity]); // Only depend on identity string, not the whole object
 
   const [rpcMethod, setRpcMethod] = useState("");
   const [rpcPayload, setRpcPayload] = useState("");
@@ -183,12 +179,6 @@ export default function Playground({
 
   // Get agent transcriptions
   const agentTranscriptions = useTrackTranscription(voiceAssistant.audioTrack);
-  
-  // Debug: Check agent audio track
-  useEffect(() => {
-    console.log('Voice Assistant agent:', voiceAssistant.agent);
-    console.log('Voice Assistant audioTrack:', voiceAssistant.audioTrack);
-  }, [voiceAssistant.agent, voiceAssistant.audioTrack]);
   
   // Update subtitle when agent speaks
   useEffect(() => {
@@ -349,7 +339,7 @@ export default function Playground({
     } catch (e) {
       console.error('RPC call failed:', e);
     }
-  }, [room, rpcMethod, rpcPayload, voiceAssistant.agent]);
+  }, [room, rpcMethod, rpcPayload, voiceAssistant.agent?.identity]); // Use identity string instead of object
 
   const settingsTileContent = useMemo(() => {
     return (
@@ -451,7 +441,7 @@ export default function Playground({
     roomState,
     themeColors,
     setUserSettings,
-    voiceAssistant.agent,
+    !!voiceAssistant.agent, // Convert to boolean to avoid object reference changes
   ]);
 
   let mobileTabs: PlaygroundTab[] = [];

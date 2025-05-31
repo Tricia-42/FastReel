@@ -2,6 +2,40 @@ import NextAuth, { NextAuthOptions } from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
 import CredentialsProvider from "next-auth/providers/credentials"
 import { createFirebaseUser } from "@/lib/firebase-admin"
+import { ensureUserExists } from "@/lib/tricia-backend"
+
+// 擴展 Session 型別
+declare module "next-auth" {
+  interface Session {
+    user: {
+      id?: string
+      name?: string | null
+      first_name?: string | null
+      last_name?: string | null
+      email?: string | null
+      image?: string | null
+      locale?: string
+    }
+  }
+}
+
+// 擴展 JWT 型別
+declare module "next-auth/jwt" {
+  interface JWT {
+    locale?: string
+  }
+}
+
+// 擴展 Profile 型別
+interface GoogleProfile {
+  sub: string
+  name: string
+  email: string
+  picture: string
+  locale?: string
+  given_name?: string
+  family_name?: string
+}
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -15,7 +49,29 @@ export const authOptions: NextAuthOptions = {
           access_type: "offline",
           response_type: "code"
         }
-      }
+      },
+      profile(profile) {
+        const googleProfile = profile as GoogleProfile;
+        console.log('[NextAuth] Google profile:', {
+          sub: googleProfile.sub,
+          name: googleProfile.name,
+          email: googleProfile.email,
+          picture: googleProfile.picture,
+          given_name: googleProfile.given_name,
+          family_name: googleProfile.family_name,
+          locale: googleProfile.locale
+        });
+        
+        return {
+          id: googleProfile.sub,
+          name: googleProfile.name,
+          email: googleProfile.email,
+          image: googleProfile.picture,
+          first_name: googleProfile.given_name,
+          last_name: googleProfile.family_name,
+          locale: googleProfile.locale
+        }
+      },
     }),
     // Test mode provider for local development
     ...(process.env.NEXT_PUBLIC_TEST_MODE === 'true' ? [
@@ -53,50 +109,45 @@ export const authOptions: NextAuthOptions = {
             id: user.id,
             email: user.email,
             name: user.name,
-            image: user.image,
+            image: user.image
           });
           
-          // If this is a new user AND Firebase is available, create them in your backend
-          if (isNewUser && firebaseUser) {
-            console.log('[NextAuth] Creating new user in backend for:', user.email);
+          // Only create Tricia backend user for NEW users (first-time sign-in)
+          if (firebaseUser && isNewUser) {
+            console.log('[NextAuth] First-time user detected, creating in Tricia backend:', user.email);
             
-            // Small delay to ensure Firebase user is fully created
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            // 從 profile 中取得 Google 提供的資訊
+            const googleProfile = profile as GoogleProfile;
             
-            // Parse name into first and last
-            const nameParts = (user.name || '').split(' ');
-            const firstName = nameParts[0] || '';
-            const lastName = nameParts.slice(1).join(' ') || '';
+            // 使用預設語系，因為在 signIn 階段無法取得 accept-language
+            const locale = 'en-US';
             
-            // Call your backend API to create user
-            const apiUrl = process.env.NEXT_PUBLIC_TRICIA_BASE_URL || 'https://api.heytricia.ai/api/v1';
-            const bearerToken = process.env.TRICIA_API_BEARER_TOKEN || 'admin';
-            
-            const response = await fetch(`${apiUrl}/users`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${bearerToken}`,
-              },
-              body: JSON.stringify({
-                id: user.id, // Firebase UID
-                first_name: firstName,
-                last_name: lastName,
-                email: user.email,
-                avatar_url: user.image,
-                notification_enabled: true,
-                account_type: 'personal',
-              }),
+            console.log('[NextAuth] Creating user with profile data:', {
+              id: user.id,
+              email: user.email,
+              first_name: googleProfile.given_name,
+              last_name: googleProfile.family_name,
+              locale: locale
             });
             
-            if (!response.ok) {
-              const errorText = await response.text();
-              console.error('[NextAuth] Failed to create user in backend:', response.status, errorText);
-              // Note: We don't throw here to allow sign-in to continue
-              // The user exists in Firebase but not in your backend
+            const userCreated = await ensureUserExists({
+              id: user.id,
+              email: user.email,
+              first_name: googleProfile.given_name,
+              last_name: googleProfile.family_name,
+              image: user.image,
+              locale: locale
+            });
+            
+            if (!userCreated) {
+              console.error('[NextAuth] Failed to create new user in backend');
+              // Optionally block sign-in if backend user creation fails
+              // return false;
             } else {
-              console.log('[NextAuth] User created successfully in backend');
+              console.log('[NextAuth] New user created successfully in backend');
             }
+          } else if (firebaseUser && !isNewUser) {
+            console.log('[NextAuth] Existing user signed in:', user.email);
           }
         } catch (error) {
           console.error('[NextAuth] Error in sign-in process:', error);
@@ -115,7 +166,7 @@ export const authOptions: NextAuthOptions = {
       else if (new URL(url).origin === baseUrl) return url
       return baseUrl
     },
-    async session({ session, token }) {
+    async session({ session, token, user }) {
       console.log('[NextAuth] Session callback:', { 
         userEmail: session.user?.email,
         hasToken: !!token 
@@ -124,6 +175,17 @@ export const authOptions: NextAuthOptions = {
       // Pass user ID to the session for client-side use
       if (session.user && token.sub) {
         session.user.id = token.sub
+      }
+      
+      // 從 token 中取得 Google 提供的資訊
+      if (token.given_name) {
+        (session.user as any).first_name = token.given_name
+      }
+      if (token.family_name) {
+        (session.user as any).last_name = token.family_name
+      }
+      if (token.locale) {
+        session.user.locale = token.locale
       }
       
       // Add Firebase custom token to session
@@ -145,10 +207,23 @@ export const authOptions: NextAuthOptions = {
       
       return session
     },
-    async jwt({ token, user, account }) {
+    async jwt({ token, user, account, profile }) {
       if (account && user) {
         console.log('[NextAuth] JWT token created for:', user.email)
       }
+      
+      // 加入 Google 提供的資訊到 token
+      const googleProfile = profile as GoogleProfile;
+      if (googleProfile?.given_name) {
+        token.given_name = googleProfile.given_name
+      }
+      if (googleProfile?.family_name) {
+        token.family_name = googleProfile.family_name
+      }
+      if (googleProfile?.locale) {
+        token.locale = googleProfile.locale
+      }
+      
       return token
     }
   },

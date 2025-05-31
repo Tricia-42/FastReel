@@ -9,6 +9,9 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Inter } from "next/font/google";
 import Head from "next/head";
 import { useCallback, useState, useEffect } from "react";
+import { GetServerSideProps } from "next";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "./api/auth/[...nextauth]";
 
 import Playground from "@/components/playground/Playground";
 import { PlaygroundToast } from "@/components/toast/PlaygroundToast";
@@ -56,11 +59,12 @@ export default function Home() {
 }
 
 export function HomeInner() {
-  const { shouldConnect, wsUrl, token, mode, connect, disconnect } = useConnection();
+  const { shouldConnect, wsUrl, token, connect, disconnect } = useConnection();
   const { config } = useConfig();
   const { toastMessage, setToastMessage } = useToast();
   const [isDisconnecting, setIsDisconnecting] = useState(false);
   const [isReady, setIsReady] = useState(false);
+  const [hasInitialized, setHasInitialized] = useState(false);
   
   // Sync Firebase Auth with NextAuth session
   const { firebaseUser, isLoading: isFirebaseLoading, error: firebaseError } = useFirebaseAuth();
@@ -81,6 +85,15 @@ export function HomeInner() {
     }
   }, [firebaseUser]);
 
+  // Auto-connect when component mounts (user is already authenticated)
+  useEffect(() => {
+    if (!hasInitialized && !shouldConnect && !isDisconnecting) {
+      console.log('[Connection] Auto-connecting authenticated user...');
+      setHasInitialized(true);
+      connect();
+    }
+  }, [connect, shouldConnect, isDisconnecting, hasInitialized]);
+
   // Clean up on unmount to prevent connection issues with HMR
   useEffect(() => {
     return () => {
@@ -89,7 +102,7 @@ export function HomeInner() {
         disconnect();
       }
     };
-  }, []);
+  }, [shouldConnect, disconnect]);
 
   // Add a small delay after getting connection details to ensure clean connection
   useEffect(() => {
@@ -106,23 +119,6 @@ export function HomeInner() {
       setIsReady(false);
     }
   }, [shouldConnect, wsUrl, token]);
-
-  const handleConnect = useCallback(
-    async (mode: ConnectionMode) => {
-      // If already connected, disconnect first
-      if (shouldConnect && !isDisconnecting) {
-        setIsDisconnecting(true);
-        // console.log('[Connection] Disconnecting existing connection before reconnecting...');
-        await disconnect();
-        // Wait for disconnect to complete
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Increased from 500ms
-        setIsDisconnecting(false);
-      }
-      console.log(`[Connection] Connecting in ${mode} mode...`);
-      connect(mode);
-    },
-    [connect, disconnect, shouldConnect, isDisconnecting]
-  );
 
   const handleDisconnect = useCallback(
     (shouldStayConnected: boolean) => {
@@ -174,14 +170,14 @@ export function HomeInner() {
           )}
         </AnimatePresence>
         
-        {!shouldConnect ? (
-          <PlaygroundConnect
-            accentColor={config.settings.theme_color}
-            onConnectClicked={handleConnect}
-          />
-        ) : !isReady ? (
+        {!shouldConnect || !isReady ? (
           <div className="flex items-center justify-center h-full">
-            <div className="text-white">Initializing connection...</div>
+            <div className="text-white">
+              <div className="text-center">
+                <h2 className="text-2xl font-bold mb-2">Connecting to Tricia...</h2>
+                <p className="text-gray-400">Please wait while we set up your session</p>
+              </div>
+            </div>
           </div>
         ) : (
           <LiveKitRoom
@@ -212,3 +208,27 @@ export function HomeInner() {
     </>
   );
 }
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const session = await getServerSession(context.req, context.res, authOptions);
+  
+  // Check if we're in test mode
+  const isTestMode = process.env.NEXT_PUBLIC_TEST_MODE === 'true';
+  
+  // If not authenticated and not in test mode, redirect to sign-in page
+  if (!session && !isTestMode) {
+    return {
+      redirect: {
+        destination: '/auth/signin',
+        permanent: false,
+      },
+    };
+  }
+  
+  // Pass session to page
+  return {
+    props: {
+      session,
+    },
+  };
+};

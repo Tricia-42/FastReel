@@ -1,0 +1,78 @@
+# Dependencies
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Next.js build output
+.next
+out
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Version control
+.git
+.gitignore
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Documentation
+README.md
+CONTRIBUTING.md
+docs/
+*.md
+
+# Development files
+.eslintrc.json
+.prettierrc
+jest.config.js
+tsconfig.json
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+
+# Test files
+__tests__
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+coverage/
+.nyc_output
+
+# Temporary files
+tmp/
+temp/
+
+# Build files
+Dockerfile
+.dockerignore
+docker-compose.yml
+
+# Scripts
+scripts/
+
+# Logs
+logs/
+*.log
+
+# Certificates and secrets
+*.pem
+*.key
+*.crt
+*.p12
+client_secret*
+tricia-*.json 

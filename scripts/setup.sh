@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# StayReel Development Setup Script
+# CompanionKit Development Setup Script
 # Usage: ./scripts/setup.sh
 
 set -e
 
-echo "🎬 Setting up StayReel - Memory preservation platform..."
+echo "🤝 Setting up CompanionKit - AI Companion Toolkit..."
 
 # Check Node.js version
 NODE_VERSION=$(node -v | cut -d'v' -f2 | cut -d'.' -f1)
@@ -69,7 +69,7 @@ echo ""
 echo "📚 Next steps:"
 echo "   - Read the README.md to understand our mission"
 echo "   - Check CONTRIBUTING.md for contribution guidelines"
-echo "   - Join our Slack: https://join.slack.com/t/stayreel-community/shared_invite/xyz"
+echo "   - Join our Slack: https://join.slack.com/t/companionkit-community/shared_invite/xyz"
 echo ""
-echo "💙 Thank you for helping us preserve memories and support families!"
+echo "💙 Thank you for building empathetic AI companions that make a difference!"
 echo "" 

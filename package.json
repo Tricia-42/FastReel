@@ -1,11 +1,12 @@
 {
-  "name": "stayreel",
+  "name": "companionkit",
   "version": "0.1.0",
-  "description": "StayReel - Preserving memories for families affected by dementia through AI-guided conversations",
+  "description": "CompanionKit - Open-source toolkit for building AI-powered companion applications with empathy-driven design",
   "private": true,
   "scripts": {
     "dev": "next dev -p 8005 -H 0.0.0.0",
     "dev:remote": "next dev -p 8005 -H 0.0.0.0",
+    "dev:quiet": "./scripts/dev-quiet.sh",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"

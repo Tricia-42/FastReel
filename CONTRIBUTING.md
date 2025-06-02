@@ -1,4 +1,4 @@
-# Contributing to StayReel
+# Contributing to CompanionKit
 
 Thank you for your interest in helping us preserve memories and support families affected by dementia. Every contribution makes a difference in someone's life.
 

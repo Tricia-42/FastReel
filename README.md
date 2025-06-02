@@ -1,202 +1,71 @@
-# StayReel 🎬
+# CompanionKit
 
-> Preserving memories through AI-powered conversations
-
-[![Demo](https://img.shields.io/badge/demo-live-brightgreen)](https://demo.heytricia.ai)
+[![Demo](https://img.shields.io/badge/demo-live-brightgreen)](https://demo.companionkit.ai)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
+[![Slack](https://img.shields.io/badge/slack-join-purple)](https://join.slack.com/t/companionkit-community/shared_invite/xyz)
+[![npm](https://img.shields.io/npm/v/@companionkit/core)](https://www.npmjs.com/package/@companionkit/core)
 
-StayReel transforms conversations into lasting memories. Built by [Tricia, Inc](https://heytricia.ai), it's an open-source platform that helps people with dementia and their caregivers create meaningful connections through AI-guided storytelling and memory preservation.
+CompanionKit is an open-source toolkit for building AI-powered companion applications. It provides modular, easy-to-integrate components for creating empathetic, personalized digital companions that support emotional wellness, mental health, and specialized care scenarios.
 
----
-
-## 🌐 Explore StayReel
-
-- **Live Demo**: [demo.heytricia.ai](https://demo.heytricia.ai)
-- **Company Website**: [heytricia.ai](https://heytricia.ai)
-- **Join Our Slack Community**: [StayReel Developers](https://join.slack.com/t/stayreel-community/shared_invite/xyz)
-
----
-
-## 🎯 Our Mission
-
-At Tricia, we believe technology should strengthen human connections, not replace them. StayReel empowers:
-
-- **People with dementia** to share their stories and preserve memories
-- **Unpaid caregivers** to capture precious moments and understand their loved ones better
-- **Families** to build a digital legacy that spans generations
-
-## 🚀 Quick Start
-
-### One-Command Setup
+## Quick Start
 
 ```bash
-# Clone and run setup script
-git clone git@github.com:Tricia-42/StayReel.git
-cd StayReel
+# Clone the repository
+git clone https://github.com/Tricia-42/CompanionKit.git
+cd CompanionKit
+
+# Run the setup script
 ./scripts/setup.sh
-```
 
-The setup script will:
-- Check Node.js version
-- Install dependencies  
-- Configure environment variables
-- Provide next steps
-
-### Manual Setup
-
-#### Tricia Community Members
-
-If you have access to the Vercel project:
-
-```bash
-git clone git@github.com:Tricia-42/StayReel.git
-cd StayReel
-npm install
-
-# Pull environment variables
-vercel link
-vercel env pull .env.local
-
-npm run dev
-```
-
-#### External Contributors
-
-```bash
-git clone git@github.com:Tricia-42/StayReel.git
-cd StayReel
-npm install
-
-# Setup environment
-cp .env.example .env.local
-# Edit .env.local with your credentials
-
+# Start development server
 npm run dev
 ```
 
 Visit http://localhost:8005 after starting the server.
 
----
+## Documentation
 
-## 🏗️ Architecture
+- [Getting Started](docs/getting-started.md) - Installation and setup guide
+- [Architecture](docs/architecture.md) - Technical overview and design decisions
+- [API Reference](docs/api-reference.md) - Complete API documentation
+- [Deployment](docs/deployment.md) - Production deployment guide
+- [Contributing](docs/contributing.md) - How to contribute to CompanionKit
+- [Developer Guidelines](docs/developer-guidelines.md) - Core principles and best practices
 
-```mermaid
-graph LR
-    A[Caregiver/User] -->|Voice| B[StayReel Web App]
-    B -->|WebRTC| C[LiveKit Cloud]
-    C <-->|Real-time Audio| D[AI Companion]
-    D -->|Generate| E[Memory Artifacts]
-    E -->|Store| F[Family Archive]
-```
+## CompanionKit Demo
 
----
+Try CompanionKit without any setup at our [Interactive Demo](https://demo.companionkit.ai), showcasing the full capabilities of AI-powered companion interactions.
 
-## ✨ Core Features
+## Core Features
 
-- **Guided Conversations**: AI companions that gently prompt memory sharing
-- **Real-time Transcription**: Capture every word for future generations
-- **Memory Synthesis**: Transform conversations into shareable stories
-- **Caregiver Tools**: Session notes, mood tracking, and care insights
-- **Privacy First**: Your memories stay yours - fully encrypted and private
+- **🤝 Empathetic AI Interactions** - Natural conversation flows designed for emotional support and engagement
+- **🔧 Modular Architecture** - Easy-to-integrate components for rapid companion app development
+- **🔒 Privacy-First Design** - End-to-end encryption and robust data protection
+- **♿ Accessibility Built-in** - WCAG compliant interfaces for diverse user needs
+- **🚀 Real-time Communication** - WebRTC-powered voice and video capabilities via LiveKit
+- **📱 Cross-Platform Support** - Web, mobile, and desktop ready
 
----
+## Use Cases
 
-## 🔮 Roadmap: Multi-Modal Memories
+- **Mental Health Support** - Therapeutic companions for anxiety, depression, and wellness
+- **Elder Care** - Companions for seniors, including those with dementia or Alzheimer's
+- **Educational Companions** - Interactive learning assistants and language practice partners
+- **Healthcare Navigation** - Patient support companions for treatment adherence and care coordination
+- **Corporate Wellness** - Employee wellbeing and mental health support companions
 
-### Phase 1: Visual Memory Creation (Q1 2025)
+## Community
 
-**Photo-to-Story Generation**
-```typescript
-// Transform old photos into narrated memories
-export async function createPhotoMemory(photo: File, audioNarration: Blob) {
-  // AI analyzes photo context
-  // Combines with voice narration
-  // Creates shareable memory video
-}
-```
+- Join our [Slack Community](https://join.slack.com/t/companionkit-community/shared_invite/xyz)
+- Follow updates on [Twitter](https://twitter.com/companionkit)
+- Read our [Blog](https://blog.companionkit.ai)
+- Submit issues on [GitHub](https://github.com/Tricia-42/CompanionKit/issues)
 
-### Phase 2: Memory Reel Builder (Q2 2025)
-
-**Conversational Video Creation**
-```typescript
-// Build video reels through natural conversation
-const { reel, addScene, narrate } = useMemoryReel()
-// "Tell me about your wedding day..."
-// AI helps reconstruct and visualize memories
-```
-
-### Phase 3: Legacy Platform (Q3 2025)
-
-- Family member access controls
-- Memory timeline visualization
-- Care coordination features
-- Integration with care facilities
-
----
-
-## 🛠️ Technical Stack
-
-```
-src/
-├── components/     # React UI components
-├── pages/api/     # Backend API routes
-├── lib/           # Core utilities
-├── agents/        # AI companion logic
-└── hooks/         # React hooks
-```
-
-**Key Technologies:**
-- **LiveKit**: Real-time voice infrastructure
-- **Next.js**: Full-stack React framework
-- **AI Agents**: Customizable conversation companions
-- **Secure Storage**: End-to-end encrypted memories
-
----
-
-## 🤝 Contributing
-
-We welcome contributions that align with our mission. Priority areas:
-
-- **Accessibility**: Making StayReel easier for seniors
-- **Caregiver Features**: Tools that reduce caregiver burden
-- **Memory Formats**: New ways to preserve and share memories
-- **Language Support**: Reaching more families globally
-- **Clinical Integration**: Working with care professionals
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
----
-
-## 🔒 Privacy & Ethics
-
-StayReel is built with privacy and dignity at its core:
-
-- All conversations are encrypted
-- Families own their data completely
-- No training on user conversations
-- Transparent AI interactions
-- Caregiver consent protocols
-
----
-
-## 📞 Get Involved
-
-- **Developers**: Join our [Slack workspace](https://join.slack.com/t/stayreel-community/shared_invite/xyz)
-- **Caregivers**: Share your needs at feedback@heytricia.ai
-- **Researchers**: Collaborate at research@heytricia.ai
-- **Care Facilities**: Partner with us at partnerships@heytricia.ai
-
----
-
-## 📄 License
+## License
 
 Apache 2.0 - see [LICENSE](LICENSE)
 
 ---
 
-<p align="center">
-  <strong>Building technology that preserves what matters most</strong><br>
-  Made with ❤️ by <a href="https://heytricia.ai">Tricia, Inc</a>
-</p>
+Built and maintained by [Tricia, Inc](https://heytricia.ai) | [Documentation](docs/) | [Interactive Demo](https://demo.companionkit.ai)
 
 

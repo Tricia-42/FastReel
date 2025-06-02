@@ -118,28 +118,30 @@ export default function Playground({
   // State for current image index in carousel
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  // Register RPC handlers for receiving calls from the agent
+  // Register RPC handlers
   useEffect(() => {
-    if (!room || roomState !== ConnectionState.Connected) return;
+    if (!room) return;
 
-    // Handler for journal generated event
     const handleJournalGenerated = async (data: any) => {
-      console.log('Received journal generated RPC');
       try {
-        // The payload should be in data.payload
-        const payload = typeof data.payload === 'string' ? data.payload : JSON.stringify(data.payload);
-        const journalData = JSON.parse(payload);
-        // console.log('Parsed journal data:', journalData);
+        console.log('!!! JOURNAL GENERATED !!!', data);
         
-        // Update journal content with the received data
-        setJournalContent({
-          title: journalData.title,
-          text: journalData.narrative,
-          images: journalData.images || [],
-          createdAt: journalData.createdAt
-        });
+        // Parse the journal data
+        let journalData;
+        if (typeof data === 'string') {
+          try {
+            journalData = JSON.parse(data);
+          } catch {
+            journalData = { text: data };
+          }
+        } else {
+          journalData = data;
+        }
         
-        // Return success response
+        // Update the journal content state
+        setJournalContent(journalData);
+        
+        // Return acknowledgment
         return JSON.stringify({ status: 'success', message: 'Journal received' });
       } catch (error: any) {
         console.error('Error handling journal generated:', error);
@@ -147,16 +149,10 @@ export default function Playground({
       }
     };
 
-    // Handler for journal saved event
     const handleJournalSaved = async (data: any) => {
-      console.log('Received journal saved RPC');
       try {
-        // The payload should be in data.payload
-        const payload = typeof data.payload === 'string' ? data.payload : JSON.stringify(data.payload);
-        const savedData = JSON.parse(payload);
-        // console.log('Journal saved successfully:', savedData);
+        console.log('!!! JOURNAL SAVED !!!', data);
         
-        // You can show a success notification here
         // For now, just log it
         
         return JSON.stringify({ status: 'success', message: 'Journal save acknowledged' });
@@ -175,31 +171,32 @@ export default function Playground({
       room.localParticipant.unregisterRpcMethod('agent.journal_generated');
       room.localParticipant.unregisterRpcMethod('agent.journal_saved');
     };
-  }, [room, roomState]);
+  }, [room]); // Only depend on room existence, not roomState
 
   // Get agent transcriptions
   const agentTranscriptions = useTrackTranscription(voiceAssistant.audioTrack);
   
-  // Update subtitle when agent speaks
+  // Update subtitle when agent speaks - with optimization
   useEffect(() => {
-    if (agentTranscriptions && agentTranscriptions.segments && agentTranscriptions.segments.length > 0) {
-      const latestSegment = agentTranscriptions.segments[agentTranscriptions.segments.length - 1];
-      if (latestSegment && latestSegment.final) {
-        setCurrentTranscript({
-          text: latestSegment.text,
-          speaker: "Tricia",
-          timestamp: Date.now()
-        });
-      }
+    if (!agentTranscriptions?.segments?.length) return;
+    
+    const latestSegment = agentTranscriptions.segments[agentTranscriptions.segments.length - 1];
+    if (latestSegment?.final && latestSegment.text.trim()) {
+      setCurrentTranscript({
+        text: latestSegment.text,
+        speaker: "Tricia",
+        timestamp: Date.now()
+      });
     }
-  }, [agentTranscriptions]);
+  }, [agentTranscriptions?.segments?.length]); // Only react to length changes
 
+  // Update camera and mic settings when connected
   useEffect(() => {
-    if (roomState === ConnectionState.Connected) {
+    if (roomState === ConnectionState.Connected && localParticipant) {
       localParticipant.setCameraEnabled(config.settings.inputs.camera);
       localParticipant.setMicrophoneEnabled(config.settings.inputs.mic);
     }
-  }, [config, localParticipant, roomState]);
+  }, [roomState, config.settings.inputs.camera, config.settings.inputs.mic, localParticipant]);
 
   // Clear transcript after 5 seconds (increased from 3)
   useEffect(() => {
@@ -216,7 +213,7 @@ export default function Playground({
   // Reset image index when journal content changes
   useEffect(() => {
     setCurrentImageIndex(0);
-  }, [journalContent]);
+  }, [journalContent?.images]);
 
   const agentVideoTrack = tracks.find(
     (trackRef) =>
@@ -240,30 +237,30 @@ export default function Playground({
   // Get user transcriptions using the microphone track
   const userTranscriptions = useTrackTranscription(localMicTrack);
   
-  // Update subtitle when user speaks (using LiveKit transcription)
+  // Update subtitle when user speaks - with optimization
   useEffect(() => {
-    if (userTranscriptions && userTranscriptions.segments && userTranscriptions.segments.length > 0) {
-      const latestSegment = userTranscriptions.segments[userTranscriptions.segments.length - 1];
-      if (latestSegment && latestSegment.final) {
-        setCurrentTranscript({
-          text: latestSegment.text,
-          speaker: "You",
-          timestamp: Date.now()
-        });
-        
-        // Also add to transcript history
-        setTranscripts((prevTranscripts) => [
-          ...prevTranscripts,
-          {
-            name: "You",
-            message: latestSegment.text,
-            timestamp: Date.now(),
-            isSelf: true,
-          },
-        ]);
-      }
+    if (!userTranscriptions?.segments?.length) return;
+    
+    const latestSegment = userTranscriptions.segments[userTranscriptions.segments.length - 1];
+    if (latestSegment?.final && latestSegment.text.trim()) {
+      setCurrentTranscript({
+        text: latestSegment.text,
+        speaker: "You",
+        timestamp: Date.now()
+      });
+      
+      // Also add to transcript history
+      setTranscripts((prevTranscripts) => [
+        ...prevTranscripts,
+        {
+          name: "You",
+          message: latestSegment.text,
+          timestamp: Date.now(),
+          isSelf: true,
+        },
+      ]);
     }
-  }, [userTranscriptions]);
+  }, [userTranscriptions?.segments?.length]); // Only react to length changes
 
   const onDataReceived = useCallback(
     (msg: any) => {

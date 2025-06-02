@@ -1,6 +1,6 @@
 # CompanionKit
 
-[![Demo](https://img.shields.io/badge/demo-live-brightgreen)](https://trip.companionkit.ai)
+[![Demo](https://img.shields.io/badge/demo-live-brightgreen)](https://demo.heytricia.ai)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
 [![Slack](https://img.shields.io/badge/slack-join-purple)](https://join.slack.com/t/companionkit-community/shared_invite/xyz)
 [![npm](https://img.shields.io/npm/v/@companion-kit/core)](https://www.npmjs.com/package/@companion-kit/core)

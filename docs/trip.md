@@ -4,7 +4,7 @@
 
 Trip is a demo application showcasing the capabilities of CompanionKit. It demonstrates how to build an AI-powered companion for travel and journey experiences using the CompanionKit toolkit.
 
-**Live Demo:** [trip.companionkit.ai](https://trip.companionkit.ai)
+**Live Demo:** [demo.heytricia.ai](https://demo.heytricia.ai)
 
 ## What is Trip?
 

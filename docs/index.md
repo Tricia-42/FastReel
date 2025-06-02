@@ -54,7 +54,7 @@ Build companions for:
 
 ## Quick Links
 
-- **Demo**: [Trip App](https://trip.companionkit.ai)
+- **Demo**: [Trip App](https://demo.heytricia.ai)
 - **GitHub**: [companion-kit](https://github.com/Tricia-42/companion-kit)
 - **npm**: [@companion-kit/core](https://www.npmjs.com/package/@companion-kit/core)
 - **Slack**: [Join Community](https://companionkit-community.slack.com)

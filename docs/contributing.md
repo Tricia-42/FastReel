@@ -22,8 +22,8 @@ Thank you for your interest in contributing to CompanionKit! This guide covers t
 
 ```bash
 # Clone your fork
-git clone https://github.com/YOUR_USERNAME/CompanionKit.git
-cd CompanionKit
+git clone https://github.com/YOUR_USERNAME/companion-kit.git
+cd companion-kit
 
 # Install dependencies
 npm install
@@ -179,7 +179,7 @@ Brief description of changes
 ## Project Structure
 
 ```
-CompanionKit/
+companion-kit/
 ├── src/
 │   ├── components/      # React components
 │   │   ├── ui/         # Generic UI components

@@ -17,8 +17,8 @@ Welcome to CompanionKit! This guide will help you set up the toolkit for buildin
 The fastest way to get started is using our setup script:
 
 ```bash
-git clone https://github.com/Tricia-42/CompanionKit.git
-cd CompanionKit
+git clone https://github.com/Tricia-42/companion-kit.git
+cd companion-kit
 ./scripts/setup.sh
 ```
 
@@ -34,9 +34,9 @@ If you prefer to set up manually:
 
 1. **Clone the repository**
    ```bash
-git clone https://github.com/Tricia-42/CompanionKit.git
-cd CompanionKit
-```
+   git clone https://github.com/Tricia-42/companion-kit.git
+   cd companion-kit
+   ```
 
 2. **Install dependencies**
    ```bash
@@ -148,5 +148,5 @@ Check that your Firebase project has authentication enabled and the correct sign
 
 - **Documentation**: Check our [full documentation](../README.md)
 - **Community**: Join our [Slack workspace](https://join.slack.com/t/companionkit-community)
-- **Issues**: Report bugs on [GitHub](https://github.com/Tricia-42/CompanionKit/issues)
+- **Issues**: Report bugs on [GitHub](https://github.com/Tricia-42/companion-kit/issues)
 - **Email**: support@heytricia.ai 

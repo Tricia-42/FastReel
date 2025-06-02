@@ -127,6 +127,6 @@ If you're seeing performance issues due to excessive logging:
 
 If you continue to experience issues:
 
-1. Check the [GitHub Issues](https://github.com/Tricia-42/CompanionKit/issues)
+1. Check the [GitHub Issues](https://github.com/Tricia-42/companion-kit/issues)
 2. Join our [Slack Community](https://companionkit-community.slack.com)
 3. Include console logs when reporting issues (after filtering out the noise) 

@@ -1,5 +1,4 @@
 {
-  "rootDirectory": "playground",
   "buildCommand": "npm run build",
   "outputDirectory": ".next",
   "devCommand": "npm run dev",

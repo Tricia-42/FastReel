@@ -1,7 +1,7 @@
 {
-  "name": "companion-kit",
+  "name": "tricia-playground",
   "version": "0.1.0",
-  "description": "CompanionKit - Open-source toolkit for building AI-powered companion applications with empathy-driven design",
+  "description": "Tricia Playground - Open-source demo and frontend components for AI companion applications powered by Tricia",
   "private": true,
   "scripts": {
     "dev": "next dev -p 8005 -H 0.0.0.0",

@@ -1,0 +1,38 @@
+# FastReel Backend Requirements
+# Note: This is a placeholder - currently using Tricia hosted API
+
+# Web Framework
+fastapi==0.104.1
+uvicorn==0.24.0
+python-multipart==0.0.6
+
+# AI/ML Libraries (for future self-hosting)
+openai==1.3.0
+langchain==0.0.340
+transformers==4.35.0
+torch==2.1.0
+
+# Voice Processing
+pydub==0.25.1
+speechrecognition==3.10.0
+
+# Story Generation & Media
+moviepy==1.0.3
+pillow==10.1.0
+opencv-python==4.8.1.78
+
+# Database
+sqlalchemy==2.0.23
+alembic==1.12.1
+asyncpg==0.29.0
+
+# Utils
+python-dotenv==1.0.0
+pydantic==2.5.0
+httpx==0.25.1
+redis==5.0.1
+
+# Development
+pytest==7.4.3
+black==23.11.0
+flake8==6.1.0 

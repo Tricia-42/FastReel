@@ -225,10 +225,25 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     };
   }
   
+  // 确保 session 对象中不包含 undefined 值
+  const serializedSession = session ? {
+    ...session,
+    user: session.user ? {
+      ...session.user,
+      id: session.user.id || null,
+      name: session.user.name || null,
+      email: session.user.email || null,
+      image: session.user.image || null,
+      first_name: session.user.first_name || null,
+      last_name: session.user.last_name || null,
+      locale: session.user.locale || null
+    } : null
+  } : null;
+  
   // Pass session to page
   return {
     props: {
-      session,
+      session: serializedSession,
     },
   };
 };

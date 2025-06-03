@@ -1,21 +1,21 @@
-# Tricia Arena - Live Demo
+# Tricia - Live Demo
 
 **🌟 [demo.heytricia.ai](https://demo.heytricia.ai)**
 
-The Tricia Arena is a live demonstration of AI companion capabilities, hosted publicly to showcase what's possible with the Tricia platform and CompanionKit framework.
+The live Tricia demo is a showcase of FastReel's AI storytelling capabilities, hosted publicly to demonstrate what's possible with AI-powered memory companions and voice-to-reel generation for dementia care.
 
-## What is the Arena?
+## What is the Demo?
 
-Similar to [FastChat's Chatbot Arena](https://chat.lmsys.org), the Tricia Arena is a hosted playground where users can:
+Similar to [FastChat's demo](https://chat.lmsys.org), the Tricia demo is a hosted application where users can:
 
-- **Experience AI Companions** - Chat with Trip, the memory companion for seniors
+- **Experience AI Companions** - Chat with Tricia, the memory companion for seniors
 - **Test Voice Interactions** - Real-time voice conversations optimized for dementia care
 - **Explore Use Cases** - See how empathetic AI companions help preserve memories
-- **Try Before Building** - Experience the platform before getting API access
+- **Try Before Building** - Experience FastReel before getting API access
 
-## Current Demo: Trip
+## About Tricia
 
-**Trip** is a memory companion AI designed for dementia care that demonstrates:
+**Tricia** is a memory companion AI designed for dementia care that demonstrates FastReel's capabilities:
 
 ### Core Capabilities
 - 🧠 **Memory Preservation** - Help seniors capture and preserve life stories
@@ -36,22 +36,24 @@ Similar to [FastChat's Chatbot Arena](https://chat.lmsys.org), the Tricia Arena 
 
 ```
 demo.heytricia.ai
-├── Frontend (This Playground)
+├── FastReel Frontend
 │   ├── Next.js Application
-│   ├── LiveKit Voice Integration
-│   ├── Real-time UI Components
-│   └── Trip Demo Interface
+│   ├── LiveKit Voice Integration (Senior-optimized)
+│   ├── Memory Companion UI Components
+│   ├── Story/Reel Generation Interface
+│   └── Tricia Demo Application
 │
-├── Tricia API Backend
-│   ├── AI Companion Engine
-│   ├── Empathy Processing
-│   ├── Voice Synthesis
-│   └── Context Management
+├── FastReel Backend (Private)
+│   ├── AI Storytelling Engine
+│   ├── Voice-to-Reel Processing
+│   ├── Memory Context & Empathy Engine
+│   ├── TikTok-style Content Generation
+│   └── Dementia-specialized AI Models
 │
 └── Infrastructure
     ├── Vercel Hosting
-    ├── LiveKit Cloud
-    ├── Firebase Auth
+    ├── LiveKit Cloud (Voice)
+    ├── Firebase Auth (Family access)
     └── CDN Distribution
 ```
 
@@ -75,16 +77,16 @@ The arena helps us understand:
 - **Auth**: Firebase
 - **Analytics**: Privacy-focused metrics only
 
-## Comparison to Other Arenas
+## Comparison to Other AI Demos
 
-| Feature | Tricia Arena | FastChat Arena | Character.AI |
-|---------|--------------|----------------|--------------|
-| **Focus** | Dementia Care | LLM Comparison | Character Chat |
+| Feature | Tricia (FastReel) | FastChat Demo | Character.AI |
+|---------|-------------------|---------------|--------------|
+| **Focus** | Dementia Care & Storytelling | LLM Comparison | Character Chat |
 | **Voice** | ✅ Senior-optimized | ❌ Text only | ❌ Text only |
 | **Memory Care** | ✅ Specialized | ❌ None | ❌ None |
-| **Journal Generation** | ✅ Core feature | ❌ None | ❌ None |
+| **Story/Reel Generation** | ✅ Core feature | ❌ None | ❌ None |
 | **Privacy** | ✅ Medical-safe | ⚠️ Logged | ❌ Permanent |
-| **Use Case** | Senior Care | Research | Entertainment |
+| **Use Case** | Senior Care & Family | Research | Entertainment |
 
 ## Future Expansions
 
@@ -122,13 +124,13 @@ The arena helps us understand:
 
 ## API Rate Limits
 
-The arena uses the same Tricia API with these limits:
+The demo uses FastReel's hosted Tricia API with these limits:
 - **Conversations**: 50 messages per session
 - **Voice Minutes**: 30 minutes per session  
 - **Concurrent Sessions**: 1 per IP
 - **Daily Limit**: 5 sessions per IP
 
-*For production use, [request API access](https://developers.heytricia.ai)*
+*For production use with FastReel, [request API access](https://developers.heytricia.ai)*
 
 ## Privacy & Data
 
@@ -148,8 +150,8 @@ The arena uses the same Tricia API with these limits:
 ## Feedback & Support
 
 ### Report Issues
-- **Bug Reports**: [GitHub Issues](https://github.com/Tricia-42/companion-kit/issues)
-- **Feature Requests**: [Community Slack](https://companionkit-community.slack.com)
+- **Bug Reports**: [GitHub Issues](https://github.com/Tricia-42/FastReel/issues)
+- **Feature Requests**: [FastReel Slack](https://fastreel-community.slack.com)
 - **General Feedback**: feedback@heytricia.ai
 
 ### Community
@@ -160,16 +162,16 @@ The arena uses the same Tricia API with these limits:
 
 ## Getting Started Building
 
-Inspired by the arena? Start building your own companion:
+Inspired by Tricia? Start building with FastReel:
 
 1. **Try the Demo**: [demo.heytricia.ai](https://demo.heytricia.ai)
-2. **Clone the Playground**: This repository
+2. **Clone FastReel**: This repository
 3. **Request API Access**: [developers.heytricia.ai](https://developers.heytricia.ai)
-4. **Join Community**: [Slack](https://companionkit-community.slack.com)
+4. **Join Community**: [FastReel Slack](https://fastreel-community.slack.com)
 5. **Read Docs**: [Getting Started](getting-started.md)
 
 ---
 
-**Arena Status**: ✅ Live and Operational  
+**Demo Status**: ✅ Live and Operational  
 **Last Updated**: December 2024  
-**Next Demo**: Sage (Advanced Dementia Care) - Coming Q1 2025 
+**Next Feature**: Multi-modal Memory Capture - Coming Q1 2025 

@@ -12,6 +12,7 @@ import {
   PlaygroundTabbedTile,
   PlaygroundTile,
 } from "@/components/playground/PlaygroundTile";
+import { Sidebar } from '@/components/playground/Sidebar';
 import { useConfig } from "@/hooks/useConfig";
 import { TranscriptionTile } from "@/transcriptions/TranscriptionTile";
 import {
@@ -803,6 +804,17 @@ export default function Playground({
           onConnect(roomState === ConnectionState.Disconnected)
         }
       />
+      {/* Sidebar */}
+      <Sidebar>
+        <div className="text-white">
+          <h2 className="text-xl font-bold mb-4">Menu</h2>
+          <div className="space-y-4">
+            <div className="p-2 hover:bg-gray-800 rounded cursor-pointer">
+              Menu Item 1
+            </div>
+          </div>
+        </div>
+      </Sidebar>
       <div
         className={`flex gap-4 p-4 grow w-full selection:bg-${config.settings.theme_color}-900`}
         style={{ height: `calc(100% - ${headerHeight}px)` }}

@@ -1,7 +1,7 @@
 {
-  "name": "tricia-playground",
+  "name": "fastreel",
   "version": "0.1.0",
-  "description": "Tricia Playground - Open-source demo and frontend components for AI companion applications powered by Tricia",
+  "description": "FastReel - Open-source toolkit for rapidly building AI-driven voice agents and dynamic social storytelling apps, featuring Tricia dementia care companion",
   "private": true,
   "scripts": {
     "dev": "next dev -p 8005 -H 0.0.0.0",

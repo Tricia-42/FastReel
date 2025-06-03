@@ -1,0 +1,106 @@
+---
+description: React best practices and patterns for modern web applications
+globs: **/*.tsx, **/*.jsx, components/**/*
+alwaysApply: false
+---
+
+# React Best Practices for Next.js 14 Pages Router
+
+## Component Structure
+- Use functional components exclusively
+- Keep components small and focused (< 200 lines)
+- Extract reusable logic into custom hooks
+- Use composition over inheritance
+- Implement proper prop types with TypeScript interfaces
+- Split large components into smaller, testable units
+- Colocate related components in feature folders
+
+## Next.js Specific Patterns
+- Use `getStaticProps` for static data fetching
+- Use `getServerSideProps` sparingly for dynamic data
+- Implement proper loading states with `router.isFallback`
+- Use `next/dynamic` for code splitting
+- Leverage `next/image` for optimized images
+- Use `next/link` for client-side navigation
+- Implement proper error boundaries
+
+## Hooks
+- Follow the Rules of Hooks strictly
+- Use custom hooks for reusable logic
+- Keep hooks focused and single-purpose
+- Use appropriate dependency arrays in useEffect
+- Implement cleanup in useEffect when needed
+- Avoid nested hooks and conditional hooks
+- Prefix custom hooks with "use"
+
+## State Management
+- Use useState for local component state
+- Implement useReducer for complex state logic
+- Use Context API for cross-component state
+- Keep state as close to where it's used as possible
+- Avoid prop drilling through proper state lifting
+- Consider SWR or React Query for server state
+- Implement proper state persistence when needed
+
+## Performance
+- Implement proper memoization (useMemo, useCallback)
+- Use React.memo for expensive pure components
+- Avoid unnecessary re-renders with proper dependencies
+- Implement proper lazy loading with next/dynamic
+- Use proper key props in lists (avoid index as key)
+- Profile and optimize with React DevTools
+- Monitor bundle size and code split appropriately
+
+## Forms
+- Use controlled components for form inputs
+- Implement proper form validation (client and server)
+- Handle form submission states (loading, error, success)
+- Show appropriate loading and error feedback
+- Use libraries like react-hook-form for complex forms
+- Implement proper accessibility for all form elements
+- Handle form errors gracefully
+
+## Error Handling
+- Implement Error Boundaries for component trees
+- Handle async errors in data fetching methods
+- Show user-friendly error messages
+- Implement proper fallback UI components
+- Log errors to monitoring service (client-side)
+- Handle edge cases gracefully
+- Provide recovery actions when possible
+
+## Testing
+- Write unit tests for utility functions
+- Implement integration tests for components
+- Use React Testing Library best practices
+- Test user interactions, not implementation
+- Test error scenarios and edge cases
+- Mock external dependencies properly
+- Maintain high test coverage for critical paths
+
+## Accessibility
+- Use semantic HTML elements
+- Implement proper ARIA attributes when needed
+- Ensure keyboard navigation works properly
+- Test with screen readers
+- Handle focus management in SPAs
+- Provide proper alt text for images
+- Ensure proper color contrast ratios
+
+## Code Organization
+- Group related components in feature folders
+- Use barrel exports (index.ts) for clean imports
+- Implement proper file naming conventions
+- Keep styles close to components
+- Use absolute imports with @/ prefix
+- Document complex component logic
+- Maintain consistent folder structure
+
+## TypeScript Integration
+- Define proper interfaces for all props
+- Use proper return types for components
+- Leverage TypeScript utility types
+- Avoid using `any` type
+- Implement proper generic components when needed
+- Use discriminated unions for complex props
+- Export types alongside components 

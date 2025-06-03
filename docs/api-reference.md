@@ -1,441 +1,179 @@
-# StayReel API Reference
+# Tricia API Reference
 
 ## Overview
 
-StayReel provides a comprehensive API for building memory preservation applications. This reference covers both the JavaScript/TypeScript SDK and the REST API endpoints.
+The Tricia API powers AI-driven voice agents and social storytelling applications. This reference covers the core endpoints for creating voice chat sessions and generating reels from conversations.
 
-## JavaScript SDK
+**Base URL**: `https://api.heytricia.ai`
 
-### Installation
+**Beta Access**: Contact i@heytricia.ai for API access and authorization tokens.
 
-```bash
-npm install @stayreel/core
-```
+## Authentication
 
-### Basic Usage
-
-```typescript
-import { StayReel, MemorySession } from '@stayreel/core'
-
-// Initialize StayReel
-const stayreel = new StayReel({
-  apiKey: process.env.STAYREEL_API_KEY,
-  options: {
-    environment: 'production',
-    region: 'us-east-1'
-  }
-})
-
-// Create a memory session
-const session = await stayreel.createSession({
-  userId: 'user-123',
-  companion: 'sarah-gentle-guide',
-  mode: 'voice'
-})
-```
-
-## Core Classes
-
-### StayReel
-
-The main client for interacting with the StayReel API.
-
-```typescript
-class StayReel {
-  constructor(config: StayReelConfig)
-  
-  // Session Management
-  createSession(options: SessionOptions): Promise<MemorySession>
-  getSession(sessionId: string): Promise<MemorySession>
-  listSessions(userId: string): Promise<MemorySession[]>
-  
-  // Memory Management
-  createMemory(data: MemoryData): Promise<Memory>
-  getMemory(memoryId: string): Promise<Memory>
-  updateMemory(memoryId: string, updates: Partial<Memory>): Promise<Memory>
-  deleteMemory(memoryId: string): Promise<void>
-  
-  // AI Companions
-  listCompanions(): Promise<Companion[]>
-  getCompanion(companionId: string): Promise<Companion>
-}
-```
-
-### MemorySession
-
-Represents an active memory preservation session.
-
-```typescript
-class MemorySession {
-  // Properties
-  id: string
-  userId: string
-  companion: Companion
-  status: SessionStatus
-  startedAt: Date
-  
-  // Methods
-  connect(): Promise<void>
-  disconnect(): Promise<void>
-  
-  // Voice Methods
-  startRecording(): Promise<void>
-  stopRecording(): Promise<void>
-  
-  // Text Methods
-  sendMessage(text: string): Promise<Response>
-  
-  // Memory Methods
-  saveMemory(): Promise<Memory>
-  getTranscript(): Promise<Transcript>
-  
-  // Events
-  on(event: 'connected' | 'disconnected' | 'error', handler: Function): void
-  on(event: 'transcription', handler: (text: string) => void): void
-  on(event: 'response', handler: (response: Response) => void): void
-}
-```
-
-### Memory
-
-Represents a preserved memory.
-
-```typescript
-interface Memory {
-  id: string
-  userId: string
-  sessionId: string
-  title: string
-  summary: string
-  transcript: Transcript
-  tags: string[]
-  createdAt: Date
-  updatedAt: Date
-  media?: MediaAttachment[]
-  shareSettings: ShareSettings
-  metadata: Record<string, any>
-}
-```
-
-## REST API
-
-Base URL: `https://api.stayreel.ai/v1`
-
-### Authentication
-
-All API requests require authentication via API key:
+All API requests require authentication via Bearer token:
 
 ```http
-Authorization: Bearer YOUR_API_KEY
+Authorization: Bearer YOUR_TRICIA_API_TOKEN
 ```
 
-### Endpoints
+## Core Endpoints
 
-#### Sessions
+### Create Chat Session
 
-##### Create Session
+The primary endpoint creates a LiveKit-powered chat room with an AI agent ready for voice interaction.
+
 ```http
-POST /sessions
+POST /api/v1/chats
 Content-Type: application/json
+Authorization: Bearer YOUR_TOKEN
 
 {
-  "userId": "user-123",
-  "companionId": "sarah-gentle-guide",
-  "mode": "voice",
-  "metadata": {
-    "source": "web-app"
-  }
+  "agent_id": "tricia-companion-v1"
 }
 ```
 
-Response:
+**Response:**
 ```json
 {
-  "id": "session-456",
-  "userId": "user-123",
-  "companion": {
-    "id": "sarah-gentle-guide",
-    "name": "Sarah",
-    "description": "A gentle guide for life stories"
-  },
-  "status": "active",
-  "connectionUrl": "wss://rt.stayreel.ai/session-456",
-  "token": "eyJ0eXAiOiJKV1QiLCJhbGc..."
+  "id": "18f158fa-6853-409a-839f-275dec3af26b",
+  "room_name": "chat_18f158fa",
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "livekit_url": "wss://livekit.heytricia.ai",
+  "agent_status": "dispatched",
+  "created_at": "2025-06-03T20:04:40.145Z"
 }
 ```
 
-##### Get Session
-```http
-GET /sessions/{sessionId}
-```
+### How It Works
 
-##### List Sessions
-```http
-GET /sessions?userId={userId}&limit=10&offset=0
-```
+1. **Room Creation**: Creates a LiveKit room for real-time voice communication
+2. **Agent Dispatch**: Automatically dispatches the AI agent to the room
+3. **Access Token**: Returns a LiveKit access token for the client to join
+4. **Voice Chat**: Client uses the token to connect and start voice conversation
+5. **Reel Generation**: Conversations can be converted to shareable reels
 
-#### Memories
+### Client Integration
 
-##### Create Memory
-```http
-POST /memories
-Content-Type: application/json
+Use the returned `access_token` with LiveKit SDK to join the room:
 
-{
-  "sessionId": "session-456",
-  "title": "My First Day at School",
-  "tags": ["childhood", "education"],
-  "shareSettings": {
-    "visibility": "private"
+```javascript
+import { Room, RoomEvent } from 'livekit-client';
+
+// Create and connect to room
+const room = new Room();
+await room.connect(response.livekit_url, response.access_token);
+
+// Handle voice chat events
+room.on(RoomEvent.TrackSubscribed, (track, publication, participant) => {
+  // Handle incoming audio from AI agent
+  if (track.kind === 'audio') {
+    const audioElement = track.attach();
+    document.body.appendChild(audioElement);
   }
-}
+});
+
+// Start voice conversation
+await room.localParticipant.setMicrophoneEnabled(true);
 ```
 
-##### Get Memory
+## User Management
+
+### Check User Exists
+
 ```http
-GET /memories/{memoryId}
+GET /api/v1/users/{userId}
+Authorization: Bearer YOUR_TOKEN
 ```
 
-##### Update Memory
+### Create User
+
 ```http
-PATCH /memories/{memoryId}
+POST /api/v1/users
 Content-Type: application/json
+Authorization: Bearer YOUR_TOKEN
 
 {
-  "title": "Updated Title",
-  "tags": ["childhood", "school", "1960s"]
+  "id": "user-google-id",
+  "email": "user@example.com",
+  "first_name": "John",
+  "last_name": "Doe",
+  "locale": "en-US"
 }
 ```
 
-##### Delete Memory
-```http
-DELETE /memories/{memoryId}
-```
+## Reel Generation
 
-##### Export Memory
+After a conversation, generate shareable reels:
+
 ```http
-POST /memories/{memoryId}/export
+POST /api/v1/reels/generate
 Content-Type: application/json
+Authorization: Bearer YOUR_TOKEN
 
 {
-  "format": "pdf",
-  "options": {
-    "includeTranscript": true,
-    "includeMedia": true
-  }
+  "chat_id": "18f158fa-6853-409a-839f-275dec3af26b",
+  "style": "tiktok",
+  "duration": 60
 }
-```
-
-#### Companions
-
-##### List Companions
-```http
-GET /companions
-```
-
-Response:
-```json
-{
-  "companions": [
-    {
-      "id": "sarah-gentle-guide",
-      "name": "Sarah",
-      "description": "A gentle guide for life stories",
-      "specialties": ["life-stories", "family-history"],
-      "languages": ["en", "es", "fr"],
-      "voiceId": "voice-sarah-v2"
-    }
-  ]
-}
-```
-
-#### Media
-
-##### Upload Media
-```http
-POST /media/upload
-Content-Type: multipart/form-data
-
-file: [binary data]
-memoryId: memory-789
-type: photo
-description: "Family reunion photo from 1985"
-```
-
-##### Get Media
-```http
-GET /media/{mediaId}
 ```
 
 ## WebSocket Events
 
-When connected to a session via WebSocket:
+When connected to a LiveKit room, the AI agent handles:
 
-### Client -> Server
+### Voice Interaction
+- Real-time speech recognition
+- Natural conversation flow
+- Context-aware responses
+- Senior-optimized speech processing
 
-```json
-// Start recording
-{
-  "type": "start_recording",
-  "data": {}
-}
-
-// Send text message
-{
-  "type": "message",
-  "data": {
-    "text": "I remember my first day of school..."
-  }
-}
-
-// Stop recording
-{
-  "type": "stop_recording",
-  "data": {}
-}
-```
-
-### Server -> Client
-
-```json
-// Transcription update
-{
-  "type": "transcription",
-  "data": {
-    "text": "I remember my first day of school...",
-    "isFinal": false
-  }
-}
-
-// AI response
-{
-  "type": "response",
-  "data": {
-    "text": "That sounds like an important memory. Can you tell me more about how you felt that day?",
-    "audioUrl": "https://audio.stayreel.ai/response-123.mp3"
-  }
-}
-
-// Session status
-{
-  "type": "status",
-  "data": {
-    "status": "active",
-    "duration": 120
-  }
-}
-```
-
-## Error Handling
-
-### Error Response Format
-
-```json
-{
-  "error": {
-    "code": "INVALID_REQUEST",
-    "message": "The companion ID provided is invalid",
-    "details": {
-      "companionId": "invalid-id"
-    }
-  }
-}
-```
-
-### Common Error Codes
-
-| Code | Description | HTTP Status |
-|------|-------------|-------------|
-| `UNAUTHORIZED` | Invalid or missing API key | 401 |
-| `FORBIDDEN` | Access denied to resource | 403 |
-| `NOT_FOUND` | Resource not found | 404 |
-| `INVALID_REQUEST` | Invalid request parameters | 400 |
-| `RATE_LIMITED` | Too many requests | 429 |
-| `SERVER_ERROR` | Internal server error | 500 |
+### Memory Preservation
+- Automatic transcription
+- Story extraction
+- Journal generation
+- Shareable content creation
 
 ## Rate Limits
 
 | Endpoint | Limit | Window |
 |----------|-------|--------|
-| Session creation | 10 | 1 hour |
-| Memory creation | 100 | 1 hour |
+| Chat creation | 10 | 1 hour |
+| Reel generation | 20 | 1 hour |
 | API requests | 1000 | 1 hour |
-| Media uploads | 50 | 1 day |
 
-## Webhooks
+## Error Responses
 
-Configure webhooks to receive real-time updates:
-
-```http
-POST /webhooks
-Content-Type: application/json
-
+```json
 {
-  "url": "https://your-app.com/webhooks/stayreel",
-  "events": ["session.completed", "memory.created"],
-  "secret": "your-webhook-secret"
+  "error": {
+    "code": "UNAUTHORIZED",
+    "message": "Invalid API token"
+  }
 }
 ```
 
-### Webhook Events
+Common error codes:
+- `UNAUTHORIZED` - Invalid or missing token
+- `RATE_LIMITED` - Too many requests
+- `INVALID_REQUEST` - Bad request parameters
+- `SERVER_ERROR` - Internal server error
 
-- `session.started` - New session started
-- `session.completed` - Session ended
-- `memory.created` - New memory created
-- `memory.updated` - Memory updated
-- `memory.shared` - Memory shared
-- `media.uploaded` - Media attached to memory
+## SDK Support
 
-## SDK Examples
+Currently, integrate directly with the REST API and LiveKit client SDK. Official Tricia SDK coming soon.
 
-### React Hook
+## Beta Access
 
-```typescript
-import { useMemorySession } from '@stayreel/react'
+The Tricia API is currently in beta. For access:
+1. Contact i@heytricia.ai
+2. Describe your use case
+3. Receive API credentials
+4. Start building with voice AI
 
-function MemoryRecorder() {
-  const { session, isConnected, startRecording, stopRecording } = useMemorySession({
-    companionId: 'sarah-gentle-guide',
-    onTranscription: (text) => console.log('Transcription:', text),
-    onResponse: (response) => console.log('AI Response:', response)
-  })
-  
-  return (
-    <div>
-      <button onClick={startRecording}>Start</button>
-      <button onClick={stopRecording}>Stop</button>
-    </div>
-  )
-}
-```
+## Coming Soon
 
-### Node.js Integration
-
-```typescript
-import { StayReel } from '@stayreel/node'
-
-const stayreel = new StayReel({
-  apiKey: process.env.STAYREEL_API_KEY
-})
-
-// Process uploaded audio
-async function processAudioMemory(audioFile: Buffer, userId: string) {
-  const session = await stayreel.createSession({
-    userId,
-    companion: 'sarah-gentle-guide',
-    mode: 'audio-upload'
-  })
-  
-  const memory = await session.processAudio(audioFile)
-  return memory
-}
-```
-
-## Best Practices
-
-1. **Session Management**: Always properly disconnect sessions when done
-2. **Error Handling**: Implement exponential backoff for retries
-3. **Security**: Never expose API keys in client-side code
-4. **Privacy**: Encrypt sensitive data before storing
-5. **Performance**: Use pagination for listing endpoints
-6. **Webhooks**: Verify webhook signatures for security 
+- **Journal API** - Automated journal generation from conversations
+- **Memory API** - Long-term memory management
+- **Analytics API** - Conversation insights and metrics
+- **Webhook Events** - Real-time notifications
+- **Official SDKs** - JavaScript/Python client libraries 

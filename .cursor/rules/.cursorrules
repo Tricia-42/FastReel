@@ -1,0 +1,88 @@
+# Cursor Rules Configuration for FastReel
+
+## Global Rules (Apply to all files)
+- Follow clean-code principles
+- Adhere to codequality guidelines
+- Use TypeScript best practices
+- Follow gitflow workflow
+
+## Playground-Specific Rules
+
+### Frontend Files
+For files matching these patterns, apply frontend-specific rules:
+- `playground/src/pages/**/*.tsx` (excluding `playground/src/pages/api/**`)
+- `playground/src/components/**/*`
+- `playground/src/hooks/**/*`
+- `playground/src/styles/**/*`
+- `playground/public/**/*`
+
+Apply these rules:
+- nextjs-pages-frontend
+- react
+- tailwind
+- typescript
+- clean-code
+- codequality
+
+### Backend/API Files
+For files matching these patterns, apply backend-specific rules:
+- `playground/src/pages/api/**/*`
+- `playground/src/middleware.ts`
+- `playground/src/lib/api/**/*`
+- `playground/src/lib/auth/**/*`
+- `playground/src/lib/db/**/*`
+
+Apply these rules:
+- nextjs-pages-backend
+- typescript
+- clean-code
+- codequality
+
+### Shared Library Files
+For files in `playground/src/lib/**/*` (excluding api/auth/db subdirectories):
+- Determine context based on imports and usage
+- If importing React or Next.js client components: apply frontend rules
+- If handling HTTP requests or database operations: apply backend rules
+- When unclear: apply both sets of rules
+
+## FastReel Core Library Rules
+For files in `fastreel/**/*`:
+- Apply typescript rules
+- Apply clean-code rules
+- Focus on library best practices
+- Ensure proper exports and documentation
+
+## Documentation Rules
+For files matching `*.md`, `*.mdx`:
+- Keep documentation clear and concise
+- Use proper markdown formatting
+- Include code examples where helpful
+- Keep README files up to date
+
+## Configuration Files
+For files like `*.json`, `*.config.js`, `*.config.ts`:
+- Document all configuration options
+- Use environment variables for sensitive data
+- Keep configurations minimal and clear
+- Version control appropriate configs only
+
+## Test Files
+For files matching `*.test.ts`, `*.test.tsx`, `*.spec.ts`, `*.spec.tsx`:
+- Follow testing best practices
+- Write descriptive test names
+- Test behavior, not implementation
+- Mock external dependencies properly
+
+## Auto-Import Rules
+When creating new files:
+1. Check file path to determine applicable rules
+2. Import relevant rule sets automatically
+3. Apply rules consistently throughout the file
+4. Suggest rule updates if patterns don't match
+
+## Rule Priority
+When multiple rules apply:
+1. Specific rules override general rules
+2. Newer rules override older rules
+3. Project-specific rules override framework rules
+4. Always maintain code consistency within a file 

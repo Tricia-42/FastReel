@@ -1,12 +1,12 @@
 # Deployment Guide
 
-This guide covers deployment options for CompanionKit, focusing on quick cloud deployments using Tricia's managed backend.
+This guide covers deployment options for the FastReel demo application.
 
 ## Quick Deployment with Vercel (Recommended)
 
-The fastest way to deploy CompanionKit:
+The fastest way to deploy FastReel:
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FTricia-42%2Fcompanion-kit)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FTricia-42%2FFastReel)
 
 ### Manual Vercel Deployment
 
@@ -36,7 +36,9 @@ NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_domain
 NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project
 
 # Tricia Backend (Required)
-TRICIA_API_KEY=your_api_key # Get from https://developers.heytricia.ai
+TRICIA_API_BEARER_TOKEN=your_bearer_token # Contact i@heytricia.ai for access
+NEXT_PUBLIC_TRICIA_BASE_URL=https://api.heytricia.ai
+NEXT_PUBLIC_TRICIA_AGENT_ID=tricia-companion-v1
 ```
 
 ## Alternative Cloud Platforms
@@ -79,10 +81,10 @@ gcloud run deploy companionkit \
 
 ## Getting Your API Keys
 
-### 1. Tricia API Key (Required)
-- Sign up at [Tricia Developer Portal](https://developers.heytricia.ai)
-- Create a new project
-- Copy your API key
+### 1. Tricia API Access (Required)
+- Contact i@heytricia.ai for beta access
+- Describe your use case
+- Receive your bearer token
 
 ### 2. LiveKit Credentials
 - Create account at [LiveKit Cloud](https://livekit.io)

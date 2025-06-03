@@ -1,6 +1,6 @@
-# Contributing to CompanionKit
+# Contributing to FastReel
 
-Thank you for your interest in contributing to CompanionKit! This guide covers the technical aspects of contributing. For our full contribution philosophy and guidelines, see [CONTRIBUTING.md](../CONTRIBUTING.md).
+Thank you for your interest in contributing to FastReel! This guide covers the technical aspects of contributing. For our full contribution philosophy and guidelines, see [CONTRIBUTING.md](../CONTRIBUTING.md).
 
 ## Quick Start
 
@@ -22,8 +22,8 @@ Thank you for your interest in contributing to CompanionKit! This guide covers t
 
 ```bash
 # Clone your fork
-git clone https://github.com/YOUR_USERNAME/companion-kit.git
-cd companion-kit
+git clone https://github.com/YOUR_USERNAME/FastReel.git
+cd FastReel
 
 # Install dependencies
 npm install
@@ -95,7 +95,7 @@ npm run test:e2e
 Place test files next to the code they test:
 
 ```
-src/
+playground/
   components/
     Button.tsx
     Button.test.tsx
@@ -179,8 +179,8 @@ Brief description of changes
 ## Project Structure
 
 ```
-companion-kit/
-├── src/
+FastReel/
+├── playground/          # Frontend playground app
 │   ├── components/      # React components
 │   │   ├── ui/         # Generic UI components
 │   │   └── features/   # Feature-specific components
@@ -193,6 +193,7 @@ companion-kit/
 │   ├── hooks/          # Custom React hooks
 │   ├── types/          # TypeScript definitions
 │   └── utils/          # Utility functions
+├── fastreel/           # Backend servers (WIP)
 ├── public/             # Static assets
 ├── tests/              # Test utilities
 └── docs/               # Documentation
@@ -294,9 +295,9 @@ export function MemoryCard({ memory, onShare, className }: MemoryCardProps) {
 
 ## Questions?
 
-- **Technical questions**: Post in #dev-help on [Slack](https://companionkit-community.slack.com)
+- **Technical questions**: Post in #dev-help on [Slack](https://fastreel-community.slack.com)
 - **Feature discussions**: Create a GitHub Discussion
 - **Bug reports**: Open a GitHub Issue
-- **Security issues**: Email security@companionkit.ai
+- **Security issues**: Email security@fastreel.ai
 
-Thank you for contributing to CompanionKit! 🤝 
+Thank you for contributing to FastReel! 🤝 

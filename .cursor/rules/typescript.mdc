@@ -1,0 +1,95 @@
+---
+description: TypeScript coding standards and best practices for modern web development
+globs: **/*.ts, **/*.tsx, **/*.d.ts
+alwaysApply: false
+---
+
+# TypeScript Best Practices for Next.js
+
+## Type System
+- Prefer interfaces over types for object definitions
+- Use type for unions, intersections, and mapped types
+- Avoid using `any`, prefer `unknown` for unknown types
+- Use strict TypeScript configuration in tsconfig.json
+- Leverage TypeScript's built-in utility types
+- Use generics for reusable type patterns
+- Enable `strictNullChecks` and handle null/undefined properly
+
+## Next.js Specific Types
+- Use `GetStaticProps`, `GetServerSideProps` from 'next'
+- Type page components with `NextPage` or `FC`
+- Use `NextApiRequest`, `NextApiResponse` for API routes
+- Type router with `NextRouter` from 'next/router'
+- Use proper types for Image and Link components
+- Type environment variables with declaration merging
+- Create types for API responses
+
+## Naming Conventions
+- Use PascalCase for type names and interfaces
+- Use camelCase for variables and functions
+- Use UPPER_CASE for constants and enums
+- Use descriptive names with auxiliary verbs (e.g., isLoading, hasError)
+- Prefix interfaces for React props with component name + 'Props'
+- Prefix API response types with API endpoint name
+- Use 'I' prefix for interfaces only when necessary to avoid conflicts
+
+## Code Organization
+- Keep type definitions close to where they're used
+- Export types and interfaces from dedicated type files when shared
+- Use barrel exports (index.ts) for organizing exports
+- Place shared types in `types/` directory
+- Co-locate component props with their components
+- Create separate type files for API contracts
+- Group related types in namespace when appropriate
+
+## Functions
+- Use explicit return types for public functions
+- Use arrow functions for callbacks and inline functions
+- Implement proper error handling with custom error types
+- Use function overloads for complex type scenarios
+- Prefer async/await over Promises
+- Type event handlers properly (e.g., React.MouseEvent)
+- Use proper generics for reusable functions
+
+## Best Practices
+- Enable strict mode in tsconfig.json
+- Use readonly for immutable properties
+- Leverage discriminated unions for type safety
+- Use type guards for runtime type checking
+- Implement proper null checking with optional chaining
+- Avoid type assertions unless necessary
+- Use `as const` for literal types
+
+## Error Handling
+- Create custom error classes extending Error
+- Use Result/Either types for operations that can fail
+- Type catch blocks properly (unknown in TS 4.4+)
+- Implement proper error boundaries with types
+- Use discriminated unions for error states
+- Create specific error types for different domains
+
+## API Types
+- Define request/response types for all endpoints
+- Use zod or similar for runtime validation
+- Create shared types between frontend and backend
+- Type query parameters and path parameters
+- Use proper types for form data
+- Implement proper pagination types
+- Type WebSocket messages when used
+
+## React Patterns
+- Type children properly (React.ReactNode)
+- Use proper event handler types
+- Type refs correctly with useRef
+- Create proper types for custom hooks
+- Use generics for reusable components
+- Type context values properly
+- Implement proper HOC types
+
+## Testing Types
+- Type mock data properly
+- Use proper types for test utilities
+- Type custom matchers and assertions
+- Create test-specific type utilities
+- Mock modules with proper types
+- Type test fixtures appropriately 

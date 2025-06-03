@@ -1,8 +1,8 @@
-# CompanionKit Architecture
+# FastReel Architecture
 
 ## Overview
 
-CompanionKit is built as a modular, empathy-driven toolkit for creating AI-powered companion applications. The architecture emphasizes real-time interaction, privacy, accessibility, and developer-friendly integration.
+FastReel is designed as a framework for building AI-powered voice agents and social storytelling applications. The current demo uses Tricia's API while the full FastReel backend is under development.
 
 ## Core Components
 
@@ -33,20 +33,20 @@ CompanionKit is built as a modular, empathy-driven toolkit for creating AI-power
 User Device <-> LiveKit Client SDK <-> LiveKit Cloud <-> AI Agent
 ```
 
-### 3. AI Memory Engine
+### 3. Tricia API Integration
 
-**Components:**
-- **Conversation Manager**: Orchestrates AI interactions
-- **Memory Synthesizer**: Transforms conversations into structured memories
-- **Context Tracker**: Maintains conversation history and user preferences
-- **Prompt Templates**: Customizable conversation guides
+**Current Implementation:**
+- **Chat Creation**: Creates LiveKit rooms with AI agents
+- **Agent Dispatch**: Automatically deploys voice agents to rooms
+- **Voice Processing**: Real-time speech recognition and synthesis
+- **Reel Generation**: Converts conversations to shareable content
 
-**Flow:**
-1. Voice input captured via LiveKit
-2. Real-time transcription
-3. AI processes context and generates response
-4. Response synthesized to voice
-5. Memory artifacts created post-conversation
+**API Flow:**
+1. Create chat session via Tricia API
+2. Receive LiveKit access token
+3. Connect to LiveKit room
+4. AI agent handles conversation
+5. Generate reels from conversation data
 
 ### 4. Data Layer
 
@@ -76,9 +76,9 @@ User Device <-> LiveKit Client SDK <-> LiveKit Cloud <-> AI Agent
 3. Role-based access control
 4. Optional SSO integration
 
-## Deployment Architecture
+## Current Architecture
 
-### Cloud Deployment (Recommended)
+### Demo Deployment
 
 ```
 ┌─────────────────┐     ┌──────────────┐     ┌─────────────┐
@@ -88,9 +88,24 @@ User Device <-> LiveKit Client SDK <-> LiveKit Cloud <-> AI Agent
                               ┌───────────────────────┴──────┐
                               │                              │
                         ┌─────▼──────┐              ┌────────▼────────┐
-                        │  LiveKit   │              │ Tricia Backend  │
-                        │   Cloud    │              │   (Optional)    │
+                        │  LiveKit   │              │  Tricia API     │
+                        │   Cloud    │              │  (Required)     │
                         └────────────┘              └─────────────────┘
+```
+
+### Future FastReel Architecture
+
+```
+┌─────────────────┐     ┌──────────────┐     ┌─────────────────┐
+│   Frontend App  │────▶│  FastReel    │────▶│   API Server    │
+└─────────────────┘     │  Framework   │     └─────────────────┘
+                        └──────────────┘              │
+                                          ┌───────────┴───────────┐
+                                          │                       │
+                                    ┌─────▼──────┐       ┌───────▼────────┐
+                                    │Voice Agent │       │  MCP Server    │
+                                    │  Server    │       │(Journal Gen)   │
+                                    └────────────┘       └────────────────┘
 ```
 
 

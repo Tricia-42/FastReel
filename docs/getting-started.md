@@ -1,6 +1,6 @@
-# Getting Started with CompanionKit
+# Getting Started with FastReel
 
-Welcome to CompanionKit! This guide will help you set up the toolkit for building AI-powered companion applications.
+Welcome to FastReel! This guide will help you get started with the FastReel demo application that showcases AI-powered voice agents and social storytelling capabilities.
 
 ## Prerequisites
 
@@ -17,8 +17,8 @@ Welcome to CompanionKit! This guide will help you set up the toolkit for buildin
 The fastest way to get started is using our setup script:
 
 ```bash
-git clone https://github.com/Tricia-42/companion-kit.git
-cd companion-kit
+git clone https://github.com/Tricia-42/FastReel.git
+cd FastReel
 ./scripts/setup.sh
 ```
 
@@ -34,8 +34,8 @@ If you prefer to set up manually:
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/Tricia-42/companion-kit.git
-   cd companion-kit
+   git clone https://github.com/Tricia-42/FastReel.git
+   cd FastReel
    ```
 
 2. **Install dependencies**
@@ -87,13 +87,14 @@ This binds to all network interfaces, allowing access from other devices on your
 ## Project Structure
 
 ```
-CompanionKit/
-├── src/
+FastReel/
+├── playground/         # Frontend playground app
 │   ├── components/     # React UI components
 │   ├── pages/          # Next.js pages and API routes
 │   ├── lib/            # Core utilities and helpers
 │   ├── hooks/          # Custom React hooks
 │   └── types/          # TypeScript type definitions
+├── fastreel/           # Backend servers (WIP)
 ├── public/             # Static assets
 ├── scripts/            # Build and setup scripts
 └── docs/               # Documentation
@@ -101,30 +102,35 @@ CompanionKit/
 
 ## Using Tricia's Backend
 
-CompanionKit requires Tricia's backend for AI processing and data management:
+The FastReel demo currently uses Tricia's API for AI processing:
 
-1. **Get API Key**: Sign up at [Tricia Developer Portal](https://developers.heytricia.ai)
+1. **Get API Access**: Contact i@heytricia.ai for beta access
 2. **Add to `.env.local`**:
    ```env
-   TRICIA_API_KEY=your_api_key
+   TRICIA_API_BEARER_TOKEN=your_bearer_token
+   NEXT_PUBLIC_TRICIA_BASE_URL=https://api.heytricia.ai
+   NEXT_PUBLIC_TRICIA_AGENT_ID=tricia-companion-v1
    ```
 
-### Benefits:
-- Managed AI models optimized for empathetic interactions
-- Automatic updates and improvements
-- Built-in compliance and security
-- No infrastructure to maintain
-- HIPAA-compliant data handling
+### What Tricia API Provides:
+- LiveKit-powered voice chat rooms
+- AI agent dispatch and management
+- Real-time voice conversations
+- Reel generation from conversations
+- Senior-optimized speech processing
 
-### Note on Custom Backends:
-If you need a fully self-hosted solution, you'll need to implement your own backend infrastructure. CompanionKit provides the frontend toolkit - custom backend implementation is up to individual developers based on their specific requirements.
+### FastReel Backend (Coming Soon):
+The FastReel backend framework is under development and will include:
+- **API Server** - Core FastReel functionality
+- **Voice Agent** - Customizable LiveKit agents with guardrails
+- **MCP Server** - Journal generation and automation
 
 ## Next Steps
 
 - Explore the [Architecture Documentation](architecture.md)
 - Check out the [API Reference](api-reference.md)
-- Try the example implementations in `/src/pages/`
-- Join our [Slack Community](https://join.slack.com/t/companionkit-community)
+- Try the example implementations in `/playground/pages/`
+- Join our [Slack Community](https://fastreel-community.slack.com)
 
 ## Common Issues
 
@@ -147,6 +153,6 @@ Check that your Firebase project has authentication enabled and the correct sign
 ## Getting Help
 
 - **Documentation**: Check our [full documentation](../README.md)
-- **Community**: Join our [Slack workspace](https://join.slack.com/t/companionkit-community)
-- **Issues**: Report bugs on [GitHub](https://github.com/Tricia-42/companion-kit/issues)
-- **Email**: support@heytricia.ai 
+- **Community**: Join our [Slack workspace](https://fastreel-community.slack.com)
+- **Issues**: Report bugs on [GitHub](https://github.com/Tricia-42/FastReel/issues)
+- **Email**: support@fastreel.ai 

@@ -1,70 +1,76 @@
-# CompanionKit Documentation
+# FastReel Documentation
 
-## Open-Source AI Companion Toolkit
+## Open-Source Framework for AI Voice Agents
 
-CompanionKit is a modular toolkit for building AI-powered companion applications with empathy-driven design.
+FastReel is a framework for building AI-powered voice agents and social storytelling applications. Create TikTok-style reels from conversations.
 
 ## Quick Start
 
 ```bash
-# Clone and setup
-git clone https://github.com/Tricia-42/companion-kit.git
-cd companion-kit
-./scripts/setup.sh
+# Clone the repository
+git clone https://github.com/Tricia-42/FastReel.git
+cd FastReel
 
-# Run the demo
+# Navigate to playground
+cd playground
+
+# Install and run
+npm install
 npm run dev
 ```
 
-Visit http://localhost:8005 to see the Trip demo app.
+Visit http://localhost:8005 to see the Tricia demo.
 
 ## Core Documentation
 
 ### Getting Started
 - [Installation Guide](getting-started.md) - Setup and configuration
-- [Trip Demo App](trip.md) - Example implementation
+- [API Reference](api-reference.md) - Tricia API documentation
 - [Architecture](architecture.md) - Technical overview
 
 ### Developer Resources
 - [Developer Guidelines](developer-guidelines.md) - Principles and best practices
-- [API Reference](api-reference.md) - Component APIs
 - [Contributing](contributing.md) - How to contribute
+- [Troubleshooting](troubleshooting.md) - Common issues
 
 ### Deployment
 - [Deployment Guide](deployment.md) - Production deployment
-- [Troubleshooting](troubleshooting.md) - Common issues
 
 ## Key Features
 
-- 🤝 **Empathetic AI** - Natural, caring conversations
-- 🔧 **Modular Design** - Easy-to-integrate components
-- 🔒 **Privacy-First** - Built-in encryption and security
-- ♿ **Accessible** - WCAG compliant interfaces
-- 🚀 **Real-time** - WebRTC voice/video via LiveKit
-- 📱 **Cross-Platform** - Web, mobile, desktop ready
+- 🎙️ **Voice Agents** - LiveKit-powered real-time voice chat
+- 📱 **Reel Generation** - Convert conversations to TikTok-style content
+- 🧠 **AI-Driven** - Intelligent conversation and story extraction
+- ♿ **Senior-Friendly** - Optimized for accessibility
+- 🔒 **Privacy-First** - Secure conversation handling
 
-## Use Cases
+## Current Status
 
-Build companions for:
-- Mental health support
-- Elder care
-- Education and tutoring
-- Healthcare navigation
-- Personal wellness
+- ✅ **Demo App** - Fully functional with Tricia API
+- 🚧 **FastReel Backend** - Under development
+  - API Server (WIP)
+  - Voice Agent Server (WIP)
+  - MCP Server (WIP)
+
+## API Access
+
+The demo uses Tricia's API. For access:
+- Contact: i@heytricia.ai
+- Describe your use case
+- Receive API credentials
 
 ## Quick Links
 
-- **Demo**: [Trip App](https://demo.heytricia.ai)
-- **GitHub**: [companion-kit](https://github.com/Tricia-42/companion-kit)
-- **npm**: [@companion-kit/core](https://www.npmjs.com/package/@companion-kit/core)
-- **Slack**: [Join Community](https://companionkit-community.slack.com)
+- **Demo**: [Tricia Companion](https://demo.heytricia.ai)
+- **GitHub**: [FastReel](https://github.com/Tricia-42/FastReel)
+- **Slack**: [Join Community](https://fastreel-community.slack.com)
 
 ## Getting Help
 
-- 💬 [Slack Community](https://companionkit-community.slack.com)
-- 🐛 [GitHub Issues](https://github.com/Tricia-42/companion-kit/issues)
-- 📧 support@companionkit.ai
+- 💬 [Slack Community](https://fastreel-community.slack.com)
+- 🐛 [GitHub Issues](https://github.com/Tricia-42/FastReel/issues)
+- 📧 i@heytricia.ai
 
 ---
 
-Built and maintained by [Tricia, Inc](https://heytricia.ai) 
+Built by [Tricia](https://heytricia.ai) | FastReel Framework (gradual rollout) 

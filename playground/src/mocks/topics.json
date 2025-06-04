@@ -1,0 +1,66 @@
+[
+  {
+    "id": "topic_001",
+    "name": "Family Stories",
+    "icon": "👨‍👩‍👧‍👦",
+    "color": "blue",
+    "description": "Share memories about your loved ones",
+    "reelCount": 1234
+  },
+  {
+    "id": "topic_002",
+    "name": "Cooking & Recipes",
+    "icon": "🍳",
+    "color": "orange",
+    "description": "Traditional recipes and cooking memories",
+    "reelCount": 856
+  },
+  {
+    "id": "topic_003",
+    "name": "Garden Tales",
+    "icon": "🌻",
+    "color": "green",
+    "description": "Stories from the garden",
+    "reelCount": 623
+  },
+  {
+    "id": "topic_004",
+    "name": "Travel Memories",
+    "icon": "✈️",
+    "color": "purple",
+    "description": "Adventures from around the world",
+    "reelCount": 945
+  },
+  {
+    "id": "topic_005",
+    "name": "War Stories",
+    "icon": "🎖️",
+    "color": "red",
+    "description": "Military service and wartime memories",
+    "reelCount": 412
+  },
+  {
+    "id": "topic_006",
+    "name": "Career Journey",
+    "icon": "💼",
+    "color": "gray",
+    "description": "Professional life and work stories",
+    "reelCount": 789
+  },
+  {
+    "id": "topic_007",
+    "name": "Childhood Days",
+    "icon": "🧸",
+    "color": "pink",
+    "description": "Growing up and childhood adventures",
+    "reelCount": 1567
+  },
+  {
+    "id": "topic_008",
+    "name": "Love & Romance",
+    "icon": "💕",
+    "color": "rose",
+    "description": "Stories of love and relationships",
+    "reelCount": 892
+  }
+] 

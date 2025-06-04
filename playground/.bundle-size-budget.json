@@ -1,0 +1,57 @@
+{
+  "budgets": [
+    {
+      "path": "/**",
+      "resourceSizes": [
+        {
+          "resourceType": "total",
+          "budget": 350
+        },
+        {
+          "resourceType": "script",
+          "budget": 150
+        }
+      ]
+    },
+    {
+      "path": "/",
+      "resourceSizes": [
+        {
+          "resourceType": "total",
+          "budget": 200
+        },
+        {
+          "resourceType": "script",
+          "budget": 100
+        }
+      ]
+    },
+    {
+      "path": "/feed",
+      "resourceSizes": [
+        {
+          "resourceType": "total",
+          "budget": 250
+        },
+        {
+          "resourceType": "script",
+          "budget": 120
+        }
+      ]
+    },
+    {
+      "path": "/create",
+      "resourceSizes": [
+        {
+          "resourceType": "total",
+          "budget": 400
+        },
+        {
+          "resourceType": "script",
+          "budget": 200
+        }
+      ]
+    }
+  ],
+  "compression": "gzip"
+} 

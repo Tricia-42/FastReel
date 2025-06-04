@@ -19,6 +19,13 @@ FastReel is designed as a framework for building AI-powered voice agents and soc
 - Progressive enhancement for accessibility
 - Responsive design for all devices
 - Offline-first architecture
+- Playground tiles layout system
+
+**Component Architecture:**
+- Modular tile-based UI components
+- Reusable layout patterns (sidebar, canvas, meters)
+- Separation of LiveKit logic from UI components
+- CSS-based animations for performance
 
 ### 2. Real-time Communication
 

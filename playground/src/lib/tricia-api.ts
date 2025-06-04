@@ -36,7 +36,7 @@ export class TriciaAPIError extends Error {
  * Create a new chat session with Tricia
  */
 export async function createTriciaChat(payload: TriciaCreateChatPayload): Promise<TriciaCreateChatResponse> {
-  const apiUrl = `${process.env.TRICIA_BASE_URL || 'https://api.heytricia.ai/api/v1'}/chats`;
+  const apiUrl = `${process.env.NEXT_PUBLIC_TRICIA_API_URL || 'https://api.heytricia.ai'}/api/v1/chats`;
   const authToken = process.env.TRICIA_AUTH_TOKEN || 'admin';
 
   console.log('[Tricia API] Creating chat for user:', payload.user_id);

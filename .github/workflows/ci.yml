@@ -1,0 +1,113 @@
+name: Next.js CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 0. Checkout
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Needed for bundle analysis
+
+      # 1. Setup Node & restore caches
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            .next/cache
+            node_modules/.cache
+          key: ${{ runner.os }}-node${{ matrix.node-version || '20' }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
+          restore-keys: |
+            ${{ runner.os }}-node${{ matrix.node-version || '20' }}-${{ hashFiles('**/package-lock.json') }}-
+            ${{ runner.os }}-node${{ matrix.node-version || '20' }}-
+
+      # 2. Install dependencies
+      - name: Install dependencies
+        run: |
+          cd playground
+          npm ci
+
+      # 3. Static checks
+      - name: Run ESLint
+        run: |
+          cd playground
+          npm run lint
+
+      - name: Run TypeScript check
+        run: |
+          cd playground
+          npx tsc --noEmit
+
+      # 4. Build
+      - name: Build Next.js app
+        run: |
+          cd playground
+          npm run build
+        env:
+          NEXT_BUILD_REPORT: 1
+          NEXT_PUBLIC_TEST_MODE: true
+
+      # 5. Bundle analysis comment
+      - name: Analyze bundle
+        uses: hashicorp/nextjs-bundle-analysis@v1.0.0
+        if: github.event_name == 'pull_request'
+        with:
+          build-directory: ./playground/.next
+          base-branch: main
+
+      # 6. Lighthouse CI
+      - name: Run Lighthouse CI
+        uses: treosh/lighthouse-ci-action@v10
+        with:
+          configPath: ./playground/.lighthouserc.json
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+
+      # 7. Upload build artifacts
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: nextjs-build
+          path: |
+            playground/.next/
+            playground/out/
+          retention-days: 7
+
+      # 8. Upload bundle analysis
+      - name: Upload bundle analysis
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bundle-analysis
+          path: playground/.next/analyze/
+          retention-days: 30
+
+  # Optional: Deploy preview to Vercel
+  preview:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event_name == 'pull_request'
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          working-directory: ./playground
+          alias-domains: pr-{{PR_NUMBER}}.fastreel.vercel.app 

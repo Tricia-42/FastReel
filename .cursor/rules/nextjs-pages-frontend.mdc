@@ -3,3 +3,92 @@ description:
 globs:
 alwaysApply: false
 ---
+# Next.js 14 Pages Router - Frontend Rules
+
+## Page Components
+- Use `getStaticProps` for static generation when possible
+- Use `getServerSideProps` only when necessary for dynamic data
+- Implement proper TypeScript types for page props
+- Use `GetStaticProps`, `GetServerSideProps` types from next
+- Keep data fetching logic separate from component logic
+- Handle loading and error states properly
+
+## Routing
+- Use `next/router` for programmatic navigation
+- Implement proper route guards in `_app.tsx`
+- Use dynamic routes with proper parameter validation
+- Handle 404 and error pages properly
+- Use `next/link` for client-side navigation
+- Implement proper prefetching strategies
+
+## Component Structure
+- Place page components in `pages/` directory
+- Keep reusable components in `components/` directory
+- Use absolute imports with `@/` prefix
+- Implement proper component hierarchy
+- Keep page components focused on layout and data orchestration
+- Extract business logic into custom hooks
+
+## State Management
+- Use React Context for global state when needed
+- Implement proper state persistence with localStorage/sessionStorage
+- Handle authentication state in `_app.tsx`
+- Use SWR or React Query for server state management
+- Keep client state minimal and close to usage
+- Implement proper state synchronization
+
+## Performance Optimization
+- Use `next/image` for optimized images
+- Implement proper code splitting with dynamic imports
+- Use `React.memo` for expensive components
+- Optimize bundle size with proper imports
+- Implement proper caching strategies
+- Monitor Core Web Vitals
+
+## SEO & Meta Tags
+- Use `next/head` for page-specific meta tags
+- Implement proper Open Graph tags
+- Use structured data when appropriate
+- Handle canonical URLs properly
+- Implement proper sitemap generation
+- Use semantic HTML elements
+
+## Forms & User Input
+- Use controlled components for forms
+- Implement proper client-side validation
+- Show loading states during submission
+- Handle errors gracefully with user feedback
+- Use proper accessibility attributes
+- Implement proper keyboard navigation
+
+## Authentication
+- Handle auth state in `_app.tsx` with SessionProvider
+- Implement proper route protection
+- Use secure HTTP-only cookies for tokens
+- Handle token refresh properly
+- Implement proper logout flow
+- Show appropriate UI based on auth state
+
+## Error Handling
+- Implement custom error pages (_error.tsx)
+- Use Error Boundaries for component errors
+- Log errors to monitoring service
+- Show user-friendly error messages
+- Implement proper fallback UI
+- Handle network errors gracefully
+
+## Testing
+- Write integration tests for pages
+- Test data fetching methods
+- Mock API responses properly
+- Test authentication flows
+- Test error scenarios
+- Use React Testing Library
+
+## File Naming Conventions
+- Use kebab-case for page files
+- Use PascalCase for component files
+- Use camelCase for utility files
+- Keep file names descriptive
+- Match file names to exported component names
+- Use index.tsx for barrel exports

@@ -1,3 +1,9 @@
+// Fix for LiveKit WebRTC proxy error in Next.js
+if (typeof window !== 'undefined') {
+  // @ts-ignore
+  window.global = window;
+}
+
 import "@livekit/components-styles/components/participant";
 import "@/styles/globals.css";
 import type { AppProps } from "next/app";
@@ -10,6 +16,8 @@ import "@livekit/components-styles/prefabs";
 import Head from "next/head";
 import { Public_Sans } from "next/font/google";
 import { ConfigProvider } from "@/hooks/useConfig";
+import AppLayout from "@/layouts/AppLayout";
+import { useRouter } from "next/router";
 
 const publicSans = Public_Sans({ subsets: ["latin"] });
 
@@ -32,13 +40,19 @@ export default function App({
   Component, 
   pageProps: { session, ...pageProps } 
 }: AppProps) {
+  const router = useRouter();
+  
+  // Pages that should not have the layout wrapper
+  const noLayoutPages = ['/auth/signin', '/auth/signup'];
+  const shouldUseLayout = !noLayoutPages.includes(router.pathname);
+
   return (
     <>
       <Head>
-        <title>CompanionKit - AI Companion Platform</title>
+        <title>Tricia - AI Memory Companion</title>
         <meta
           name="description"
-          content="Build empathetic AI-powered companion applications for emotional wellness and support"
+          content="Transform your memories into beautiful AI-powered reels"
         />
         <meta
           name="viewport"
@@ -51,9 +65,15 @@ export default function App({
       <SessionProvider session={session}>
         <ToastProvider>
           <ConfigProvider>
-            <main className={publicSans.className}>
-              <Component {...pageProps} />
-            </main>
+            <div className={publicSans.className}>
+              {shouldUseLayout ? (
+                <AppLayout>
+                  <Component {...pageProps} />
+                </AppLayout>
+              ) : (
+                <Component {...pageProps} />
+              )}
+            </div>
           </ConfigProvider>
         </ToastProvider>
       </SessionProvider>

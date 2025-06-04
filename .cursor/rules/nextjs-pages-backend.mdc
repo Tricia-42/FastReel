@@ -3,3 +3,108 @@ description:
 globs:
 alwaysApply: false
 ---
+# Next.js 14 Pages Router - Backend/API Rules
+
+## API Route Structure
+- Place API routes in `pages/api/` directory
+- Use proper HTTP methods (GET, POST, PUT, DELETE)
+- Return appropriate status codes
+- Implement proper error handling
+- Use TypeScript for type safety
+- Keep routes RESTful and predictable
+
+## Request Handling
+- Validate request methods explicitly
+- Parse and validate request body
+- Implement proper input validation
+- Use middleware for common functionality
+- Handle CORS properly
+- Implement rate limiting when needed
+
+## Response Format
+- Use consistent JSON response structure
+- Include appropriate headers
+- Implement proper error response format
+- Use status codes correctly (200, 201, 400, 401, 403, 404, 500)
+- Include helpful error messages
+- Return paginated data when appropriate
+
+## Authentication & Authorization
+- Implement proper JWT validation
+- Use NextAuth.js for authentication
+- Check permissions before processing requests
+- Implement proper session management
+- Use secure HTTP-only cookies
+- Handle token refresh in API routes
+
+## Database Operations
+- Use connection pooling
+- Implement proper transaction handling
+- Use parameterized queries to prevent SQL injection
+- Handle database errors gracefully
+- Implement proper data validation
+- Use appropriate indexes for performance
+
+## Error Handling
+- Create custom error classes
+- Log errors with appropriate context
+- Don't expose sensitive information in errors
+- Implement proper error monitoring
+- Use try-catch blocks consistently
+- Return user-friendly error messages
+
+## Security
+- Validate and sanitize all inputs
+- Implement CSRF protection
+- Use environment variables for secrets
+- Implement proper rate limiting
+- Validate Content-Type headers
+- Use HTTPS in production
+
+## Performance
+- Implement proper caching strategies
+- Use efficient database queries
+- Minimize response payload size
+- Implement pagination for large datasets
+- Use streaming for large responses
+- Monitor API performance metrics
+
+## Middleware
+- Create reusable middleware functions
+- Use middleware for authentication
+- Implement logging middleware
+- Handle CORS in middleware
+- Validate requests in middleware
+- Keep middleware focused and composable
+
+## Testing
+- Write unit tests for API routes
+- Test error scenarios
+- Mock external dependencies
+- Test authentication flows
+- Validate response formats
+- Use proper test database
+
+## API Documentation
+- Document all endpoints
+- Include request/response examples
+- Document error responses
+- Specify required headers
+- Document authentication requirements
+- Keep documentation up to date
+
+## File Organization
+- Group related API routes in folders
+- Use descriptive file names
+- Keep route handlers focused
+- Extract business logic to services
+- Use shared utilities for common tasks
+- Implement proper separation of concerns
+
+## Environment Variables
+- Use `.env.local` for local development
+- Never commit secrets to version control
+- Validate required environment variables
+- Use proper naming conventions (NEXT_PUBLIC_ for client)
+- Document all environment variables
+- Use different values for different environments

@@ -1,0 +1,44 @@
+[
+  {
+    "id": "user_001",
+    "username": "sarahjohnson",
+    "displayName": "Sarah Johnson",
+    "email": "sarah.j@example.com",
+    "avatarUrl": "https://picsum.photos/seed/user001/200",
+    "bio": "Sharing my memories with AI 🎬 | Grandmother of 5 | Love gardening 🌻",
+    "followerCount": 1234,
+    "followingCount": 567,
+    "reelCount": 42,
+    "isFollowing": false,
+    "isVerified": false,
+    "createdAt": "2023-06-15T00:00:00Z"
+  },
+  {
+    "id": "user_002",
+    "username": "mikechen",
+    "displayName": "Mike Chen",
+    "email": "mike.c@example.com",
+    "avatarUrl": "https://picsum.photos/seed/user002/200",
+    "bio": "Retired teacher | Father of 3 | Using AI to preserve family stories 📚",
+    "followerCount": 890,
+    "followingCount": 234,
+    "reelCount": 28,
+    "isFollowing": true,
+    "isVerified": false,
+    "createdAt": "2023-07-20T00:00:00Z"
+  },
+  {
+    "id": "user_003",
+    "username": "marywilliams",
+    "displayName": "Mary Williams",
+    "email": "mary.w@example.com",
+    "avatarUrl": "https://picsum.photos/seed/user003/200",
+    "bio": "Former chef | Sharing recipes & cooking memories | 91 years young! 👩‍🍳",
+    "followerCount": 2156,
+    "followingCount": 123,
+    "reelCount": 67,
+    "isFollowing": false,
+    "isVerified": true,
+    "createdAt": "2023-05-10T00:00:00Z"
+  }
+] 

@@ -32,6 +32,7 @@ Visit http://localhost:8005 to see the Tricia demo.
 - [Developer Guidelines](developer-guidelines.md) - Principles and best practices
 - [Contributing](contributing.md) - How to contribute
 - [Troubleshooting](troubleshooting.md) - Common issues
+- [Create Flow Update](create-flow-update.md) - Playground tiles layout implementation
 
 ### Deployment
 - [Deployment Guide](deployment.md) - Production deployment

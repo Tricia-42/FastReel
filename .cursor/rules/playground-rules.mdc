@@ -3,3 +3,116 @@ description:
 globs:
 alwaysApply: false
 ---
+# Playground Rules - Next.js 14 Pages Router
+
+## Rule Application by File Path
+
+### Frontend Rules (nextjs-pages-frontend)
+Apply to files matching:
+- `playground/src/pages/**/*.tsx` (excluding api folder)
+- `playground/src/components/**/*`
+- `playground/src/hooks/**/*`
+- `playground/src/lib/**/*` (client-side utilities)
+- `playground/src/styles/**/*`
+- `playground/public/**/*`
+
+### Backend/API Rules (nextjs-pages-backend)
+Apply to files matching:
+- `playground/src/pages/api/**/*`
+- `playground/src/lib/**/*` (server-side utilities)
+- `playground/src/middleware.ts`
+
+### Shared Rules (Always Apply)
+- clean-code
+- codequality
+- typescript
+- gitflow
+
+### Frontend-Specific Rules
+When working on frontend files, also apply:
+- react
+- tailwind
+
+## Project-Specific Guidelines
+
+### Authentication
+- Use NextAuth.js with Firebase Auth provider
+- Handle auth state in _app.tsx
+- Protect routes using middleware
+- Store tokens securely
+
+### API Design
+- Follow RESTful conventions
+- Use consistent error handling
+- Implement proper validation
+- Return standardized responses
+
+### Component Architecture
+- Use composition over inheritance
+- Keep components focused and reusable
+- Implement proper prop validation with TypeScript
+- Use custom hooks for shared logic
+
+### State Management
+- Use React Context for global UI state
+- Use SWR/React Query for server state
+- Keep state close to where it's used
+- Avoid prop drilling
+
+### Performance
+- Implement proper code splitting
+- Use Next.js Image optimization
+- Monitor bundle size
+- Implement proper caching
+
+### Testing Strategy
+- Unit tests for utilities and hooks
+- Integration tests for API routes
+- Component tests with React Testing Library
+- E2E tests for critical user flows
+
+### Development Workflow
+- Use feature branches
+- Write descriptive commit messages
+- Keep PRs focused and small
+- Update documentation with changes
+
+## File Structure Conventions
+
+### Pages Directory
+```
+pages/
+  _app.tsx          # App wrapper
+  _document.tsx     # Document wrapper
+  index.tsx         # Home page
+  auth/            # Auth-related pages
+    login.tsx
+    register.tsx
+  api/             # API routes
+    auth/          # Auth endpoints
+    tricia/        # Feature-specific endpoints
+```
+
+### Components Directory
+```
+components/
+  common/          # Shared components
+  features/        # Feature-specific components
+  layouts/         # Layout components
+  ui/              # UI primitives
+```
+
+### Lib Directory
+```
+lib/
+  api/             # API utilities
+  auth/            # Auth utilities
+  utils/           # General utilities
+  constants/       # App constants
+```
+
+## Environment Variables
+- Use NEXT_PUBLIC_ prefix for client-side vars
+- Keep sensitive data server-side only
+- Document all required variables
+- Use .env.local for local development

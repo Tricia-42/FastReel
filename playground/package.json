@@ -9,7 +9,10 @@
     "dev:quiet": "./scripts/dev-quiet.sh",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "analyze": "ANALYZE=true next build",
+    "ci": "npm run lint && npm run typecheck && npm run build"
   },
   "dependencies": {
     "@livekit/components-react": "^2.9.3",
@@ -28,15 +31,20 @@
     "next-plugin-preval": "^1.2.6",
     "qrcode.react": "^4.0.0",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "webrtc-adapter": "^9.0.3"
   },
   "devDependencies": {
+    "@babel/plugin-transform-runtime": "^7.27.4",
+    "@babel/preset-env": "^7.27.2",
+    "@next/bundle-analyzer": "^15.3.3",
     "@types/js-yaml": "^4.0.9",
     "@types/lodash": "^4.17.0",
     "@types/node": "^20.10.4",
     "@types/react": "^18.2.43",
     "@types/react-dom": "^18",
     "autoprefixer": "^10.4.16",
+    "babel-loader": "^10.0.0",
     "eslint": "^8",
     "eslint-config-next": "14.2.26",
     "postcss": "^8.4.31",

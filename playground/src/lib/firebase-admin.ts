@@ -2,22 +2,32 @@ import * as admin from 'firebase-admin';
 import * as fs from 'fs';
 import * as path from 'path';
 
-// Try to load service account from file if environment variables are not set
+// Try to load service account from environment variable
 let serviceAccount: any = null;
 
-// First, try to use environment variables
+// First, try to use individual environment variables
 const hasFirebaseCredentials = 
   process.env.FIREBASE_PROJECT_ID && 
   process.env.FIREBASE_CLIENT_EMAIL && 
   process.env.FIREBASE_PRIVATE_KEY;
 
-// If environment variables are not available, try to load from service account file
-if (!hasFirebaseCredentials) {
+// If not available, try to load from FIREBASE_SERVICE_ACCOUNT_KEY env var
+if (!hasFirebaseCredentials && process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
+  try {
+    serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
+    console.log('Loaded Firebase service account from environment variable');
+  } catch (error) {
+    console.error('Failed to parse FIREBASE_SERVICE_ACCOUNT_KEY:', error);
+  }
+}
+
+// As a last resort, try to load from file (development only)
+if (!hasFirebaseCredentials && !serviceAccount && process.env.NODE_ENV === 'development') {
   try {
     const serviceAccountPath = path.join(process.cwd(), 'tricia-e00ce-689fa22ff901.json');
     if (fs.existsSync(serviceAccountPath)) {
       serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, 'utf8'));
-      console.log('Loaded Firebase service account from file');
+      console.log('Loaded Firebase service account from file (development mode)');
     }
   } catch (error) {
     console.error('Failed to load service account file:', error);

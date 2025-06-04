@@ -20,6 +20,31 @@ body {
   background-image: url("data:image/svg+xml,%3Csvg width='18' height='18' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='0' y='0' width='2' height='2' fill='rgba(255, 255, 255, 0.03)' /%3E%3C/svg%3E");
 }
 
+/* Dot grid background from playground */
+.dot-grid-bg {
+  background-image: 
+    linear-gradient(0deg, rgba(255, 255, 255, 0.02) 50%, transparent 50%),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 50%, transparent 50%);
+  background-size: 32px 32px;
+  background-position: 0 0, 0 0;
+}
+
+/* Panel with dotted border */
+.panel {
+  @apply border border-gray-800 rounded-sm bg-gray-900/50 backdrop-blur-sm;
+}
+
+/* Canvas wrapper */
+.canvas-wrap {
+  @apply relative w-full mx-auto;
+  max-width: 960px;
+}
+
+/* Meter bar styles */
+.meter-bar {
+  @apply bg-gray-800 rounded-sm overflow-hidden;
+}
+
 .cursor-animation {
   animation: fadeIn 0.5s ease-in-out alternate-reverse infinite;
 }

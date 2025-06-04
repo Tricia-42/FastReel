@@ -75,23 +75,7 @@ export default function SignIn() {
             )}
           </Button>
 
-          {isTestMode && (
-            <Button
-              accentColor="gray"
-              className="w-full"
-              onClick={() => handleSignIn("credentials")}
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <>
-                  <LoadingSVG />
-                  <span>Signing in...</span>
-                </>
-              ) : (
-                <span>Sign in with Test Mode</span>
-              )}
-            </Button>
-          )}
+
 
           {error && (
             <p className="text-red-500 text-sm text-center">{error}</p>

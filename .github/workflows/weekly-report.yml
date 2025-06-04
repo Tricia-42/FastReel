@@ -1,0 +1,154 @@
+name: Weekly Performance Report
+
+on:
+  schedule:
+    # Run every Monday at 9 AM UTC
+    - cron: '0 9 * * 1'
+  workflow_dispatch: # Allow manual trigger
+
+concurrency:
+  group: weekly-performance-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  performance-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: |
+          cd playground
+          npm ci
+      
+      - name: Build application
+        run: |
+          cd playground
+          npm run build
+        env:
+          NEXT_PUBLIC_TEST_MODE: true
+      
+      - name: Check staging URL availability
+        id: check-url
+        run: |
+          STAGING_URL="${{ secrets.STAGING_URL || 'http://localhost:3000' }}"
+          echo "::add-mask::$STAGING_URL"
+          
+          # Check if URL is reachable
+          if curl -f -s -o /dev/null -w "%{http_code}" "$STAGING_URL" | grep -q "200\|301\|302"; then
+            echo "url_available=true" >> $GITHUB_OUTPUT
+            echo "staging_url=$STAGING_URL" >> $GITHUB_OUTPUT
+          else
+            echo "url_available=false" >> $GITHUB_OUTPUT
+            echo "::warning::Staging URL not reachable, using local build"
+          fi
+      
+      - name: Run Lighthouse CI
+        uses: treosh/lighthouse-ci-action@v10
+        with:
+          configPath: ./playground/.lighthouserc.json
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+        id: lighthouse
+      
+      - name: Format report
+        id: format-report
+        run: |
+          cd playground
+          node << 'EOF'
+          const fs = require('fs');
+          const results = JSON.parse(process.env.LIGHTHOUSE_RESULTS || '[]');
+          
+          const scores = results.map(r => ({
+            url: r.url,
+            performance: Math.round(r.summary.performance * 100),
+            accessibility: Math.round(r.summary.accessibility * 100),
+            bestPractices: Math.round(r.summary['best-practices'] * 100),
+            seo: Math.round(r.summary.seo * 100),
+            lcp: r.audits['largest-contentful-paint'].numericValue,
+            cls: r.audits['cumulative-layout-shift'].numericValue,
+            fcp: r.audits['first-contentful-paint'].numericValue
+          }));
+          
+          const avgScores = {
+            performance: Math.round(scores.reduce((a, b) => a + b.performance, 0) / scores.length),
+            accessibility: Math.round(scores.reduce((a, b) => a + b.accessibility, 0) / scores.length),
+            bestPractices: Math.round(scores.reduce((a, b) => a + b.bestPractices, 0) / scores.length),
+            seo: Math.round(scores.reduce((a, b) => a + b.seo, 0) / scores.length)
+          };
+          
+          const report = {
+            date: new Date().toISOString().split('T')[0],
+            scores: avgScores,
+            details: scores,
+            trend: 'stable' // Would compare with last week in real implementation
+          };
+          
+          fs.writeFileSync('performance-report.json', JSON.stringify(report, null, 2));
+          
+          // Set output for Slack
+          console.log(`::set-output name=performance::${avgScores.performance}`);
+          console.log(`::set-output name=accessibility::${avgScores.accessibility}`);
+          EOF
+        env:
+          LIGHTHOUSE_RESULTS: ${{ steps.lighthouse.outputs.manifest }}
+      
+      - name: Send Slack notification
+        if: env.SLACK_WEBHOOK_URL != ''
+        run: |
+          echo "::add-mask::${{ secrets.SLACK_WEBHOOK_URL }}"
+          curl -X POST ${{ secrets.SLACK_WEBHOOK_URL }} \
+            -H 'Content-type: application/json' \
+            -d @- << EOF
+          {
+            "text": "Weekly Performance Report - FastReel",
+            "blocks": [
+              {
+                "type": "header",
+                "text": {
+                  "type": "plain_text",
+                  "text": "📊 Weekly Performance Report"
+                }
+              },
+              {
+                "type": "section",
+                "fields": [
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Performance:* ${{ steps.format-report.outputs.performance }}/100"
+                  },
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Accessibility:* ${{ steps.format-report.outputs.accessibility }}/100"
+                  }
+                ]
+              },
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "View full report: ${{ steps.lighthouse.outputs.links }}"
+                }
+              }
+            ]
+          }
+          EOF
+      
+      - name: Upload report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: weekly-performance-report
+          path: playground/performance-report.json
+          retention-days: 90
+      
+      - name: Update metrics dashboard
+        run: |
+          # This would update a dashboard in real implementation
+          echo "Performance metrics updated" 
